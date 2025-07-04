@@ -1,69 +1,40 @@
-# React + TypeScript + Vite
+# QTIME - Sistema de Agendamento de Quadras (Front-end)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**QTIME** é um sistema web desenvolvido para a **Euro Futebol Society**, com o objetivo de automatizar o agendamento de quadras de futebol society e vôlei de areia. Esta aplicação representa a camada **front-end**, construída com **ReactJS**, **TypeScript** e **TailwindCSS**, focando em proporcionar uma experiência intuitiva, rápida e acessível tanto para os clientes quanto para os administradores do sistema.
 
-Currently, two official plugins are available:
+## ⚙️ Tecnologias utilizadas
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- [ReactJS](https://reactjs.org/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [TailwindCSS](https://tailwindcss.com/)
+- [Vite](https://vitejs.dev/)
 
-## Expanding the ESLint configuration
+## 🎯 Funcionalidades do front-end
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Para clientes:
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Cadastro e login (via email ou conta Google)
+- Visualização da disponibilidade das quadras
+- Agendamento de horários com pagamento antecipado (Pix ou Cartão)
+- Participação em fila de espera para horários ocupados
+- Cancelamento com reembolso automático (dentro do prazo)
+- Acesso à lista de reservas ativas
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### Para administradores:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- Painel de controle com visão geral das quadras
+- Agendamentos manuais
+- Cancelamento de reservas e notificações aos clientes
+- Geração de relatórios financeiros e estatísticos
+- Configuração de preços, horários e regras de cancelamento
+- Integração com Google Calendar
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🤝 Contribuidores
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- [João Victor Vardenski de Andrade](https://github.com/joaovardenski) – Front-end
+- Hendryus Kawan Matos da Silva – Back-end
+- Yuri Madureira Gouveia – Back-end
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 📄 Licença
+
+Este projeto é de caráter acadêmico, desenvolvido como parte da disciplina de Projeto de Software do curso de Engenharia de Software da Universidade Estadual de Ponta Grossa – 2025.
