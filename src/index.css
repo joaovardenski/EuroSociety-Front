@@ -1,16 +1,25 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @import "tailwindcss";
-@import "./reset.css";
-
 
 @theme {
     --font-principal: "Inter", sans-serif;
 
     --color-azulBase: #03205A;
     --color-azulEscuro: #140047;
-    --color-azulClaro: #F2FFFF
+    --color-azulClaro: #F2FFFF;
     --color-roxo: #364C7B;
     --color-azulCiano: #07B8EE;
     --color-cinzaClaro: #D9D9D9;
     --color-cinzaEscuro: #A1ADC6;
+}
+
+:root {
+    font-family: var(--font-principal);
+    color: var(--color-azulBase);
+
+    button {
+        &:hover {
+            cursor: pointer;
+        }
+    }
 }
