@@ -3,6 +3,8 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 // Páginas
 import Login from "../pages/Auth/Login";
+import Register from "../pages/Auth/Register";
+import RecoverPassword from "../pages/Auth/RecoverPassword";
 //import Registrar from "./pages/Auth/Registrar";
 //import Dashboard from "./pages/Client/Dashboard";
 //import Agendamento from "./pages/Client/Agendamento";
@@ -18,10 +20,14 @@ const router = createBrowserRouter([
     path: "/login",
     element: <Login />,
   },
-  // {
-  //   path: "/registrar",
-  //   element: <Registrar />,
-  // },
+  {
+     path: "/registrar",
+     element: <Register />,
+   },
+   {
+    path: "/recuperar-senha",
+    element: <RecoverPassword />,
+   },
   // {
   //   path: "/",
   //   element: <Dashboard />, // Página inicial para cliente logado

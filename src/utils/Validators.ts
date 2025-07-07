@@ -27,3 +27,16 @@ export function getSenhaError(senha: string): string {
 
   return "";
 }
+
+// Verifica se o nome bate com todos os critérios de validação, retornando o erro específico ou uma string vazia se não houver erro
+export function getNomeError(nome: string): string {
+  const trimmed = nome.trim();
+  if (!trimmed) return "Nome é obrigatório";
+  if (trimmed.length < 2) return "Nome muito curto";
+  if (trimmed.length > 100) return "Nome muito longo";
+  const onlyLetters = /^[A-Za-zÀ-ÿ\s]+$/u.test(trimmed);
+  if (!onlyLetters) return "Nome deve conter apenas letras e espaços";
+
+  return "";
+}
+

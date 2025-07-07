@@ -8,11 +8,13 @@ import InputFieldAuth from "../../components/InputFieldAuth";
 import SubmitButtonAuth from "../../components/SubmitButtonAuth";
 
 // Utils
-import { getEmailError, getSenhaError } from "../../utils/Validators";
+import { getNomeError, getEmailError, getSenhaError } from "../../utils/Validators";
 
-function Login() {
+function Register() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [senhaError, setSenhaError] = useState("");
 
@@ -21,13 +23,15 @@ function Login() {
 
     const emailValidation = getEmailError(email);
     const senhaValidation = getSenhaError(senha);
+    const nameValidation = getNomeError(name);
 
+    setNameError(nameValidation);
     setEmailError(emailValidation);
     setSenhaError(senhaValidation);
 
-    if (!emailValidation && !senhaValidation) {
-      console.log("Enviar dados:", { email, senha });
-      // lógica de login aqui
+    if (!nameValidation && !emailValidation && !senhaValidation) {
+      console.log("Enviar dados:", { name, email, senha });
+      // lógica de cadastro aqui
     }
   }
 
@@ -44,21 +48,30 @@ function Login() {
         </div>
 
         {/* Formulário */}
-        <div className="w-full md:w-1/2 flex flex-col items-center gap-6 py-10 md:py-16 px-6">
+        <div className="w-full md:w-1/2 flex flex-col items-center gap-6 py-10 md:py-10 px-6">
           <div className="flex flex-col items-center gap-3 md:hidden">
             <img
               src={euroLogoWhite}
               alt="Logo da Euro Society"
-              style={{ height: "calc(100vh / 4)" }}
+              style={{ height: "calc(100vh / 5)" }}
             />
-            <h1 className="text-white text-3xl font-semibold">Login</h1>
+            <h1 className="text-white text-3xl font-semibold">Registrar</h1>
           </div>
 
           <h1 className="hidden md:block text-2xl font-bold text-black text-center">
-            LOGIN
+            REGISTRAR
           </h1>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
+            <InputFieldAuth
+              id="inome"
+              label="Nome:"
+              type="text"
+              placeholder="Nome"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              error={nameError}
+            />
             <InputFieldAuth
               id="iemail"
               label="Email:"
@@ -77,30 +90,35 @@ function Login() {
               onChange={(e) => setSenha(e.target.value)}
               error={senhaError}
             />
-            <SubmitButtonAuth label="Entrar" icon="login" onClick={handleSubmit}/>
+
+            <SubmitButtonAuth
+              label="Registrar"
+              icon="register"
+              onClick={handleSubmit}
+            />
           </form>
 
           {/* Separador */}
           <div className="flex items-center w-full">
             <hr className="flex-grow border-gray-400 md:border-gray-300" />
-            <span className="mx-2 text-white md:text-gray-600 font-medium">ou</span>
+            <span className="mx-2 text-white md:text-gray-600 font-medium">
+              ou
+            </span>
             <hr className="flex-grow border-gray-400 md:border-gray-300" />
           </div>
 
-          {/* Botão de entrar com Google */}
+          {/* Botão de registrar com Google */}
           <GoogleButtonAuth label="Entrar com Google" />
 
-          {/* Links para cadastro e esqueci a senha*/}
+          {/* Links para entrar no sistema */}
           <div className="text-center text-white text-sm md:text-gray-700">
             <p>
-              Não tem uma conta?{" "}
-              <a href="/registrar" className="text-blue-300 md:text-blue-500 hover:underline">
-                Cadastre-se
-              </a>
-            </p>
-            <p className="mt-2">
-              <a href="/recuperar-senha" className="text-blue-300 md:text-blue-500 hover:underline">
-                Esqueceu sua senha?
+              Já tem uma conta?{" "}
+              <a
+                href="/login"
+                className="text-blue-300 md:text-blue-500 hover:underline"
+              >
+                Entrar
               </a>
             </p>
           </div>
@@ -111,4 +129,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Register;

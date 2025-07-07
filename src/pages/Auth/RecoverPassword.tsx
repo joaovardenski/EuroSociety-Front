@@ -3,31 +3,26 @@ import { useState } from "react";
 import euroLogoWhite from "../../assets/euroSocietyWhite.png";
 
 // Components
-import GoogleButtonAuth from "../../components/GoogleButtonAuth";
 import InputFieldAuth from "../../components/InputFieldAuth";
 import SubmitButtonAuth from "../../components/SubmitButtonAuth";
 
 // Utils
-import { getEmailError, getSenhaError } from "../../utils/Validators";
+import { getEmailError } from "../../utils/Validators";
 
-function Login() {
+function RecoverPassword() {
   const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
   const [emailError, setEmailError] = useState("");
-  const [senhaError, setSenhaError] = useState("");
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     const emailValidation = getEmailError(email);
-    const senhaValidation = getSenhaError(senha);
 
     setEmailError(emailValidation);
-    setSenhaError(senhaValidation);
 
-    if (!emailValidation && !senhaValidation) {
-      console.log("Enviar dados:", { email, senha });
-      // lógica de login aqui
+    if (!emailValidation) {
+      console.log("Enviar dados:", { email });
+      // lógica de recuperação aqui
     }
   }
 
@@ -51,11 +46,11 @@ function Login() {
               alt="Logo da Euro Society"
               style={{ height: "calc(100vh / 4)" }}
             />
-            <h1 className="text-white text-3xl font-semibold">Login</h1>
+            <h1 className="text-white text-3xl font-semibold">Recuperar Senha</h1>
           </div>
 
           <h1 className="hidden md:block text-2xl font-bold text-black text-center">
-            LOGIN
+            RECUPERAR SENHA
           </h1>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
@@ -68,39 +63,16 @@ function Login() {
               onChange={(e) => setEmail(e.target.value)}
               error={emailError}
             />
-            <InputFieldAuth
-              id="isenha"
-              label="Senha:"
-              type="password"
-              placeholder="Senha"
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
-              error={senhaError}
-            />
-            <SubmitButtonAuth label="Entrar" icon="login" onClick={handleSubmit}/>
+            <SubmitButtonAuth label="Enviar link de recuperação" icon="send" onClick={handleSubmit}/>
           </form>
 
-          {/* Separador */}
-          <div className="flex items-center w-full">
-            <hr className="flex-grow border-gray-400 md:border-gray-300" />
-            <span className="mx-2 text-white md:text-gray-600 font-medium">ou</span>
-            <hr className="flex-grow border-gray-400 md:border-gray-300" />
-          </div>
-
-          {/* Botão de entrar com Google */}
-          <GoogleButtonAuth label="Entrar com Google" />
+          <p className="text-white text-[15px] text-center font-semibold md:text-gray-700">Um link de recuperação será enviado no seu endereço de email</p>
 
           {/* Links para cadastro e esqueci a senha*/}
           <div className="text-center text-white text-sm md:text-gray-700">
-            <p>
-              Não tem uma conta?{" "}
-              <a href="/registrar" className="text-blue-300 md:text-blue-500 hover:underline">
-                Cadastre-se
-              </a>
-            </p>
             <p className="mt-2">
-              <a href="/recuperar-senha" className="text-blue-300 md:text-blue-500 hover:underline">
-                Esqueceu sua senha?
+              <a href="/login" className="text-blue-300 md:text-blue-500 hover:underline">
+                Voltar para o Login
               </a>
             </p>
           </div>
@@ -111,4 +83,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default RecoverPassword;
