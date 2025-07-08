@@ -5,6 +5,8 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "../pages/Auth/Login";
 import Register from "../pages/Auth/Register";
 import RecoverPassword from "../pages/Auth/RecoverPassword";
+import Dashboard from "../pages/Client/Dashboard";
+import PrivateRoute from "../routes/PrivateRoute";
 //import Registrar from "./pages/Auth/Registrar";
 //import Dashboard from "./pages/Client/Dashboard";
 //import Agendamento from "./pages/Client/Agendamento";
@@ -21,17 +23,21 @@ const router = createBrowserRouter([
     element: <Login />,
   },
   {
-     path: "/registrar",
-     element: <Register />,
-   },
-   {
+    path: "/registrar",
+    element: <Register />,
+  },
+  {
     path: "/recuperar-senha",
     element: <RecoverPassword />,
-   },
-  // {
-  //   path: "/",
-  //   element: <Dashboard />, // Página inicial para cliente logado
-  // },
+  },
+  {
+    path: "/",
+    element: (
+      <PrivateRoute>
+        <Dashboard />
+      </PrivateRoute>
+    ),
+  },
   // {
   //   path: "/agendamento",
   //   element: <Agendamento />,
