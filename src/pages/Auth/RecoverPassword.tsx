@@ -16,12 +16,14 @@ function RecoverPassword() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    const emailValidation = getEmailError(email);
+    const trimmedEmail = email.trim();
+
+    const emailValidation = getEmailError(trimmedEmail);
 
     setEmailError(emailValidation);
 
     if (!emailValidation) {
-      console.log("Enviar dados:", { email });
+      console.log("Enviar dados:", { email: trimmedEmail });
       // lógica de recuperação aqui
     }
   }

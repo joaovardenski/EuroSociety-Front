@@ -21,16 +21,20 @@ function Register() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    const emailValidation = getEmailError(email);
-    const senhaValidation = getSenhaError(senha);
-    const nameValidation = getNomeError(name);
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
+    const trimmedSenha = senha.trim();
 
+    const nameValidation = getNomeError(trimmedName);
+    const emailValidation = getEmailError(trimmedEmail);
+    const senhaValidation = getSenhaError(trimmedSenha);
+    
     setNameError(nameValidation);
     setEmailError(emailValidation);
     setSenhaError(senhaValidation);
 
     if (!nameValidation && !emailValidation && !senhaValidation) {
-      console.log("Enviar dados:", { name, email, senha });
+      console.log("Enviar dados:", { name: trimmedName, email: trimmedEmail, senha: trimmedSenha });
       // lógica de cadastro aqui
     }
   }

@@ -19,14 +19,17 @@ function Login() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    const emailValidation = getEmailError(email);
-    const senhaValidation = getSenhaError(senha);
+    const trimmedEmail = email.trim();
+    const trimmedSenha = senha.trim();
+
+    const emailValidation = getEmailError(trimmedEmail);
+    const senhaValidation = getSenhaError(trimmedSenha);
 
     setEmailError(emailValidation);
     setSenhaError(senhaValidation);
 
     if (!emailValidation && !senhaValidation) {
-      console.log("Enviar dados:", { email, senha });
+      console.log("Enviar dados:", { email: trimmedEmail, senha: trimmedSenha });
       // lógica de login aqui
     }
   }
@@ -77,13 +80,19 @@ function Login() {
               onChange={(e) => setSenha(e.target.value)}
               error={senhaError}
             />
-            <SubmitButtonAuth label="Entrar" icon="login" onClick={handleSubmit}/>
+            <SubmitButtonAuth
+              label="Entrar"
+              icon="login"
+              onClick={handleSubmit}
+            />
           </form>
 
           {/* Separador */}
           <div className="flex items-center w-full">
             <hr className="flex-grow border-gray-400 md:border-gray-300" />
-            <span className="mx-2 text-white md:text-gray-600 font-medium">ou</span>
+            <span className="mx-2 text-white md:text-gray-600 font-medium">
+              ou
+            </span>
             <hr className="flex-grow border-gray-400 md:border-gray-300" />
           </div>
 
@@ -94,17 +103,22 @@ function Login() {
           <div className="text-center text-white text-sm md:text-gray-700">
             <p>
               Não tem uma conta?{" "}
-              <a href="/registrar" className="text-blue-300 md:text-blue-500 hover:underline">
+              <a
+                href="/registrar"
+                className="text-blue-300 md:text-blue-500 hover:underline"
+              >
                 Cadastre-se
               </a>
             </p>
             <p className="mt-2">
-              <a href="/recuperar-senha" className="text-blue-300 md:text-blue-500 hover:underline">
+              <a
+                href="/recuperar-senha"
+                className="text-blue-300 md:text-blue-500 hover:underline"
+              >
                 Esqueceu sua senha?
               </a>
             </p>
           </div>
-
         </div>
       </div>
     </div>
