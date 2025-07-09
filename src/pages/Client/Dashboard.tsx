@@ -21,6 +21,7 @@ function Dashboard() {
     time: "19:00h",
     status: "Confirmado",
   };
+  const ActiveBookings = 8; 
 
   return (
     <div className="flex flex-col min-h-screen bg-[#e1e6f9]">
@@ -47,9 +48,9 @@ function Dashboard() {
               <h2 className="text-lg font-semibold text-center mb-2">
                 Sua próxima reserva
               </h2>
-              <p className="text-sm text-gray-700">Quadra: {lastBooking.court}</p>
-              <p className="text-sm text-gray-700">Data: {lastBooking.date}</p>
-              <p className="text-sm text-gray-700">Horário: {lastBooking.time}</p>
+              <p className="text-sm font-semibold text-gray-700">Quadra: <span className="font-medium">{lastBooking.court}</span></p>
+              <p className="text-sm font-semibold text-gray-700">Data: <span className="font-medium">{lastBooking.date}</span></p>
+              <p className="text-sm font-semibold text-gray-700">Horário: <span className="font-medium">{lastBooking.time}</span></p>
               <p className="text-sm font-semibold text-gray-700 mt-1">
                 Status: <span className={lastBooking.status == "Confirmado"? "text-green-600": "text-red-600"}>{lastBooking.status}</span>
               </p>
@@ -82,7 +83,7 @@ function Dashboard() {
                 Minhas reservas ativas
               </h2>
               <p className="text-sm text-gray-700 mb-4">
-                Você tem 3 reservas ativas no momento.
+                Você tem <span className="text-azulBase font-bold">{ActiveBookings}</span> reservas ativas no momento.
               </p>
               <p className="text-sm text-gray-700 mb-4">
                 Acompanhe seus horários e gerencie seus jogos.
