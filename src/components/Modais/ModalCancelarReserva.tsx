@@ -44,13 +44,13 @@ export default function ModalCancelarReserva({
       )}
       <div className="flex justify-center gap-3 mt-4">
         <button
-          className="min-w-[140px] bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 font-medium"
+          className="text-[14px]  min-w-[140px] bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 font-medium md:text-md"
           onClick={onClose}
         >
           Manter Reserva
         </button>
         <button
-          className="min-w-[140px] bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 flex items-center justify-center gap-2 font-medium"
+          className="text-[14px]  min-w-[140px] bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 flex items-center justify-center gap-2 font-medium md:text-md"
           onClick={onConfirm}
         >
           <X size={18} />
