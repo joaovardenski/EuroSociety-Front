@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 // Icons
 import {
   CalendarClock,
@@ -14,6 +16,7 @@ import FooterEuro from "../../components/FooterEuro";
 import BottomNav from "../../components/BottomNav";
 
 function Dashboard() {
+  const navigate = useNavigate();
   const user = "João Victor";
   const lastBooking = {
     court: "Society",
@@ -21,7 +24,7 @@ function Dashboard() {
     time: "19:00h",
     status: "Confirmado",
   };
-  const ActiveBookings = 8; 
+  const ActiveBookings = 8;
 
   return (
     <div className="flex flex-col min-h-screen bg-[#e1e6f9]">
@@ -55,7 +58,7 @@ function Dashboard() {
                 Status: <span className={lastBooking.status == "Confirmado"? "text-green-600": "text-red-600"}>{lastBooking.status}</span>
               </p>
             </div>
-            <button className="mt-4 w-full py-2 rounded bg-white border border-gray-400 text-sm hover:bg-gray-100 flex items-center justify-center gap-2">
+            <button className="mt-4 w-full font-semibold py-2 rounded bg-white border border-gray-400 text-sm hover:bg-gray-100 flex items-center justify-center gap-2" onClick={() => navigate("/minhas-reservas")}>
               <Eye size={16} /> Ver detalhes
             </button>
           </div>
@@ -71,7 +74,7 @@ function Dashboard() {
                 facilidade.
               </p>
             </div>
-            <button className="w-full py-2 rounded bg-azulBase text-white hover:bg-azulBase/90 flex items-center justify-center gap-2">
+            <button className="w-full font-semibold py-2 rounded bg-azulBase text-white hover:bg-azulBase/90 flex items-center justify-center gap-2">
               <CalendarPlus size={16} /> Agendar agora
             </button>
           </div>
@@ -89,7 +92,7 @@ function Dashboard() {
                 Acompanhe seus horários e gerencie seus jogos.
               </p>
             </div>
-            <button className="w-full py-2 rounded bg-white border border-gray-400 text-sm hover:bg-gray-100 flex items-center justify-center gap-2">
+            <button className="w-full font-semibold py-2 rounded bg-white border border-gray-400 text-sm hover:bg-gray-100 flex items-center justify-center gap-2" onClick={() => navigate("/minhas-reservas")}>
               <List size={16} /> Ver todas
             </button>
           </div>
