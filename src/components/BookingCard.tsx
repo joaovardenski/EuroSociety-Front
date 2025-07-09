@@ -11,13 +11,12 @@ export interface Reserva {
 
 interface BookingCardProps {
   reserva: Reserva;
+  onCancel?: (reserva: Reserva) => void;
 }
 
-export default function BookingCard({ reserva }: BookingCardProps) {
+export default function BookingCard({ reserva, onCancel }: BookingCardProps) {
   return (
-    <div
-      className="flex items-start bg-white shadow-md rounded-xl p-4 justify-between flex-col md:flex-row md:items-center"
-    >
+    <div className="flex items-start bg-white shadow-md rounded-xl p-4 justify-between flex-col md:flex-row md:items-center">
       {/* Ícone */}
       <div className="hidden md:flex items-center justify-center w-12 h-12 bg-azulBase text-white rounded-full mb-3 md:mb-0 md:mr-6">
         <Calendar size={24} />
@@ -37,8 +36,9 @@ export default function BookingCard({ reserva }: BookingCardProps) {
         <p className="flex items-center gap-2">
           <DollarSign size={16} /> Valor: <strong>{reserva.valor}</strong>
         </p>
-        <p className="text-green-600 font-semibold">
-          Status: {reserva.status}
+        <p className="font-semibold">
+          Status:{" "}
+          <span className="text-green-600 font-semibold">{reserva.status}</span>
         </p>
       </div>
 
@@ -47,7 +47,10 @@ export default function BookingCard({ reserva }: BookingCardProps) {
         <button className="flex items-center  gap-2 bg-azulBase text-white px-4 py-1 rounded text-sm hover:bg-azulEscuro w-full md:w-[130px]">
           <Eye size={16} /> Detalhes
         </button>
-        <button className="flex items-center  gap-2 border border-red-500 text-red-500 px-4 py-1 rounded text-sm hover:bg-red-100 w-full md:w-[130px]">
+        <button
+          className="flex items-center gap-2 border border-red-500 text-red-500 px-4 py-1 rounded text-sm hover:bg-red-100 w-full md:w-[130px]"
+          onClick={() => onCancel?.(reserva)}
+        >
           <CircleX size={16} /> Cancelar
         </button>
       </div>

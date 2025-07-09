@@ -12,27 +12,48 @@ import BookingCard from "../../components/BookingCard";
 import type { Reserva } from "../../components/BookingCard";
 import FooterEuro from "../../components/FooterEuro";
 import BottomNav from "../../components/BottomNav";
+import Modal from "../../components/Modais/Modal";
+import ModalCancelarReserva from "../../components/Modais/ModalCancelarReserva";
 
 function Bookings() {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [reservaSelecionada, setReservaSelecionada] = useState<Reserva | null>(
+    null
+  );
+
+  function abrirModal(reserva: Reserva) {
+    setReservaSelecionada(reserva);
+    setModalOpen(true);
+  }
+
+  function confirmarCancelamento() {
+    if (reservaSelecionada) {
+      setReservas((prev) => prev.filter((r) => r.id !== reservaSelecionada.id));
+    }
+
+    setModalOpen(false);
+    setReservaSelecionada(null);
+  }
+
   const navigate = useNavigate();
-  const reservas: Reserva[] = [
+  const [reservas, setReservas] = useState<Reserva[]>([
     {
       id: 1,
       quadra: "Quadra Society",
       data: "Sexta, 07 de Junho de 2025",
       horario: "19:00 - 20:00",
-      valor: "R$ 150,00",
+      valor: "R$ 200,00",
       status: "CONFIRMADA",
     },
     {
       id: 2,
       quadra: "Quadra Society",
-      data: "Sexta, 07 de Junho de 2025",
-      horario: "19:00 - 20:00",
+      data: "Sábado, 08 de Junho de 2025",
+      horario: "20:00 - 21:00",
       valor: "R$ 150,00",
       status: "CONFIRMADA",
     },
-  ];
+  ]);
 
   const [searchOption, setSearchOption] = useState("Todas");
 
@@ -91,7 +112,11 @@ function Bookings() {
             </div>
           ) : (
             reservas.map((reserva) => (
-              <BookingCard key={reserva.id} reserva={reserva} />
+              <BookingCard
+                key={reserva.id}
+                reserva={reserva}
+                onCancel={abrirModal}
+              />
             ))
           )}
         </div>
@@ -100,6 +125,18 @@ function Bookings() {
       <BottomNav />
 
       <FooterEuro />
+
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
+        {reservaSelecionada && (
+          <ModalCancelarReserva
+            quadra={reservaSelecionada.quadra}
+            data={reservaSelecionada.data}
+            horario={reservaSelecionada.horario}
+            onClose={() => setModalOpen(false)}
+            onConfirm={confirmarCancelamento}
+          />
+        )}
+      </Modal>
     </div>
   );
 }
