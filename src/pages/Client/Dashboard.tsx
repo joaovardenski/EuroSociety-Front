@@ -58,7 +58,7 @@ function Dashboard() {
                 Status: <span className={lastBooking.status == "Confirmado"? "text-green-600": "text-red-600"}>{lastBooking.status}</span>
               </p>
             </div>
-            <button className="mt-4 w-full font-semibold py-2 rounded bg-white border border-gray-400 text-sm hover:bg-gray-100 flex items-center justify-center gap-2" onClick={() => navigate("/minhas-reservas")}>
+            <button className="mt-4 w-full font-semibold py-2 rounded bg-white border-2 border-gray-400 text-sm hover:bg-gray-100 flex items-center justify-center gap-2" onClick={() => navigate("/minhas-reservas")}>
               <Eye size={16} /> Ver detalhes
             </button>
           </div>
@@ -74,7 +74,7 @@ function Dashboard() {
                 facilidade.
               </p>
             </div>
-            <button className="w-full font-semibold py-2 rounded bg-azulBase text-white hover:bg-azulBase/90 flex items-center justify-center gap-2">
+            <button className="w-full font-semibold py-2 rounded bg-azulBase text-white hover:bg-azulBase/90 flex items-center justify-center gap-2" onClick={() => navigate("/agendamento")}>
               <CalendarPlus size={16} /> Agendar agora
             </button>
           </div>
@@ -92,7 +92,7 @@ function Dashboard() {
                 Acompanhe seus horários e gerencie seus jogos.
               </p>
             </div>
-            <button className="w-full font-semibold py-2 rounded bg-white border border-gray-400 text-sm hover:bg-gray-100 flex items-center justify-center gap-2" onClick={() => navigate("/minhas-reservas")}>
+            <button className="w-full font-semibold py-2 rounded bg-white border-2 border-gray-400 text-sm hover:bg-gray-100 flex items-center justify-center gap-2" onClick={() => navigate("/minhas-reservas")}>
               <List size={16} /> Ver todas
             </button>
           </div>

@@ -7,7 +7,8 @@ import Register from "../pages/Auth/Register";
 import RecoverPassword from "../pages/Auth/RecoverPassword";
 import Dashboard from "../pages/Client/Dashboard";
 import PrivateRoute from "../routes/PrivateRoute";
-import Bookings from "../pages/Client/Bookings";
+import MyBookings from "../pages/Client/MyBookings";
+import NewBooking from "../pages/Client/NewBooking";
 //import Registrar from "./pages/Auth/Registrar";
 //import Dashboard from "./pages/Client/Dashboard";
 //import Agendamento from "./pages/Client/Agendamento";
@@ -39,15 +40,19 @@ const router = createBrowserRouter([
       </PrivateRoute>
     ),
   },
-  // {
-  //   path: "/agendamento",
-  //   element: <Agendamento />,
-  // },
+  {
+    path: "/agendamento",
+    element: (
+      <PrivateRoute>
+        <NewBooking />
+      </PrivateRoute>
+    ),
+  },
   {
     path: "/minhas-reservas",
     element: (
       <PrivateRoute>
-        <Bookings />
+        <MyBookings />
       </PrivateRoute>
     ),
   },

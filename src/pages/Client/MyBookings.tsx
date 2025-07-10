@@ -15,7 +15,9 @@ import BottomNav from "../../components/BottomNav";
 import Modal from "../../components/Modais/Modal";
 import ModalCancelarReserva from "../../components/Modais/ModalCancelarReserva";
 
-function Bookings() {
+function MyBookings() {
+  const navigate = useNavigate();
+  
   const [modalOpen, setModalOpen] = useState(false);
   const [reservaSelecionada, setReservaSelecionada] = useState<Reserva | null>(
     null
@@ -35,7 +37,6 @@ function Bookings() {
     setReservaSelecionada(null);
   }
 
-  const navigate = useNavigate();
   const [reservas, setReservas] = useState<Reserva[]>([
     {
       id: 1,
@@ -104,7 +105,7 @@ function Bookings() {
                 Você ainda não possui reservas.
               </p>
               <a
-                href="/reservas" // ou use o `to` com Link se estiver usando react-router
+                href="/agendamento" // ou use o `to` com Link se estiver usando react-router
                 className="text-azulBase hover:text-azulEscuro transition"
               >
                 Clique aqui para agendar uma nova reserva
@@ -141,4 +142,4 @@ function Bookings() {
   );
 }
 
-export default Bookings;
+export default MyBookings;

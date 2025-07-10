@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import euroLogoWhite from "../../assets/euroSocietyWhite.png";
 
@@ -11,6 +12,7 @@ import SubmitButtonAuth from "../../components/SubmitButtonAuth";
 import { getEmailError, getSenhaError } from "../../utils/Validators";
 
 function Login() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -31,6 +33,7 @@ function Login() {
     if (!emailValidation && !senhaValidation) {
       console.log("Enviar dados:", { email: trimmedEmail, senha: trimmedSenha });
       // lógica de login aqui
+      navigate("/");
     }
   }
 

@@ -20,9 +20,9 @@ export default function BottomNav() {
       </button>
 
       <button
-        onClick={() => navigate("/agenda")}
+        onClick={() => navigate("/agendamento")}
         className={`flex flex-col items-center ${
-          isActive("/agenda") ? "text-azulBase" : "text-gray-600"
+          isActive("/agendamento") ? "text-azulBase" : "text-gray-600"
         } hover:text-azulBase`}
       >
         <Calendar size={22} />
