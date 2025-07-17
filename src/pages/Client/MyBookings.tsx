@@ -15,13 +15,18 @@ import BottomNav from "../../components/BottomNav";
 import Modal from "../../components/Modais/Modal";
 import ModalCancelarReserva from "../../components/Modais/ModalCancelarReserva";
 
+// Mock Data
+import { minhasReservas } from "../../data/Variaveis";
+
 function MyBookings() {
   const navigate = useNavigate();
-  
+
   const [modalOpen, setModalOpen] = useState(false);
   const [reservaSelecionada, setReservaSelecionada] = useState<Reserva | null>(
     null
   );
+  const [reservas, setReservas] = useState<Reserva[]>(minhasReservas);
+  const [searchOption, setSearchOption] = useState("Todas");
 
   function abrirModal(reserva: Reserva) {
     setReservaSelecionada(reserva);
@@ -30,33 +35,29 @@ function MyBookings() {
 
   function confirmarCancelamento() {
     if (reservaSelecionada) {
-      setReservas((prev) => prev.filter((r) => r.id !== reservaSelecionada.id));
+      setReservas((prev) =>
+        prev.filter((r) => r.id !== reservaSelecionada.id)
+      );
     }
 
     setModalOpen(false);
     setReservaSelecionada(null);
   }
 
-  const [reservas, setReservas] = useState<Reserva[]>([
-    {
-      id: 1,
-      quadra: "Quadra Society",
-      data: "Sexta, 07 de Junho de 2025",
-      horario: "19:00 - 20:00",
-      valor: "R$ 200,00",
-      status: "CONFIRMADA",
-    },
-    {
-      id: 2,
-      quadra: "Quadra Society",
-      data: "Sábado, 08 de Junho de 2025",
-      horario: "20:00 - 21:00",
-      valor: "R$ 150,00",
-      status: "CONFIRMADA",
-    },
-  ]);
+  // Filtro de reservas com base na opção selecionada
+  const agora = new Date();
 
-  const [searchOption, setSearchOption] = useState("Todas");
+  const reservasFiltradas = reservas.filter((reserva) => {
+    const [horaInicio] = reserva.slot.split(" - ");
+    const dataHoraReserva = new Date(`${reserva.data}T${horaInicio}:00`);
+
+    if (searchOption === "Próximas") {
+      return dataHoraReserva >= agora;
+    } else if (searchOption === "Anteriores") {
+      return dataHoraReserva < agora;
+    }
+    return true; // "Todas"
+  });
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f3f7ff]">
@@ -64,7 +65,7 @@ function MyBookings() {
 
       <main className="flex flex-col flex-grow mb-12 px-4 py-8 max-w-5xl mx-auto w-full md:mb-0">
         {/* Título e filtros */}
-        <div className=" flex flex-col items-center justify-center gap-5 md:justify-between md:flex-row mb-3">
+        <div className="flex flex-col items-center justify-center gap-5 md:justify-between md:flex-row mb-3">
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate(-1)}
@@ -85,8 +86,8 @@ function MyBookings() {
             />
             <SearchOptionButton
               label="Próximas"
-              isActive={searchOption === "Proximas"}
-              onClick={() => setSearchOption("Proximas")}
+              isActive={searchOption === "Próximas"}
+              onClick={() => setSearchOption("Próximas")}
             />
             <SearchOptionButton
               label="Anteriores"
@@ -97,22 +98,22 @@ function MyBookings() {
         </div>
         <hr className="hidden md:block mb-6 border-t-2 rounded-2xl border-azulBase opacity-70" />
 
-        {/* Cards de reservas */}
+        {/* Cards de reservas filtradas */}
         <div className="space-y-4">
-          {reservas.length === 0 ? (
+          {reservasFiltradas.length === 0 ? (
             <div className="flex flex-col bg-white items-center justify-center text-center text-gray-600 py-16">
               <p className="text-lg font-semibold mb-2">
-                Você ainda não possui reservas.
+                Nenhuma reserva encontrada para este filtro.
               </p>
               <a
-                href="/agendamento" // ou use o `to` com Link se estiver usando react-router
+                href="/agendamento"
                 className="text-azulBase hover:text-azulEscuro transition"
               >
                 Clique aqui para agendar uma nova reserva
               </a>
             </div>
           ) : (
-            reservas.map((reserva) => (
+            reservasFiltradas.map((reserva) => (
               <BookingCard
                 key={reserva.id}
                 reserva={reserva}
@@ -124,7 +125,6 @@ function MyBookings() {
       </main>
 
       <BottomNav />
-
       <FooterEuro />
 
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
@@ -132,7 +132,7 @@ function MyBookings() {
           <ModalCancelarReserva
             quadra={reservaSelecionada.quadra}
             data={reservaSelecionada.data}
-            horario={reservaSelecionada.horario}
+            horario={reservaSelecionada.slot}
             onClose={() => setModalOpen(false)}
             onConfirm={confirmarCancelamento}
           />

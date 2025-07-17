@@ -1,12 +1,17 @@
 import { Calendar, Clock, DollarSign, Eye, CircleX } from "lucide-react";
 
+import { Quadras } from "../data/Variaveis";
+
+import { formatarDataBrasileira } from "../utils/DateUtils";
+
 export interface Reserva {
   id: number;
+  usuario: string;
   quadra: string;
   data: string;
-  horario: string;
-  valor: string;
+  slot: string;
   status: string;
+  statusPagamento: string;
 }
 
 interface BookingCardProps {
@@ -15,6 +20,10 @@ interface BookingCardProps {
 }
 
 export default function BookingCard({ reserva, onCancel }: BookingCardProps) {
+  const quadraInfo = Object.values(Quadras).find(
+    (q) => q.nome === reserva.quadra
+  );
+
   return (
     <div className="flex items-start bg-white shadow-md rounded-xl p-4 justify-between flex-col md:flex-row md:items-center">
       {/* Ícone */}
@@ -28,17 +37,25 @@ export default function BookingCard({ reserva, onCancel }: BookingCardProps) {
           {reserva.quadra}
         </h2>
         <p className="flex items-center gap-2">
-          <Calendar size={16} /> Data: <strong>{reserva.data}</strong>
+          <Calendar size={16} /> Data: <strong>{formatarDataBrasileira(reserva.data)}</strong>
         </p>
         <p className="flex items-center gap-2">
-          <Clock size={16} /> Horário: <strong>{reserva.horario}</strong>
+          <Clock size={16} /> Horário: <strong>{reserva.slot}</strong>
         </p>
         <p className="flex items-center gap-2">
-          <DollarSign size={16} /> Valor: <strong>{reserva.valor}</strong>
+          <DollarSign size={16} /> Valor: {quadraInfo ? `R$ ${quadraInfo.preco.toFixed(2)}` : "N/A"}
         </p>
         <p className="font-semibold">
           Status:{" "}
-          <span className="text-green-600 font-semibold">{reserva.status}</span>
+          <span
+            className={`font-semibold ${
+              reserva.status === "CONFIRMADO"
+                ? "text-green-600"
+                : "text-red-600"
+            }`}
+          >
+            {reserva.status}
+          </span>
         </p>
       </div>
 
@@ -47,12 +64,15 @@ export default function BookingCard({ reserva, onCancel }: BookingCardProps) {
         <button className="flex items-center  gap-2 bg-azulBase text-white px-4 py-1 rounded text-sm hover:bg-azulEscuro w-full md:w-[130px]">
           <Eye size={16} /> Detalhes
         </button>
-        <button
-          className="flex items-center gap-2 border border-red-500 text-red-500 px-4 py-1 rounded text-sm hover:bg-red-100 w-full md:w-[130px]"
-          onClick={() => onCancel?.(reserva)}
-        >
-          <CircleX size={16} /> Cancelar
-        </button>
+        {reserva.status !== "CANCELADO" && (
+          <button
+            className="w-full flex items-center gap-2 border border-red-500 text-red-500 px-4 py-1 rounded text-sm md:w-[130px] hover:bg-red-100 "
+            onClick={() => onCancel?.(reserva)}
+            disabled={reserva.status === "CANCELADO"}
+          >
+            <CircleX size={16} /> Cancelar
+          </button>
+        )}
       </div>
     </div>
   );
