@@ -13,7 +13,7 @@ export default function AdminSidebar() {
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
   return (
-    <aside className="w-64 bg-[#052c64] text-white flex flex-col justify-between min-h-screen">
+    <aside className="w-64 bg-[#052c64] text-white flex flex-col justify-between ">
       <div>
         <nav className="pt-5">
           <a

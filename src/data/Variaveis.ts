@@ -121,6 +121,7 @@ export const agendamentosRecentes = [
     valor: 100,
     status: "Parcial",
   },
+  
 ];
 
 export const estatisticasDashboard = {

@@ -17,7 +17,8 @@ export default function TableRecentBookings({ recentBookings }: TableRecentBooki
       <h2 className="text-lg font-bold text-[#052c64] mb-4">
         Agendamentos recentes
       </h2>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto max-h-41 overflow-y-auto">
+
         <table className="w-full text-sm text-left text-gray-700">
           <thead>
             <tr className="border-b text-gray-600">
