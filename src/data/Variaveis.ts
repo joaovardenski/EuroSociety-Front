@@ -98,3 +98,34 @@ export const pagamentos = [
     statusPagamento: "Total",
   },
 ];
+
+export const agendamentosRecentes = [
+  {
+    cliente: "Carlos S.",
+    quadra: "Society",
+    dataHora: "05/07/2025 - 19:00",
+    valor: 150,
+    status: "Completo",
+  },
+  {
+    cliente: "João Victor",
+    quadra: "Futevôlei 1",
+    dataHora: "06/07/2025 - 19:00",
+    valor: 100,
+    status: "Parcial",
+  },
+  {
+    cliente: "João Victor",
+    quadra: "Futevôlei 2",
+    dataHora: "07/07/2025 - 19:00",
+    valor: 100,
+    status: "Parcial",
+  },
+];
+
+export const estatisticasDashboard = {
+  agendamentosHoje: 12,
+  receitaMes: "R$ 1.850,75",
+  novosClientes: 8,
+  pagamentosPendentes: 2,
+}

@@ -1,0 +1,75 @@
+import { CalendarDays, DollarSign, Users, AlertTriangle } from "lucide-react";
+import HeaderEuro from "../../components/HeaderEuro";
+import FooterEuro from "../../components/FooterEuro";
+
+import {
+  agendamentosRecentes,
+  estatisticasDashboard,
+} from "../../data/Variaveis";
+import AdminSidebar from "../../components/AdminSidebar";
+import TableRecentBookings from "../../components/TableRecentBookings";
+import StatisticCard from "../../components/StatisticCard";
+
+export default function PainelAdmin() {
+  const estatisticas = [
+    {
+      icon: <CalendarDays size={32} />,
+      label: "Agendamentos hoje",
+      value: estatisticasDashboard.agendamentosHoje,
+      bg: "bg-blue-200",
+    },
+    {
+      icon: <DollarSign size={32} />,
+      label: "Receita do mês",
+      value: estatisticasDashboard.receitaMes,
+      bg: "bg-green-200",
+    },
+    {
+      icon: <Users size={32} />,
+      label: "Novos clientes",
+      value: estatisticasDashboard.novosClientes,
+      bg: "bg-yellow-200",
+    },
+    {
+      icon: <AlertTriangle size={32} />,
+      label: "Pagamentos pendentes",
+      value: estatisticasDashboard.pagamentosPendentes,
+      bg: "bg-red-200",
+    },
+  ];
+
+  return (
+    <div className="flex flex-col min-h-screen bg-[#e6f4ff]">
+      <HeaderEuro />
+      {/* Menu lateral */}
+      <div className="flex">
+        <AdminSidebar />
+
+        {/* Conteúdo principal */}
+        <div className="flex-1 flex flex-col">
+          <main className="flex-1 p-6">
+            <h1 className="text-2xl font-bold text-[#052c64] mb-6">
+              Dashboard
+            </h1>
+            {/* Cards de estatística */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+              {estatisticas.map((stat, index) => (
+                <StatisticCard
+                  key={index}
+                  icon={stat.icon}
+                  value={stat.value}
+                  label={stat.label}
+                  bg={stat.bg}
+                />
+              ))}
+            </div>
+
+            {/* Agendamentos recentes */}
+            <TableRecentBookings recentBookings={agendamentosRecentes} />
+          </main>
+        </div>
+      </div>
+      <FooterEuro />
+    </div>
+  );
+}

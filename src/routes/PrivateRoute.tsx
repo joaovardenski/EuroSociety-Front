@@ -10,7 +10,7 @@ export default function PrivateRoute({ children }: PrivateRouteProps) {
   //const { isAuthenticated, isLoading } = useAuth();
 
   const isLoading = false;
-  const isAuthenticated = true;  
+  const isAuthenticated = true;
 
   if (isLoading) {
     return <div className="text-center mt-10 text-xl">Carregando...</div>;

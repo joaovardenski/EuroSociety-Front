@@ -1,6 +1,8 @@
 // src/components/ModalCancelarReserva.tsx
 import { AlertTriangle, X } from "lucide-react";
 
+import { formatarDataBrasileira } from "../../utils/DateUtils";
+
 interface ModalCancelarReservaProps {
   quadra: string;
   data: string;
@@ -30,7 +32,7 @@ export default function ModalCancelarReserva({
       </p>
       <p>
         <strong>
-          {quadra} - {data} às {horario}
+          {quadra} - {formatarDataBrasileira(data)} às {horario}
         </strong>
       </p>
       {cancelamentoPermitido ? (

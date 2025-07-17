@@ -61,7 +61,7 @@ export default function BookingCard({ reserva, onCancel }: BookingCardProps) {
 
       {/* Botões de ações */}
       <div className="flex md:flex-col items-stretch gap-2 mt-4 md:mt-0 md:ml-6 w-full md:w-auto">
-        <button className="flex items-center  gap-2 bg-azulBase text-white px-4 py-1 rounded text-sm hover:bg-azulEscuro w-full md:w-[130px]">
+        <button className="flex items-center gap-2 bg-azulBase text-white px-4 py-1 rounded text-sm hover:bg-azulEscuro w-full md:w-[130px]">
           <Eye size={16} /> Detalhes
         </button>
         {reserva.status !== "CANCELADO" && (

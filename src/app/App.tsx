@@ -9,11 +9,7 @@ import Dashboard from "../pages/Client/Dashboard";
 import PrivateRoute from "../routes/PrivateRoute";
 import MyBookings from "../pages/Client/MyBookings";
 import NewBooking from "../pages/Client/NewBooking";
-//import Registrar from "./pages/Auth/Registrar";
-//import Dashboard from "./pages/Client/Dashboard";
-//import Agendamento from "./pages/Client/Agendamento";
-//import MinhasReservas from "./pages/Client/MinhasReservas";
-//import FilaDeEspera from "./pages/Client/FilaDeEspera";
+import PainelAdmin from "../pages/Admin/PainelAdmin";
 //import Painel from "./pages/Admin/Painel";
 //import Relatorios from "./pages/Admin/Relatorios";
 //import Configuracoes from "./pages/Admin/Configuracoes";
@@ -56,27 +52,19 @@ const router = createBrowserRouter([
       </PrivateRoute>
     ),
   },
-  // {
-  //   path: "/fila-de-espera",
-  //   element: <FilaDeEspera />,
-  // },
-  // {
-  //   path: "/admin",
-  //   children: [
-  //     {
-  //       index: true,
-  //       element: <Painel />,
-  //     },
-  //     {
-  //       path: "relatorios",
-  //       element: <Relatorios />,
-  //     },
-  //     {
-  //       path: "configuracoes",
-  //       element: <Configuracoes />,
-  //     },
-  //   ],
-  // },
+  {
+    path: "/admin",
+    children: [
+      {
+        index: true,
+        element: (
+          <PrivateRoute>
+            <PainelAdmin />
+          </PrivateRoute>
+        ),
+      },
+    ],
+  },
   // {
   //   path: "*",
   //   element: <NotFound />,
