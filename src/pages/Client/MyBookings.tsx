@@ -13,7 +13,7 @@ import type { Reserva } from "../../components/BookingCard";
 import FooterEuro from "../../components/FooterEuro";
 import BottomNav from "../../components/BottomNav";
 import Modal from "../../components/Modais/Modal";
-import ModalCancelarReserva from "../../components/Modais/ModalCancelarReserva";
+import ModalCancelarReserva from "../../components/Modais/Client/ModalCancelarReserva";
 
 // Mock Data
 import { minhasReservas } from "../../data/Variaveis";

@@ -30,7 +30,7 @@ export const Quadras = {
 };
 
 export const indisponibilidadesQuadras = [
-  //Pega das reservas já feitas + agenda bloqueio
+  //Pega das reservas já feitas
   {
     nome: "Quadra Society",
     indisponiveis: ["9:00", "13:00"],
@@ -42,6 +42,22 @@ export const indisponibilidadesQuadras = [
   {
     nome: "Quadra Futevôlei 2",
     indisponiveis: ["13:00"],
+  },
+];
+
+export const bloqueadasQuadras = [
+  //Pega de agenda bloqueio
+  {
+    nome: "Quadra Society",
+    bloqueados: ["17:00"],
+  },
+  {
+    nome: "Quadra Futevôlei 1",
+    bloqueados: ["15:00"],
+  },
+  {
+    nome: "Quadra Futevôlei 2",
+    bloqueados: ["8:00"],
   },
 ];
 

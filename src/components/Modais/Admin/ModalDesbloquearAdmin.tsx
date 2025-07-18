@@ -1,8 +1,8 @@
-import Modal from "./Modal";
+import Modal from "../Modal";
 
-import { formatarDataBrasileira } from "../../utils/DateUtils";
+import { formatarDataBrasileira } from "../../../utils/DateUtils";
 
-interface ModalConfirmarAgendamentoProps {
+interface ModalDesbloquearAdminProps {
   isOpen: boolean;
   onClose: () => void;
   dados: {
@@ -14,16 +14,17 @@ interface ModalConfirmarAgendamentoProps {
   onConfirmar: () => void;
 }
 
-export default function ModalConfirmarAgendamento({
+export default function ModalDesbloquearAdmin({
   isOpen,
   onClose,
   dados,
   onConfirmar,
-}: ModalConfirmarAgendamentoProps) {
+}: ModalDesbloquearAdminProps) {
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <h2 className="text-center text-xl font-semibold text-azulBase mb-5">
-        Confirmar agendamento
+        Desbloquear horário
       </h2>
 
       <div className="space-y-2 text-md text-gray-700 mb-6 border-2 border-azulBase rounded-lg p-4 bg-gray-100">
@@ -56,7 +57,7 @@ export default function ModalConfirmarAgendamento({
           onClick={onConfirmar}
           className="w-full py-2 rounded-md bg-azulBase text-white font-semibold hover:bg-azulEscuro transition"
         >
-          Ir para pagamento
+            Desbloquear
         </button>
       </div>
     </Modal>

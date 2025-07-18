@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { CreditCard, DollarSign, Landmark } from "lucide-react";
-import Modal from "./Modal";
+import Modal from "../Modal";
 
 interface ModalDetalhesPagamentoProps {
   isOpen: boolean;

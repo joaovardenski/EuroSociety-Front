@@ -17,15 +17,15 @@ import AvailableCourts from "../../components/AvailableCourts";
 import FooterEuro from "../../components/FooterEuro";
 import BottomNav from "../../components/BottomNav";
 // Modals
-import ModalConfirmarAgendamento from "../../components/Modais/ModalConfirmarAgendamento";
-import ModalDetalhesPagamento from "../../components/Modais/ModalDetalhesPagamento";
-import ModalFilaDeEspera from "../../components/Modais/ModalFilaDeEspera";
+import ModalConfirmarAgendamento from "../../components/Modais/Client/ModalConfirmarAgendamento";
+import ModalDetalhesPagamento from "../../components/Modais/Client/ModalDetalhesPagamento";
+import ModalFilaDeEspera from "../../components/Modais/Client/ModalFilaDeEspera";
 
 //Icons
 import { ArrowLeft } from "lucide-react";
 
 // Mock Data
-import { Quadras, indisponibilidadesQuadras } from "../../data/Variaveis";
+import { Quadras, indisponibilidadesQuadras, bloqueadasQuadras } from "../../data/Variaveis";
 
 export default function NewBooking() {
   const navigate = useNavigate();
@@ -45,6 +45,9 @@ export default function NewBooking() {
   {/*Dados do mock para horários com indisponibilidade*/}
   const getIndisponiveis = (nome: string) =>
     indisponibilidadesQuadras.find((q) => q.nome === nome)?.indisponiveis || [];
+
+  const getBloqueadas = (nome: string) =>
+      bloqueadasQuadras.find((q) => q.nome === nome)?.bloqueados || [];
 
   {/*Dados para controlar a abertura e fechamento dos modais*/}
   const [modalConfirmarAberto, setModalConfirmarAberto] = useState(false);
@@ -75,7 +78,7 @@ export default function NewBooking() {
       {/* HeaderEuro component*/}
       <HeaderEuro />
 
-      <main className="bg-white mt-7 mb-20 rounded-4xl flex-grow max-w-5xl w-full mx-auto px-4 py-8 shadow-2xl md:mb-0">
+      <main className="bg-white mt-7 mb-20 rounded-4xl flex-grow max-w-5xl w-full mx-auto px-4 py-8 shadow-2xl md:mb-10">
         {/* Topo do card com título e botão de voltar*/}
         <div className="relative flex items-center justify-center mb-6">
           <button
@@ -116,6 +119,7 @@ export default function NewBooking() {
                   horaAbertura={quadra.horaAbertura}
                   horaFechamento={quadra.horaFechamento}
                   indisponiveis={getIndisponiveis(quadra.nome)}
+                  bloqueados={getBloqueadas(quadra.nome)}
                   onHorarioClick={(horario: string, indisponivel: boolean) =>
                     handleHorarioClick(key as keyof typeof Quadras, horario, indisponivel)
                   }

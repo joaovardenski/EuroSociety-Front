@@ -1,10 +1,10 @@
-import Modal from "./Modal";
+import Modal from "../Modal";
 
-import { formatarDataBrasileira } from "../../utils/DateUtils";
+import { formatarDataBrasileira } from "../../../utils/DateUtils";
 
 import { Hourglass } from "lucide-react";
 
-interface ModalFilaDeEsperaProps {
+interface ModalAgendarOcupadoAdminProps {
   isOpen: boolean;
   onClose: () => void;
   dados: {
@@ -13,15 +13,15 @@ interface ModalFilaDeEsperaProps {
     horario: string;
     valor: number;
   };
-  onEntrarFila: () => void;
+  onConfirmar: () => void;
 }
 
-export default function ModalFilaDeEspera({
+export default function ModalAgendarOcupadoAdmin({
   isOpen,
   onClose,
   dados,
-  onEntrarFila,
-}: ModalFilaDeEsperaProps) {
+  onConfirmar,
+}: ModalAgendarOcupadoAdminProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="flex flex-col items-center text-center">
@@ -30,12 +30,11 @@ export default function ModalFilaDeEspera({
         </div>
 
         <h2 className="text-lg font-bold text-azulBase mb-3">
-          Horário indisponível no momento
+          Este horário está ocupado
         </h2>
 
         <p className="text-sm text-gray-700 mb-6">
-          Você pode entrar na fila de espera. Caso o horário fique disponível,
-          entraremos em contato.
+          Caso você deseja agendar mesmo assim, o cliente será notificado do cancelamento da reserva.
         </p>
 
         {/* Dados da reserva */}
@@ -65,10 +64,10 @@ export default function ModalFilaDeEspera({
             Cancelar
           </button>
           <button
-            onClick={onEntrarFila}
+            onClick={onConfirmar}
             className="w-full py-2 rounded-md bg-yellow-500 text-white font-semibold hover:bg-yellow-600 transition"
           >
-            Entrar na fila
+            Confirmar
           </button>
         </div>
       </div>

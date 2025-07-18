@@ -6,14 +6,16 @@ type Props = {
   horaAbertura: number;
   horaFechamento: number;
   indisponiveis: string[];
-  onHorarioClick: {(horario: string, indisponivel: boolean): void;}
+  bloqueados: string[];
+  onHorarioClick: { (horario: string, indisponivel: boolean, bloqueados: boolean): void };
 };
 
-export default function AvailableCourts ({
+export default function AvailableCourts({
   nome,
   horaAbertura,
   horaFechamento,
   indisponiveis,
+  bloqueados,
   onHorarioClick,
 }: Props) {
   const horarios = gerarHorarios(horaAbertura, horaFechamento);
@@ -25,16 +27,18 @@ export default function AvailableCourts ({
       <div className="flex flex-wrap gap-3">
         {horarios.map((hora) => {
           const isIndisponivel = indisponiveis.includes(hora);
+          const isBloqueado = bloqueados.includes(hora);
           return (
             <button
               key={hora}
-              disabled={isIndisponivel}
               className={`flex items-center justify-center px-5 py-2.5 w-18 rounded-lg border text-[14px] md:text-base font-semibold transition-all md:w-22 ${
                 isIndisponivel
+                  ? "bg-yellow-200 text-gray-600"
+                  : isBloqueado
                   ? "bg-gray-300 text-gray-600 line-through cursor-not-allowed"
                   : "bg-white text-azulBase border-azulBase hover:bg-azulBase hover:text-white"
               }`}
-              onClick={() => onHorarioClick(hora, isIndisponivel)}
+              onClick={() => onHorarioClick(hora, isIndisponivel, isBloqueado)}
             >
               {hora}
             </button>

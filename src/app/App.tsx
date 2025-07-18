@@ -10,6 +10,8 @@ import PrivateRoute from "../routes/PrivateRoute";
 import MyBookings from "../pages/Client/MyBookings";
 import NewBooking from "../pages/Client/NewBooking";
 import PainelAdmin from "../pages/Admin/PainelAdmin";
+import AdminRoute from "../routes/AdminRoute";
+import AdminBooking from "../pages/Admin/AdminBooking";
 //import Painel from "./pages/Admin/Painel";
 //import Relatorios from "./pages/Admin/Relatorios";
 //import Configuracoes from "./pages/Admin/Configuracoes";
@@ -58,11 +60,19 @@ const router = createBrowserRouter([
       {
         index: true,
         element: (
-          <PrivateRoute>
+          <AdminRoute>
             <PainelAdmin />
-          </PrivateRoute>
+          </AdminRoute>
         ),
       },
+      {
+        path: "/admin/agenda",
+        element: (
+          <AdminRoute>
+            <AdminBooking />
+          </AdminRoute>
+        )
+      }
     ],
   },
   // {

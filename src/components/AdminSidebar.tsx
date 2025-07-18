@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import {
   LayoutDashboard,
@@ -12,6 +12,14 @@ import {
 export default function AdminSidebar() {
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Implement logout logic here
+    console.log("Logout clicked");
+    navigate("/login");
+  };
+
   return (
     <aside className="w-64 bg-[#052c64] text-white flex flex-col justify-between ">
       <div>
@@ -72,12 +80,11 @@ export default function AdminSidebar() {
           </a>
         </nav>
       </div>
-      <a
-        href="#"
-        className="flex gap-2 justify-center hover:text-red-500 px-4 py-4 border-t border-white"
+      <button
+        onClick={handleLogout} className="flex gap-2 justify-center hover:text-red-500 px-4 py-4 border-t border-white"
       >
         <LogOut /> Sair
-      </a>
+      </button>
     </aside>
   );
 }

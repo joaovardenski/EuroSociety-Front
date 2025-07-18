@@ -1,7 +1,7 @@
 // src/components/ModalCancelarReserva.tsx
 import { AlertTriangle, X } from "lucide-react";
 
-import { formatarDataBrasileira } from "../../utils/DateUtils";
+import { formatarDataBrasileira } from "../../../utils/DateUtils";
 
 interface ModalCancelarReservaProps {
   quadra: string;
