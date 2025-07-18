@@ -12,6 +12,7 @@ import NewBooking from "../pages/Client/NewBooking";
 import PainelAdmin from "../pages/Admin/PainelAdmin";
 import AdminRoute from "../routes/AdminRoute";
 import AdminBooking from "../pages/Admin/AdminBooking";
+import ActiveBookingsAdmin from "../pages/Admin/ActiveBookingsAdmin";
 //import Painel from "./pages/Admin/Painel";
 //import Relatorios from "./pages/Admin/Relatorios";
 //import Configuracoes from "./pages/Admin/Configuracoes";
@@ -72,7 +73,15 @@ const router = createBrowserRouter([
             <AdminBooking />
           </AdminRoute>
         )
-      }
+      },
+      {
+        path: "/admin/lista-reservas",
+        element: (
+          <AdminRoute>
+            <ActiveBookingsAdmin />
+          </AdminRoute>
+        )
+      },
     ],
   },
   // {

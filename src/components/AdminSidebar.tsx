@@ -47,9 +47,9 @@ export default function AdminSidebar() {
           </a>
 
           <a
-            href="/admin/reservas"
+            href="/admin/lista-reservas"
             className={`flex gap-2 px-4 py-4 font-semibold ${
-              isActive("/admin/reservas")
+              isActive("/admin/lista-reservas")
                 ? "bg-cyan-500 text-[#001a3f] border-l-4 border-white"
                 : "text-white hover:bg-cyan-500"
             }`}

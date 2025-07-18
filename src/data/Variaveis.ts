@@ -146,3 +146,33 @@ export const estatisticasDashboard = {
   novosClientes: 8,
   pagamentosPendentes: 2,
 }
+
+export const reservasAtivas = [
+  {
+    id: 1,
+    usuario: "João Victor",
+    quadra: "Quadra Society",
+    data: "2025-07-30",
+    slot: "10:00 - 11:00",
+    statusPagamento: "Parcial",
+    pagamentoFaltante: 30
+  },
+  {
+    id: 2,
+    usuario: "Paulo",
+    quadra: "Quadra Futevôlei 2",
+    data: "2026-10-01",
+    slot: "13:00 - 14:00",
+    statusPagamento: "Parcial",
+    pagamentoFaltante: 25
+  },
+  {
+    id: 3,
+    usuario: "André",
+    quadra: "Quadra Futevôlei 1",
+    data: "2025-07-16",
+    slot: "15:00 - 16:00",
+    statusPagamento: "Completo",
+    pagamentoFaltante: 0
+  },
+];
