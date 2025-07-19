@@ -10,10 +10,23 @@ import FiltroTipo from "../../components/Filtros/FiltroTipo";
 import TableActiveBookings from "../../components/TableActiveBookings";
 
 import { reservasAtivas } from "../../data/Variaveis";
+import ModalRecebimentoAdmin from "../../components/Modais/Admin/ModalRecebimento";
+import ModalCancelarAdmin from "../../components/Modais/Admin/ModalCancelarAdmin";
 
 export default function ActiveBookingsAdmin() {
   const [tipoSelecionado, setTipoSelecionado] = useState("Todas");
   const [dataSelecionada, setDataSelecionada] = useState("2025-07-18"); // exemplo fixo
+
+  const [modalRecebimentoOpen, setModalRecebimentoOpen] = useState(false);
+  const [modalCancelarOpen, setModalCancelarOpen] = useState(false);
+
+  const [agendamentoSelecionado, setAgendamentoSelecionado] = useState<{
+    cliente: string;
+    quadra: string;
+    data: string;
+    horario: string;
+    pagamentoFaltante: number;
+  } | null>(null);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#e6f4ff]">
@@ -52,12 +65,57 @@ export default function ActiveBookingsAdmin() {
             </div>
           </div>
 
-          <TableActiveBookings agendamentos={reservasAtivas} />
-
+          <TableActiveBookings
+            agendamentos={reservasAtivas}
+            onReceberClick={(agendamento) => {
+              setAgendamentoSelecionado({
+                cliente: agendamento.usuario,
+                quadra: agendamento.quadra,
+                data: agendamento.data,
+                horario: agendamento.slot,
+                pagamentoFaltante: 40,
+              });
+              setModalRecebimentoOpen(true);
+            }}
+            onCancelarClick={(agendamento) => {
+              setAgendamentoSelecionado({
+                cliente: agendamento.usuario,
+                quadra: agendamento.quadra,
+                data: agendamento.data,
+                horario: agendamento.slot,
+                pagamentoFaltante: 40,
+              });
+              setModalCancelarOpen(true);
+            }}
+          />
         </main>
       </div>
 
       <FooterEuro />
+
+      {agendamentoSelecionado && (
+        <ModalRecebimentoAdmin
+          isOpen={modalRecebimentoOpen}
+          onClose={() => setModalRecebimentoOpen(false)}
+          dados={agendamentoSelecionado}
+          onConfirmar={() => {
+            console.log("Confirmado!");
+            setModalRecebimentoOpen(false);
+          }}
+        />
+      )}
+
+      {agendamentoSelecionado && (
+        <ModalCancelarAdmin
+          isOpen={modalCancelarOpen}
+          onClose={() => setModalCancelarOpen(false)}
+          dados={agendamentoSelecionado}
+          onConfirmar={() => {
+            console.log("Cancelado!");
+            setModalCancelarOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 }
