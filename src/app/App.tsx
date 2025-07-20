@@ -15,6 +15,9 @@ import AdminBooking from "../pages/Admin/AdminBooking";
 import ActiveBookingsAdmin from "../pages/Admin/ActiveBookingsAdmin";
 import ReportAdmin from "../pages/Admin/ReportAdmin";
 import VariablesAdmin from "../pages/Admin/VariablesAdmin";
+import Unauthorized from "../pages/Error/Unauthorized";
+import NotAuthenticated from "../pages/Error/NotAuthenticated";
+import NotFound from "../pages/Error/NotFound";
 //import Painel from "./pages/Admin/Painel";
 //import Relatorios from "./pages/Admin/Relatorios";
 //import Configuracoes from "./pages/Admin/Configuracoes";
@@ -102,10 +105,24 @@ const router = createBrowserRouter([
       },
     ],
   },
-  // {
-  //   path: "*",
-  //   element: <NotFound />,
-  // },
+  {
+    path: "/unauthorized",
+    element: (
+        <Unauthorized />
+    ),
+  },
+  {
+    path: "/not-authenticated",
+    element: (
+        <NotAuthenticated />
+    ),
+  },
+  {
+    path: "*",
+    element: (
+        <NotFound />
+    ),
+  },
 ]);
 
 function App() {
