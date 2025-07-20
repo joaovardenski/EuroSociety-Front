@@ -13,6 +13,8 @@ import PainelAdmin from "../pages/Admin/PainelAdmin";
 import AdminRoute from "../routes/AdminRoute";
 import AdminBooking from "../pages/Admin/AdminBooking";
 import ActiveBookingsAdmin from "../pages/Admin/ActiveBookingsAdmin";
+import ReportAdmin from "../pages/Admin/ReportAdmin";
+import VariablesAdmin from "../pages/Admin/VariablesAdmin";
 //import Painel from "./pages/Admin/Painel";
 //import Relatorios from "./pages/Admin/Relatorios";
 //import Configuracoes from "./pages/Admin/Configuracoes";
@@ -79,6 +81,22 @@ const router = createBrowserRouter([
         element: (
           <AdminRoute>
             <ActiveBookingsAdmin />
+          </AdminRoute>
+        )
+      },
+      {
+        path: "/admin/relatorios",
+        element: (
+          <AdminRoute>
+            <ReportAdmin />
+          </AdminRoute>
+        )
+      },
+      {
+        path: "/admin/variaveis",
+        element: (
+          <AdminRoute>
+            <VariablesAdmin />
           </AdminRoute>
         )
       },
