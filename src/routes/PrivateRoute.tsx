@@ -16,5 +16,5 @@ export default function PrivateRoute({ children }: PrivateRouteProps) {
     return <div className="text-center mt-10 text-xl">Carregando...</div>;
   }
 
-  return isAuthenticated ? children : <Navigate to="/login" />;
+  return isAuthenticated ? children : <Navigate to="/not-authenticated" />;
 }

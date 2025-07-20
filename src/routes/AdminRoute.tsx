@@ -12,14 +12,14 @@ export default function AdminRoute({ children }: AdminRouteProps) {
 
   const isLoading = false;
   const isAuthenticated = true;
-  const isAdmin = true; // <- Aqui verifica se o usuário tem permissão de admin
+  const isAdmin = true;
 
   if (isLoading) {
     return <div className="text-center mt-10 text-xl">Carregando...</div>;
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/not-authenticated" />;
   }
 
   if (!isAdmin) {
