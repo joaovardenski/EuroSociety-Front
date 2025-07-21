@@ -1,5 +1,5 @@
 // src/components/Tabelas/TabelaAgendamentos.tsx
-import { formatarDataBrasileira } from "../utils/DateUtils";
+import { formatarDataBrasileira } from "../../utils/DateUtils";
 
 interface Agendamento {
   id: number;
@@ -17,7 +17,11 @@ interface Props {
   onCancelarClick: (agendamento: Agendamento) => void;
 }
 
-export default function TableActiveBookings({ agendamentos, onReceberClick, onCancelarClick }: Props) {
+export default function TableActiveBookings({
+  agendamentos,
+  onReceberClick,
+  onCancelarClick,
+}: Props) {
   return (
     <div className="overflow-x-auto overflow-y-auto max-h-[270px]">
       <table className="min-w-full bg-white border-2 border-gray-500 rounded-xl">
@@ -64,7 +68,10 @@ export default function TableActiveBookings({ agendamentos, onReceberClick, onCa
                   Receber
                 </button>
 
-                <button onClick={() => onCancelarClick(ag)} className="bg-red-500 text-white font-medium px-3 py-1 rounded-lg hover:bg-red-700">
+                <button
+                  onClick={() => onCancelarClick(ag)}
+                  className="bg-red-500 text-white font-medium px-3 py-1 rounded-lg hover:bg-red-700"
+                >
                   Cancelar
                 </button>
               </td>

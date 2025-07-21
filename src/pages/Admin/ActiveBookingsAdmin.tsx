@@ -1,13 +1,13 @@
 import { useState } from "react";
 
 // Components
-import HeaderEuro from "../../components/HeaderEuro";
-import AdminSidebar from "../../components/AdminSidebar";
-import FooterEuro from "../../components/FooterEuro";
+import HeaderEuro from "../../components/Layout/HeaderEuro";
+import AdminSidebar from "../../components/Navigation/AdminSidebar";
+import FooterEuro from "../../components/Layout/FooterEuro";
 import { Search } from "lucide-react";
 import FiltroData from "../../components/Filtros/FiltroData";
 import FiltroTipo from "../../components/Filtros/FiltroTipo";
-import TableActiveBookings from "../../components/TableActiveBookings";
+import TableActiveBookings from "../../components/Reservas/TableActiveBookings";
 
 import { reservasAtivas } from "../../data/Variaveis";
 import ModalRecebimentoAdmin from "../../components/Modais/Admin/ModalRecebimento";

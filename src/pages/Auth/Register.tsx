@@ -1,14 +1,17 @@
+// Hooks
 import { useState } from "react";
-
+// Assets
 import euroLogoWhite from "../../assets/euroSocietyWhite.png";
-
 // Components
-import GoogleButtonAuth from "../../components/GoogleButtonAuth";
-import InputFieldAuth from "../../components/InputFieldAuth";
-import SubmitButtonAuth from "../../components/SubmitButtonAuth";
-
+import GoogleButtonAuth from "../../components/Auth/GoogleButtonAuth";
+import InputFieldAuth from "../../components/Auth/InputFieldAuth";
+import SubmitButtonAuth from "../../components/Auth/SubmitButtonAuth";
 // Utils
-import { getNomeError, getEmailError, getSenhaError } from "../../utils/Validators";
+import {
+  getNomeError,
+  getEmailError,
+  getSenhaError,
+} from "../../utils/Validators";
 
 function Register() {
   const [name, setName] = useState("");
@@ -28,13 +31,17 @@ function Register() {
     const nameValidation = getNomeError(trimmedName);
     const emailValidation = getEmailError(trimmedEmail);
     const senhaValidation = getSenhaError(trimmedSenha);
-    
+
     setNameError(nameValidation);
     setEmailError(emailValidation);
     setSenhaError(senhaValidation);
 
     if (!nameValidation && !emailValidation && !senhaValidation) {
-      console.log("Enviar dados:", { name: trimmedName, email: trimmedEmail, senha: trimmedSenha });
+      console.log("Enviar dados:", {
+        name: trimmedName,
+        email: trimmedEmail,
+        senha: trimmedSenha,
+      });
       // lógica de cadastro aqui
     }
   }
@@ -126,7 +133,6 @@ function Register() {
               </a>
             </p>
           </div>
-
         </div>
       </div>
     </div>

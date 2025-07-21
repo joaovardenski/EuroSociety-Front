@@ -1,8 +1,8 @@
 import { Calendar, Clock, DollarSign, Eye, CircleX } from "lucide-react";
 
-import { Quadras } from "../data/Variaveis";
+import { Quadras } from "../../data/Variaveis";
 
-import { formatarDataBrasileira } from "../utils/DateUtils";
+import { formatarDataBrasileira } from "../../utils/DateUtils";
 
 export interface Reserva {
   id: number;
@@ -37,13 +37,15 @@ export default function BookingCard({ reserva, onCancel }: BookingCardProps) {
           {reserva.quadra}
         </h2>
         <p className="flex items-center gap-2">
-          <Calendar size={16} /> Data: <strong>{formatarDataBrasileira(reserva.data)}</strong>
+          <Calendar size={16} /> Data:{" "}
+          <strong>{formatarDataBrasileira(reserva.data)}</strong>
         </p>
         <p className="flex items-center gap-2">
           <Clock size={16} /> Horário: <strong>{reserva.slot}</strong>
         </p>
         <p className="flex items-center gap-2">
-          <DollarSign size={16} /> Valor: {quadraInfo ? `R$ ${quadraInfo.preco.toFixed(2)}` : "N/A"}
+          <DollarSign size={16} /> Valor:{" "}
+          {quadraInfo ? `R$ ${quadraInfo.preco.toFixed(2)}` : "N/A"}
         </p>
         <p className="font-semibold">
           Status:{" "}

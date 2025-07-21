@@ -6,12 +6,12 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 
 // Components
-import HeaderEuro from "../../components/HeaderEuro";
+import HeaderEuro from "../../components/Layout/HeaderEuro";
 import SearchOptionButton from "../../components/SearchOptionButton";
-import BookingCard from "../../components/BookingCard";
-import type { Reserva } from "../../components/BookingCard";
-import FooterEuro from "../../components/FooterEuro";
-import BottomNav from "../../components/BottomNav";
+import BookingCard from "../../components/Reservas/BookingCard";
+import type { Reserva } from "../../components/Reservas/BookingCard";
+import FooterEuro from "../../components/Layout/FooterEuro";
+import BottomNav from "../../components/Navigation/BottomNav";
 import Modal from "../../components/Modais/Modal";
 import ModalCancelarReserva from "../../components/Modais/Client/ModalCancelarReserva";
 
@@ -35,9 +35,7 @@ function MyBookings() {
 
   function confirmarCancelamento() {
     if (reservaSelecionada) {
-      setReservas((prev) =>
-        prev.filter((r) => r.id !== reservaSelecionada.id)
-      );
+      setReservas((prev) => prev.filter((r) => r.id !== reservaSelecionada.id));
     }
 
     setModalOpen(false);

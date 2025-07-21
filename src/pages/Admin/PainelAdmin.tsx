@@ -1,13 +1,13 @@
 import { CalendarDays, DollarSign, Users, AlertTriangle } from "lucide-react";
-import HeaderEuro from "../../components/HeaderEuro";
-import FooterEuro from "../../components/FooterEuro";
+import HeaderEuro from "../../components/Layout/HeaderEuro";
+import FooterEuro from "../../components/Layout/FooterEuro";
 
 import {
   agendamentosRecentes,
   estatisticasDashboard,
 } from "../../data/Variaveis";
-import AdminSidebar from "../../components/AdminSidebar";
-import TableRecentBookings from "../../components/TableRecentBookings";
+import AdminSidebar from "../../components/Navigation/AdminSidebar";
+import TableRecentBookings from "../../components/Reservas/TableRecentBookings";
 import StatisticCard from "../../components/StatisticCard";
 
 export default function PainelAdmin() {

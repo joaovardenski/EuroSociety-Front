@@ -1,4 +1,4 @@
-import euroLogoWhite from "../assets/euroSocietyWhite.png";
+import euroLogoWhite from "../../assets/euroSocietyWhite.png";
 
 export default function FooterEuro() {
     return (

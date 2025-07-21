@@ -1,28 +1,32 @@
-//Verifica se o email é válido, e retorna um sinalizador booleano
+//Verifica se o email é válido, seguindo o padrão geral de emails
 export function isValidEmail(email: string): boolean {
-  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // (xxx@yyy.zzz)
   return regex.test(email.trim());
+}
+
+// Verifica se a string contém apenas letras e espaços
+export function isOnlyLettersAndSpaces(input: string): boolean {
+  const regex = /^[A-Za-zÀ-ÿ\s]+$/u;
+  return regex.test(input.trim());
 }
 
 // Verifica se o email bate com todos os critérios de validação, retornando o erro específico ou uma string vazia se não houver erro
 export function getEmailError(email: string): string {
-  const trimmed = email.trim();
-  if (!trimmed) return "Email é obrigatório";
-  if (trimmed.length < 5) return "Email muito curto";
-  if (trimmed.length > 100) return "Email muito longo";
-  if (!isValidEmail(trimmed)) return "Formato de email inválido";
+  if (!email) return "Email é obrigatório";
+  if (email.length < 5) return "Email muito curto";
+  if (email.length > 100) return "Email muito longo";
+  if (!isValidEmail(email)) return "Formato de email inválido";
   return "";
 }
 
 // Verifica se a senha bate com todos os critérios de validação, retornando o erro específico ou uma string vazia se não houver erro
 export function getSenhaError(senha: string): string {
-  const trimmed = senha.trim();
-  if (!trimmed) return "Senha é obrigatória";
-  if (trimmed.length < 6) return "Senha deve ter pelo menos 6 caracteres";
-  if (trimmed.length > 50) return "Senha muito longa";
+  if (!senha) return "Senha é obrigatória";
+  if (senha.length < 6) return "Senha deve ter pelo menos 6 caracteres";
+  if (senha.length > 64) return "Senha muito longa";
 
-  const hasLetter = /[a-zA-Z]/.test(trimmed);
-  const hasNumber = /\d/.test(trimmed);
+  const hasLetter = /[a-zA-Z]/.test(senha);
+  const hasNumber = /\d/.test(senha);
   if (!hasLetter || !hasNumber) return "A senha deve conter letras e números";
 
   return "";
@@ -30,12 +34,10 @@ export function getSenhaError(senha: string): string {
 
 // Verifica se o nome bate com todos os critérios de validação, retornando o erro específico ou uma string vazia se não houver erro
 export function getNomeError(nome: string): string {
-  const trimmed = nome.trim();
-  if (!trimmed) return "Nome é obrigatório";
-  if (trimmed.length < 2) return "Nome muito curto";
-  if (trimmed.length > 100) return "Nome muito longo";
-  const onlyLetters = /^[A-Za-zÀ-ÿ\s]+$/u.test(trimmed);
-  if (!onlyLetters) return "Nome deve conter apenas letras e espaços";
+  if (!nome) return "Nome é obrigatório";
+  if (nome.length < 2) return "Nome muito curto";
+  if (nome.length > 80) return "Nome muito longo";
+  if (!isOnlyLettersAndSpaces(nome)) return "Nome deve conter apenas letras e espaços";
 
   return "";
 }

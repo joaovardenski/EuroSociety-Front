@@ -1,11 +1,10 @@
+// Hooks
 import { useState } from "react";
-
+// Assets
 import euroLogoWhite from "../../assets/euroSocietyWhite.png";
-
 // Components
-import InputFieldAuth from "../../components/InputFieldAuth";
-import SubmitButtonAuth from "../../components/SubmitButtonAuth";
-
+import InputFieldAuth from "../../components/Auth/InputFieldAuth";
+import SubmitButtonAuth from "../../components/Auth/SubmitButtonAuth";
 // Utils
 import { getEmailError } from "../../utils/Validators";
 
@@ -48,7 +47,9 @@ function RecoverPassword() {
               alt="Logo da Euro Society"
               style={{ height: "calc(100vh / 4)" }}
             />
-            <h1 className="text-white text-3xl font-semibold">Recuperar Senha</h1>
+            <h1 className="text-white text-3xl font-semibold">
+              Recuperar Senha
+            </h1>
           </div>
 
           <h1 className="hidden md:block text-2xl font-bold text-black text-center">
@@ -65,20 +66,28 @@ function RecoverPassword() {
               onChange={(e) => setEmail(e.target.value)}
               error={emailError}
             />
-            <SubmitButtonAuth label="Enviar link de recuperação" icon="send" onClick={handleSubmit}/>
+            <SubmitButtonAuth
+              label="Enviar link de recuperação"
+              icon="send"
+              onClick={handleSubmit}
+            />
           </form>
 
-          <p className="text-white text-[15px] text-center font-semibold md:text-gray-700">Um link de recuperação será enviado no seu endereço de email</p>
+          <p className="text-white text-[15px] text-center font-semibold md:text-gray-700">
+            Um link de recuperação será enviado no seu endereço de email
+          </p>
 
           {/* Links para cadastro e esqueci a senha*/}
           <div className="text-center text-white text-sm md:text-gray-700">
             <p className="mt-2">
-              <a href="/login" className="text-blue-300 md:text-blue-500 hover:underline">
+              <a
+                href="/login"
+                className="text-blue-300 md:text-blue-500 hover:underline"
+              >
                 Voltar para o Login
               </a>
             </p>
           </div>
-
         </div>
       </div>
     </div>

@@ -1,13 +1,12 @@
+// Hooks
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+// Assets
 import euroLogoWhite from "../../assets/euroSocietyWhite.png";
-
 // Components
-import GoogleButtonAuth from "../../components/GoogleButtonAuth";
-import InputFieldAuth from "../../components/InputFieldAuth";
-import SubmitButtonAuth from "../../components/SubmitButtonAuth";
-
+import GoogleButtonAuth from "../../components/Auth/GoogleButtonAuth";
+import InputFieldAuth from "../../components/Auth/InputFieldAuth";
+import SubmitButtonAuth from "../../components/Auth/SubmitButtonAuth";
 // Utils
 import { getEmailError, getSenhaError } from "../../utils/Validators";
 
@@ -21,17 +20,24 @@ function Login() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
+    // Limpa espaços em branco no inicio e no fim do dado antes de validar
     const trimmedEmail = email.trim();
     const trimmedSenha = senha.trim();
 
+    // Validações
     const emailValidation = getEmailError(trimmedEmail);
     const senhaValidation = getSenhaError(trimmedSenha);
 
+    // Atualiza os estados de erro (se houver)
     setEmailError(emailValidation);
     setSenhaError(senhaValidation);
 
+    // Se não houver erros, prossegue com o login
     if (!emailValidation && !senhaValidation) {
-      console.log("Enviar dados:", { email: trimmedEmail, senha: trimmedSenha });
+      console.log("Enviar dados:", {
+        email: trimmedEmail,
+        senha: trimmedSenha,
+      });
       // lógica de login aqui
       navigate("/");
     }
@@ -48,7 +54,6 @@ function Login() {
             className="max-w-[90%] h-auto"
           />
         </div>
-
         {/* Formulário */}
         <div className="w-full md:w-1/2 flex flex-col items-center gap-6 py-10 md:py-16 px-6">
           <div className="flex flex-col items-center gap-3 md:hidden">
@@ -59,11 +64,9 @@ function Login() {
             />
             <h1 className="text-white text-3xl font-semibold">Login</h1>
           </div>
-
           <h1 className="hidden md:block text-2xl font-bold text-black text-center">
             LOGIN
           </h1>
-
           <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
             <InputFieldAuth
               id="iemail"
@@ -89,7 +92,6 @@ function Login() {
               onClick={handleSubmit}
             />
           </form>
-
           {/* Separador */}
           <div className="flex items-center w-full">
             <hr className="flex-grow border-gray-400 md:border-gray-300" />
@@ -98,10 +100,8 @@ function Login() {
             </span>
             <hr className="flex-grow border-gray-400 md:border-gray-300" />
           </div>
-
           {/* Botão de entrar com Google */}
           <GoogleButtonAuth label="Entrar com Google" />
-
           {/* Links para cadastro e esqueci a senha*/}
           <div className="text-center text-white text-sm md:text-gray-700">
             <p>
@@ -121,9 +121,12 @@ function Login() {
                 Esqueceu sua senha?
               </a>
             </p>
-          </div>
-        </div>
-      </div>
+          </div>{" "}
+          {/* Fim dos links */}
+        </div>{" "}
+        {/* Fim do lado do formulário */}
+      </div>{" "}
+      {/* Fim do card principal */}
     </div>
   );
 }

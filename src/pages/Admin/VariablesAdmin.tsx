@@ -1,7 +1,7 @@
 import { useState } from "react";
-import HeaderEuro from "../../components/HeaderEuro";
-import FooterEuro from "../../components/FooterEuro";
-import AdminSidebar from "../../components/AdminSidebar";
+import HeaderEuro from "../../components/Layout/HeaderEuro";
+import FooterEuro from "../../components/Layout/FooterEuro";
+import AdminSidebar from "../../components/Navigation/AdminSidebar";
 import InputConfig from "../../components/InputConfig";
 
 export default function VariablesAdmin() {
@@ -42,12 +42,34 @@ export default function VariablesAdmin() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Society */}
             <div className="bg-white p-6 rounded-xl shadow-md">
-              <h2 className="text-lg font-semibold border-b pb-2 mb-4">Quadra Society</h2>
+              <h2 className="text-lg font-semibold border-b pb-2 mb-4">
+                Quadra Society
+              </h2>
               <div className="space-y-3">
-                <InputConfig label="Preço normal (R$/h)" value={societyPrecoNormal} onChange={setSocietyPrecoNormal} type="number" />
-                <InputConfig label="Preço após 18h (R$/h)" value={societyPrecoApos18h} onChange={setSocietyPrecoApos18h} type="number" />
-                <InputConfig label="Horário de abertura" value={societyHoraAbertura} onChange={setSocietyHoraAbertura} type="time" />
-                <InputConfig label="Horário de fechamento" value={societyHoraFechamento} onChange={setSocietyHoraFechamento} type="time" />
+                <InputConfig
+                  label="Preço normal (R$/h)"
+                  value={societyPrecoNormal}
+                  onChange={setSocietyPrecoNormal}
+                  type="number"
+                />
+                <InputConfig
+                  label="Preço após 18h (R$/h)"
+                  value={societyPrecoApos18h}
+                  onChange={setSocietyPrecoApos18h}
+                  type="number"
+                />
+                <InputConfig
+                  label="Horário de abertura"
+                  value={societyHoraAbertura}
+                  onChange={setSocietyHoraAbertura}
+                  type="time"
+                />
+                <InputConfig
+                  label="Horário de fechamento"
+                  value={societyHoraFechamento}
+                  onChange={setSocietyHoraFechamento}
+                  type="time"
+                />
                 <button className="mt-2 bg-[#2b4363] text-white px-4 py-2 rounded-md hover:bg-[#1f324b] transition">
                   Salvar Society
                 </button>
@@ -56,12 +78,34 @@ export default function VariablesAdmin() {
 
             {/* Futevôlei 1 */}
             <div className="bg-white p-6 rounded-xl shadow-md">
-              <h2 className="text-lg font-semibold border-b pb-2 mb-4">Quadra de Futevôlei 1</h2>
+              <h2 className="text-lg font-semibold border-b pb-2 mb-4">
+                Quadra de Futevôlei 1
+              </h2>
               <div className="space-y-3">
-                <InputConfig label="Preço normal (R$/h)" value={fut1PrecoNormal} onChange={setFut1PrecoNormal} type="number" />
-                <InputConfig label="Preço após 18h (R$/h)" value={fut1PrecoApos18h} onChange={setFut1PrecoApos18h} type="number" />
-                <InputConfig label="Horário de abertura" value={fut1HoraAbertura} onChange={setFut1HoraAbertura} type="time" />
-                <InputConfig label="Horário de fechamento" value={fut1HoraFechamento} onChange={setFut1HoraFechamento} type="time" />
+                <InputConfig
+                  label="Preço normal (R$/h)"
+                  value={fut1PrecoNormal}
+                  onChange={setFut1PrecoNormal}
+                  type="number"
+                />
+                <InputConfig
+                  label="Preço após 18h (R$/h)"
+                  value={fut1PrecoApos18h}
+                  onChange={setFut1PrecoApos18h}
+                  type="number"
+                />
+                <InputConfig
+                  label="Horário de abertura"
+                  value={fut1HoraAbertura}
+                  onChange={setFut1HoraAbertura}
+                  type="time"
+                />
+                <InputConfig
+                  label="Horário de fechamento"
+                  value={fut1HoraFechamento}
+                  onChange={setFut1HoraFechamento}
+                  type="time"
+                />
                 <button className="mt-2 bg-[#2b4363] text-white px-4 py-2 rounded-md hover:bg-[#1f324b] transition">
                   Salvar Futevôlei 1
                 </button>
@@ -70,12 +114,34 @@ export default function VariablesAdmin() {
 
             {/* Futevôlei 2 */}
             <div className="bg-white p-6 rounded-xl shadow-md">
-              <h2 className="text-lg font-semibold border-b pb-2 mb-4">Quadra de Futevôlei 2</h2>
+              <h2 className="text-lg font-semibold border-b pb-2 mb-4">
+                Quadra de Futevôlei 2
+              </h2>
               <div className="space-y-3">
-                <InputConfig label="Preço normal (R$/h)" value={fut2PrecoNormal} onChange={setFut2PrecoNormal} type="number" />
-                <InputConfig label="Preço após 18h (R$/h)" value={fut2PrecoApos18h} onChange={setFut2PrecoApos18h} type="number" />
-                <InputConfig label="Horário de abertura" value={fut2HoraAbertura} onChange={setFut2HoraAbertura} type="time" />
-                <InputConfig label="Horário de fechamento" value={fut2HoraFechamento} onChange={setFut2HoraFechamento} type="time" />
+                <InputConfig
+                  label="Preço normal (R$/h)"
+                  value={fut2PrecoNormal}
+                  onChange={setFut2PrecoNormal}
+                  type="number"
+                />
+                <InputConfig
+                  label="Preço após 18h (R$/h)"
+                  value={fut2PrecoApos18h}
+                  onChange={setFut2PrecoApos18h}
+                  type="number"
+                />
+                <InputConfig
+                  label="Horário de abertura"
+                  value={fut2HoraAbertura}
+                  onChange={setFut2HoraAbertura}
+                  type="time"
+                />
+                <InputConfig
+                  label="Horário de fechamento"
+                  value={fut2HoraFechamento}
+                  onChange={setFut2HoraFechamento}
+                  type="time"
+                />
                 <button className="mt-2 bg-[#2b4363] text-white px-4 py-2 rounded-md hover:bg-[#1f324b] transition">
                   Salvar Futevôlei 2
                 </button>
@@ -84,10 +150,22 @@ export default function VariablesAdmin() {
 
             {/* Descontos */}
             <div className="bg-white p-6 rounded-xl shadow-md">
-              <h2 className="text-lg font-semibold border-b pb-2 mb-4">Planos mensalistas</h2>
+              <h2 className="text-lg font-semibold border-b pb-2 mb-4">
+                Planos mensalistas
+              </h2>
               <div className="space-y-3">
-                <InputConfig label="Desconto (%) mensalista: Society" value={descontoSociety} onChange={setDescontoSociety} type="number" />
-                <InputConfig label="Desconto (%) mensalista: Futevôlei" value={descontoFutevolei} onChange={setDescontoFutevolei} type="number" />
+                <InputConfig
+                  label="Desconto (%) mensalista: Society"
+                  value={descontoSociety}
+                  onChange={setDescontoSociety}
+                  type="number"
+                />
+                <InputConfig
+                  label="Desconto (%) mensalista: Futevôlei"
+                  value={descontoFutevolei}
+                  onChange={setDescontoFutevolei}
+                  type="number"
+                />
                 <button className="mt-2 bg-[#2b4363] text-white px-4 py-2 rounded-md hover:bg-[#1f324b] transition">
                   Salvar desconto
                 </button>

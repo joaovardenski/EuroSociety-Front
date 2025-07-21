@@ -1,5 +1,5 @@
+// Hooks
 import { useNavigate } from "react-router-dom";
-
 // Icons
 import {
   CalendarClock,
@@ -9,35 +9,63 @@ import {
   CalendarPlus,
   List,
 } from "lucide-react";
-
 // Components
-import HeaderEuro from "../../components/HeaderEuro";
-import FooterEuro from "../../components/FooterEuro";
-import BottomNav from "../../components/BottomNav";
-
+import HeaderEuro from "../../components/Layout/HeaderEuro";
+import FooterEuro from "../../components/Layout/FooterEuro";
+import BottomNav from "../../components/Navigation/BottomNav";
+// Data
 import { minhasReservas } from "../../data/Variaveis";
-
+// Utils
 import { formatarDataBrasileira } from "../../utils/DateUtils";
+
+type Reserva = {
+  id: number;
+  usuario: string;
+  quadra: string;
+  data: string; // "2025-06-30"
+  slot: string; // "10:00 - 11:00"
+  status: string; // "CONFIRMADO", "CANCELADO" etc.
+  statusPagamento: string; // "Parcial", "Total", "Reembolsado"
+};
+
+type ReservaComDataHora = Reserva & { dataHora: Date };
 
 function Dashboard() {
   const navigate = useNavigate();
+  // Simula usuário autenticado (futuramente será com API/token)
   const user = "João Victor";
-  const ActiveBookings = minhasReservas.filter(
-    (reserva) => reserva.status === "CONFIRMADO"
-  );
-  const numberOfActiveBookings = ActiveBookings.length;
 
-  const agora = new Date();
+  // Filtra apenas as reservas confirmadas
+  const activeBookings = getReservasConfirmadas(minhasReservas);
 
-  const lastBooking = ActiveBookings.map((reserva) => {
+  // Conta quantas reservas ativas existem
+  const numberOfActiveBookings = activeBookings.length;
+
+  // Busca a próxima reserva futura
+  const lastBooking = getProximaReserva(activeBookings);
+
+  function getReservasConfirmadas(reservas: Reserva[]): Reserva[] {
+    return reservas.filter((reserva) => reserva.status === "CONFIRMADO");
+  }
+
+  function getProximaReserva(
+    reservas: Reserva[]
+  ): ReservaComDataHora | undefined {
+    const agora = new Date();
+
+    return reservas
+      .map(adicionarDataHora)
+      .filter((reserva) => reserva.dataHora > agora)
+      .sort((a, b) => a.dataHora.getTime() - b.dataHora.getTime())[0];
+  }
+
+  function adicionarDataHora(reserva: Reserva): ReservaComDataHora {
     const [horaInicio] = reserva.slot.split(" - ");
     return {
       ...reserva,
-      dataHora: new Date(`${reserva.data}T${horaInicio}:00`), // "2025-06-30T10:00:00"
+      dataHora: new Date(`${reserva.data}T${horaInicio}:00`),
     };
-  })
-    .filter((reserva) => reserva.dataHora > agora)
-    .sort((a, b) => a.dataHora.getTime() - b.dataHora.getTime())[0]; // Pega a mais próxima
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-[#e1e6f9]">
@@ -72,7 +100,9 @@ function Dashboard() {
                   </p>
                   <p className="text-sm font-semibold text-gray-700">
                     Data:{" "}
-                    <span className="font-medium">{formatarDataBrasileira(lastBooking.data)}</span>
+                    <span className="font-medium">
+                      {formatarDataBrasileira(lastBooking.data)}
+                    </span>
                   </p>
                   <p className="text-sm font-semibold text-gray-700">
                     Horário:{" "}

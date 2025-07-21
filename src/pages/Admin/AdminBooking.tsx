@@ -1,18 +1,15 @@
 import { useState } from "react";
 
 // Utils
-import {
-  getCurrentDate,
-  gerarHorarioFim,
-} from "../../utils/DateUtils";
+import { getCurrentDate, gerarHorarioFim } from "../../utils/DateUtils";
 
 // Components
-import HeaderEuro from "../../components/HeaderEuro";
-import AdminSidebar from "../../components/AdminSidebar";
-import FooterEuro from "../../components/FooterEuro";
+import HeaderEuro from "../../components/Layout/HeaderEuro";
+import AdminSidebar from "../../components/Navigation/AdminSidebar";
+import FooterEuro from "../../components/Layout/FooterEuro";
 import FiltroTipo from "../../components/Filtros/FiltroTipo";
 import FiltroData from "../../components/Filtros/FiltroData";
-import AvailableCourts from "../../components/AvailableCourts";
+import AvailableCourts from "../../components/Reservas/AvailableCourts";
 
 // Modals
 import ModalConfirmarAdmin from "../../components/Modais/Admin/ModalConfirmarAdmin";
@@ -20,7 +17,11 @@ import ModalAgendarAdmin from "../../components/Modais/Admin/ModalAgendarAdmin";
 import ModalAgendarOcupadoAdmin from "../../components/Modais/Admin/ModalAgendarOcupadoAdmin";
 
 // Dados mock
-import { Quadras, indisponibilidadesQuadras, bloqueadasQuadras } from "../../data/Variaveis";
+import {
+  Quadras,
+  indisponibilidadesQuadras,
+  bloqueadasQuadras,
+} from "../../data/Variaveis";
 import ModalDesbloquearAdmin from "../../components/Modais/Admin/ModalDesbloquearAdmin";
 
 export default function AdminBooking() {
@@ -40,17 +41,17 @@ export default function AdminBooking() {
   const getBloqueadas = (nome: string) =>
     bloqueadasQuadras.find((q) => q.nome === nome)?.bloqueados || [];
 
-
   const [modalConfirmarAberto, setModalConfirmarAberto] = useState(false);
   const [modalAgendarAberto, setModalAgendarAberto] = useState(false);
-  const [modalAgendarOcupadoAberto, setModalAgendarOcupadoAberto] = useState(false);
+  const [modalAgendarOcupadoAberto, setModalAgendarOcupadoAberto] =
+    useState(false);
   const [modalDesbloquearAberto, setModalDesbloquearAberto] = useState(false);
 
   const handleHorarioClick = (
     quadraKey: keyof typeof Quadras,
     horario: string,
     indisponivel: boolean,
-    bloqueado: boolean,
+    bloqueado: boolean
   ) => {
     const config = Quadras[quadraKey];
 
@@ -63,10 +64,10 @@ export default function AdminBooking() {
 
     if (indisponivel) {
       setModalAgendarOcupadoAberto(true);
-    } else if(bloqueado) {
+    } else if (bloqueado) {
       setModalDesbloquearAberto(true);
     } else {
-        setModalConfirmarAberto(true);
+      setModalConfirmarAberto(true);
     }
   };
 
@@ -111,12 +112,16 @@ export default function AdminBooking() {
                     horaFechamento={quadra.horaFechamento}
                     indisponiveis={getIndisponiveis(quadra.nome)}
                     bloqueados={getBloqueadas(quadra.nome)}
-                    onHorarioClick={(horario: string, indisponivel: boolean, bloqueados: boolean) =>
+                    onHorarioClick={(
+                      horario: string,
+                      indisponivel: boolean,
+                      bloqueados: boolean
+                    ) =>
                       handleHorarioClick(
                         key as keyof typeof Quadras,
                         horario,
                         indisponivel,
-                        bloqueados,
+                        bloqueados
                       )
                     }
                   />
@@ -155,9 +160,7 @@ export default function AdminBooking() {
           isOpen={modalAgendarOcupadoAberto}
           onClose={() => setModalAgendarOcupadoAberto(false)}
           dados={horarioSelecionado}
-          onConfirmar={() => 
-            setModalAgendarOcupadoAberto(false)
-          }
+          onConfirmar={() => setModalAgendarOcupadoAberto(false)}
         />
       )}
 
@@ -166,9 +169,7 @@ export default function AdminBooking() {
           isOpen={modalDesbloquearAberto}
           onClose={() => setModalDesbloquearAberto(false)}
           dados={horarioSelecionado}
-          onConfirmar={() => 
-            setModalDesbloquearAberto(false)
-          }
+          onConfirmar={() => setModalDesbloquearAberto(false)}
         />
       )}
 

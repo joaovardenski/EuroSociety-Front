@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserCircle, LogOut } from "lucide-react";
-import euroLogoWhite from "../assets/euroSocietyWhite.png";
+import euroLogoWhite from "../../assets/euroSocietyWhite.png";
 
 export default function HeaderEuro() {
   const user = "João Victor";

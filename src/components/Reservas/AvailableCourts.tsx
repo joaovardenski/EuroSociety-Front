@@ -1,4 +1,4 @@
-import { gerarHorarios } from "../utils/Horarios";
+import { gerarHorarios } from "../../utils/Horarios";
 
 // src/components/QuadraDisponivel.tsx
 type Props = {
@@ -7,7 +7,9 @@ type Props = {
   horaFechamento: number;
   indisponiveis: string[];
   bloqueados: string[];
-  onHorarioClick: { (horario: string, indisponivel: boolean, bloqueados: boolean): void };
+  onHorarioClick: {
+    (horario: string, indisponivel: boolean, bloqueados: boolean): void;
+  };
 };
 
 export default function AvailableCourts({
