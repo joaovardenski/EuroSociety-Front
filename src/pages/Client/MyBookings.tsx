@@ -1,10 +1,8 @@
 // Hooks
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 // Icons
 import { ArrowLeft } from "lucide-react";
-
 // Components
 import HeaderEuro from "../../components/Layout/HeaderEuro";
 import SearchOptionButton from "../../components/SearchOptionButton";
@@ -14,9 +12,10 @@ import FooterEuro from "../../components/Layout/FooterEuro";
 import BottomNav from "../../components/Navigation/BottomNav";
 import Modal from "../../components/Modais/Modal";
 import ModalCancelarReserva from "../../components/Modais/Client/ModalCancelarReserva";
-
 // Mock Data
 import { minhasReservas } from "../../data/Variaveis";
+// Types
+type FiltroReservas = "Todas" | "Próximas" | "Anteriores";
 
 function MyBookings() {
   const navigate = useNavigate();
@@ -26,7 +25,7 @@ function MyBookings() {
     null
   );
   const [reservas, setReservas] = useState<Reserva[]>(minhasReservas);
-  const [searchOption, setSearchOption] = useState("Todas");
+  const [searchOption, setSearchOption] = useState<FiltroReservas>("Todas");
 
   function abrirModal(reserva: Reserva) {
     setReservaSelecionada(reserva);
@@ -42,20 +41,31 @@ function MyBookings() {
     setReservaSelecionada(null);
   }
 
-  // Filtro de reservas com base na opção selecionada
-  const agora = new Date();
+  function filtrarReservas(reservas: Reserva[], filtro: string): Reserva[] {
+    const agora = new Date();
 
-  const reservasFiltradas = reservas.filter((reserva) => {
-    const [horaInicio] = reserva.slot.split(" - ");
-    const dataHoraReserva = new Date(`${reserva.data}T${horaInicio}:00`);
+    return reservas
+      .filter((reserva) => { //Filtra a reserva com base no filtro selecionado, retornando apenas as correspondentes
+        const [horaInicio] = reserva.slot.split(" - ");
+        const dataHoraReserva = new Date(`${reserva.data}T${horaInicio}:00`);
 
-    if (searchOption === "Próximas") {
-      return dataHoraReserva >= agora;
-    } else if (searchOption === "Anteriores") {
-      return dataHoraReserva < agora;
-    }
-    return true; // "Todas"
-  });
+        if (filtro === "Próximas") return dataHoraReserva >= agora;
+        if (filtro === "Anteriores") return dataHoraReserva < agora;
+        return true;
+      })
+      .sort((a, b) => { // Ordena as reservas com base no filtro selecionado
+        const [horaInicioA] = a.slot.split(" - ");
+        const [horaInicioB] = b.slot.split(" - ");
+        const dataHoraA = new Date(`${a.data}T${horaInicioA}:00`).getTime();
+        const dataHoraB = new Date(`${b.data}T${horaInicioB}:00`).getTime();
+
+        return filtro === "Anteriores"
+          ? dataHoraB - dataHoraA // Do mais recente para o mais antigo
+          : dataHoraA - dataHoraB; // Do mais próximo para o mais distante
+      });
+  }
+
+  const reservasFiltradas = filtrarReservas(reservas, searchOption);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f3f7ff]">
