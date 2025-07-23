@@ -1,5 +1,6 @@
 // Hooks
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 // Assets
 import euroLogoWhite from "../../assets/euroSocietyWhite.png";
 // Components
@@ -14,6 +15,7 @@ import {
 } from "../../utils/Validators";
 
 function Register() {
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -43,6 +45,8 @@ function Register() {
         senha: trimmedSenha,
       });
       // lógica de cadastro aqui
+      // handleRegister(trimmedName, trimmedEmail, trimmedSenha);
+      navigate("/login");
     }
   }
 

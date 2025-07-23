@@ -23,6 +23,7 @@ import {
   bloqueadasQuadras,
 } from "../../data/Variaveis";
 import ModalDesbloquearAdmin from "../../components/Modais/Admin/ModalDesbloquearAdmin";
+import LegendaReservas from "../../components/Reservas/LegendaReservas";
 
 export default function AdminBooking() {
   const [tipoSelecionado, setTipoSelecionado] = useState("Todas");
@@ -94,6 +95,8 @@ export default function AdminBooking() {
               setDataSelecionada={setDataSelecionada}
             />
           </div>
+
+          <LegendaReservas />
 
           {/* Lista de quadras */}
           <div className="space-y-6">

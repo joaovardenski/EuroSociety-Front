@@ -30,6 +30,7 @@ import {
   indisponibilidadesQuadras,
   bloqueadasQuadras,
 } from "../../data/Variaveis";
+import LegendaReservas from "../../components/Reservas/LegendaReservas";
 
 export default function NewBooking() {
   const navigate = useNavigate();
@@ -121,6 +122,8 @@ export default function NewBooking() {
             setDataSelecionada={setDataSelecionada}
           />
         </div>
+
+        <LegendaReservas />
 
         {/* Mostra as quadras disponíveis e horários com base nos filtros */}
         <div className="space-y-6">

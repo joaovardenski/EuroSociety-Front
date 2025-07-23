@@ -39,6 +39,7 @@ function Login() {
         senha: trimmedSenha,
       });
       // lógica de login aqui
+      // handleLogin(trimmedEmail, trimmedSenha);
       navigate("/");
     }
   }
