@@ -25,6 +25,17 @@ import {
 import ModalDesbloquearAdmin from "../../components/Modais/Admin/ModalDesbloquearAdmin";
 import LegendaReservas from "../../components/Reservas/LegendaReservas";
 
+type QuadraInfo = {
+  nome: string;
+  tipo: string;
+  status: string;
+  horaAbertura: number;
+  horaFechamento: number;
+  precoNormal: number;
+  precoNoturno: number;
+  descontoMensalista: number;
+};
+
 export default function AdminBooking() {
   const [tipoSelecionado, setTipoSelecionado] = useState("Todas");
   const [dataSelecionada, setDataSelecionada] = useState(getCurrentDate());
@@ -48,6 +59,11 @@ export default function AdminBooking() {
     useState(false);
   const [modalDesbloquearAberto, setModalDesbloquearAberto] = useState(false);
 
+  const calcularValor = (quadra: QuadraInfo, horario: string) => {
+    const horaInt = parseInt(horario.split(":")[0], 10);
+    return horaInt >= 18 ? quadra.precoNoturno : quadra.precoNormal;
+  };
+
   const handleHorarioClick = (
     quadraKey: keyof typeof Quadras,
     horario: string,
@@ -55,12 +71,13 @@ export default function AdminBooking() {
     bloqueado: boolean
   ) => {
     const config = Quadras[quadraKey];
+    const valor = calcularValor(config, horario);
 
     setHorarioSelecionado({
       quadra: config.nome,
       horario: `${horario} - ${gerarHorarioFim(horario)}`,
       data: dataSelecionada,
-      valor: config.preco,
+      valor,
     });
 
     if (indisponivel) {
@@ -127,6 +144,7 @@ export default function AdminBooking() {
                         bloqueados
                       )
                     }
+                    isAdmin={true}
                   />
                 );
               }

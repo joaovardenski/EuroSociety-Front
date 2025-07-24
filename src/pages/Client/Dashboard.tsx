@@ -8,6 +8,7 @@ import BottomNav from "../../components/Navigation/BottomNav";
 import ProximaReservaCard from "../../components/Reservas/ProximaReservaCard";
 import CardNovaReserva from "../../components/Reservas/NovaReservaCard";
 import ReservasAtivasCard from "../../components/Reservas/ReservasAtivasCard";
+import LoadingMessage from "../../components/LoadingMessage";
 // Types
 type Reserva = {
   id: number;
@@ -60,7 +61,9 @@ function Dashboard() {
     return reservas.filter((reserva) => reserva.status === "CONFIRMADO");
   }
 
-  function getProximaReserva(reservas: Reserva[]): ReservaComDataHora | undefined {
+  function getProximaReserva(
+    reservas: Reserva[]
+  ): ReservaComDataHora | undefined {
     const agora = new Date();
     return reservas
       .map(adicionarDataHora)
@@ -86,7 +89,7 @@ function Dashboard() {
 
       <main className="flex flex-col items-center flex-grow px-4 py-10 w-full">
         {isLoading ? (
-          <p className="text-gray-600 text-center">Carregando dados...</p>
+          <LoadingMessage message="Carregando quadras dados..."/>
         ) : (
           <>
             {/* Boas-vindas */}

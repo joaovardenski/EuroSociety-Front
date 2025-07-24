@@ -1,12 +1,11 @@
 // Hooks
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 // Utils
 import {
   getCurrentDate,
   gerarHorarioFim,
-  formatarDataBrasileira,
 } from "../../utils/DateUtils";
 
 // Components
@@ -16,34 +15,49 @@ import FiltroData from "../../components/Filtros/FiltroData";
 import AvailableCourts from "../../components/Reservas/AvailableCourts";
 import FooterEuro from "../../components/Layout/FooterEuro";
 import BottomNav from "../../components/Navigation/BottomNav";
+import LegendaReservas from "../../components/Reservas/LegendaReservas";
+
 // Modals
 import ModalConfirmarAgendamento from "../../components/Modais/Client/ModalConfirmarAgendamento";
 import ModalDetalhesPagamento from "../../components/Modais/Client/ModalDetalhesPagamento";
 import ModalFilaDeEspera from "../../components/Modais/Client/ModalFilaDeEspera";
 
-//Icons
+// Icons
 import { ArrowLeft } from "lucide-react";
+import LoadingMessage from "../../components/LoadingMessage";
 
-// Mock Data
-import {
-  Quadras,
-  indisponibilidadesQuadras,
-  bloqueadasQuadras,
-} from "../../data/Variaveis";
-import LegendaReservas from "../../components/Reservas/LegendaReservas";
+// Types locais
+type QuadraInfo = {
+  nome: string;
+  tipo: string;
+  status: string;
+  horaAbertura: number;
+  horaFechamento: number;
+  precoNormal: number;
+  precoNoturno: number;
+  descontoMensalista: number;
+};
+
+type Indisponibilidade = { nome: string; indisponiveis: string[] };
+type Bloqueio = { nome: string; bloqueados: string[] };
 
 export default function NewBooking() {
   const navigate = useNavigate();
 
-  {
-    /*Dados iniciais pro filtro*/
-  }
+  // ----------------- Estados -----------------
   const [tipoSelecionado, setTipoSelecionado] = useState("Todas");
   const [dataSelecionada, setDataSelecionada] = useState(getCurrentDate());
 
-  {
-    /*Dados do horário que foi selecionado para fazer alguma ação*/
-  }
+  const [quadras, setQuadras] = useState<Record<string, QuadraInfo>>({});
+  const [indisponibilidades, setIndisponibilidades] = useState<Indisponibilidade[]>([]);
+  const [bloqueios, setBloqueios] = useState<Bloqueio[]>([]);
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [modalConfirmarAberto, setModalConfirmarAberto] = useState(false);
+  const [modalPagamentoAberto, setModalPagamentoAberto] = useState(false);
+  const [modalFilaAberto, setModalFilaAberto] = useState(false);
+
   const [horarioSelecionado, setHorarioSelecionado] = useState({
     quadra: "",
     horario: "",
@@ -51,57 +65,91 @@ export default function NewBooking() {
     valor: 0,
   });
 
-  {
-    /*Dados do mock para horários com indisponibilidade*/
+  // ----------------- “APIs” locais (substitua por fetch/axios depois) -----------------
+  async function getQuadras(): Promise<Record<string, QuadraInfo>> {
+    const mod = await import("../../data/Variaveis");
+    return mod.Quadras as Record<string, QuadraInfo>;
   }
+
+  async function getIndisponibilidades(): Promise<Indisponibilidade[]> {
+    const mod = await import("../../data/Variaveis");
+    return mod.indisponibilidadesQuadras as Indisponibilidade[];
+  }
+
+  async function getBloqueios(): Promise<Bloqueio[]> {
+    const mod = await import("../../data/Variaveis");
+    return mod.bloqueadasQuadras as Bloqueio[];
+  }
+
+  // ----------------- Efeito de entrada ----------------- (Pega os dados iniciais e coloca no estado)
+  useEffect(() => {
+    async function carregarDados() {
+      try {
+        const [quadras, indisponiveis, bloqueados] = await Promise.all([
+          getQuadras(),
+          getIndisponibilidades(),
+          getBloqueios(),
+        ]);
+        setQuadras(quadras);
+        setIndisponibilidades(indisponiveis);
+        setBloqueios(bloqueados);
+      } catch (error) {
+        console.error("Erro ao carregar dados:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    carregarDados();
+  }, []);
+
+  // ----------------- Helpers -----------------
   const getIndisponiveis = (nome: string) =>
-    indisponibilidadesQuadras.find((q) => q.nome === nome)?.indisponiveis || [];
+    indisponibilidades.find((q) => q.nome === nome)?.indisponiveis || [];
 
   const getBloqueadas = (nome: string) =>
-    bloqueadasQuadras.find((q) => q.nome === nome)?.bloqueados || [];
+    bloqueios.find((q) => q.nome === nome)?.bloqueados || [];
 
-  {
-    /*Dados para controlar a abertura e fechamento dos modais*/
-  }
-  const [modalConfirmarAberto, setModalConfirmarAberto] = useState(false);
-  const [modalPagamentoAberto, setModalPagamentoAberto] = useState(false);
-  const [modalFilaAberto, setModalFilaAberto] = useState(false);
+  const calcularValor = (quadra: QuadraInfo, horario: string) => {
+    const horaInt = parseInt(horario.split(":")[0], 10);
+    return horaInt >= 18 ? quadra.precoNoturno : quadra.precoNormal;
+  };
 
-  {
-    /*Função para clique em horário disponível (se horário disponível abre modal de confirmar, senão de fila de espera)*/
-  }
-  const handleHorarioClick = (
-    quadraKey: keyof typeof Quadras,
+  // ----------------- Handlers -----------------
+  function handleHorarioClick( //Pega as informações da quadra e horário clicado para jogar no modal depois
+    quadraKey: keyof typeof quadras,
     horario: string,
-    indisponivel: boolean
-  ) => {
-    const config = Quadras[quadraKey];
+    indisponivel: boolean,
+    bloqueado: boolean
+  ) {
+    const config = quadras[quadraKey];
+    const valor = calcularValor(config, horario);
 
     setHorarioSelecionado({
       quadra: config.nome,
       horario: `${horario} - ${gerarHorarioFim(horario)}`,
       data: dataSelecionada,
-      valor: config.preco,
+      valor,
     });
 
+    if (bloqueado) return; // apenas ignora clique
     if (indisponivel) {
       setModalFilaAberto(true);
     } else {
       setModalConfirmarAberto(true);
     }
-  };
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f3f7ff]">
-      {/* HeaderEuro component*/}
       <HeaderEuro />
 
       <main className="bg-white mt-7 mb-20 rounded-4xl flex-grow max-w-5xl w-full mx-auto px-4 py-8 shadow-2xl md:mb-10">
-        {/* Topo do card com título e botão de voltar*/}
+        {/* Topo */}
         <div className="relative flex items-center justify-center mb-6">
           <button
-            onClick={() => navigate("/")}
-            className="absolute left-0 text-azulBase hover:text-azulEscuro transition"
+          onClick={() => navigate("/")}
+          className="absolute left-0 text-azulBase hover:text-azulEscuro transition"
           >
             <ArrowLeft size={23} />
           </button>
@@ -110,9 +158,8 @@ export default function NewBooking() {
           </h1>
         </div>
 
-        {/* Filtros de tipo e data */}
+        {/* Filtros */}
         <div className="bg-blue-100/50 border border-blue-400 rounded-xl p-4 mb-6 space-y-4 md:space-y-0 md:flex md:items-center md:justify-between md:gap-6">
-          {/* Os filtros recebem o dado do filtro, e também a função de setar */}
           <FiltroTipo
             tipoSelecionado={tipoSelecionado}
             setTipoSelecionado={setTipoSelecionado}
@@ -125,18 +172,17 @@ export default function NewBooking() {
 
         <LegendaReservas />
 
-        {/* Mostra as quadras disponíveis e horários com base nos filtros */}
-        <div className="space-y-6">
-          {Object.entries(Quadras).map(([key, quadra]) => {
-            {
-              /* Verifica se a quadra é o tipo selecionado */
-            }
-            if (
-              tipoSelecionado !== "Todas" &&
-              quadra.tipo.toLowerCase() !== tipoSelecionado.toLowerCase()
-            ) {
-              return null;
-            } else {
+        {/* Conteúdo */}
+        {isLoading ? (
+          <LoadingMessage message="Carregando quadras disponíveis..."/>
+        ) : (
+          <div className="space-y-6">
+            {Object.entries(quadras).map(([key, quadra]) => {
+              // Filtra por tipo
+              if (tipoSelecionado !== "Todas" && quadra.tipo.toLowerCase() !== tipoSelecionado.toLowerCase()) {
+                return null;
+              }
+
               return (
                 <AvailableCourts
                   key={quadra.nome}
@@ -145,21 +191,18 @@ export default function NewBooking() {
                   horaFechamento={quadra.horaFechamento}
                   indisponiveis={getIndisponiveis(quadra.nome)}
                   bloqueados={getBloqueadas(quadra.nome)}
-                  onHorarioClick={(horario: string, indisponivel: boolean) =>
-                    handleHorarioClick(
-                      key as keyof typeof Quadras,
-                      horario,
-                      indisponivel
-                    )
+                  onHorarioClick={(horario, indisponivel, bloqueado) =>
+                    handleHorarioClick(key as keyof typeof quadras, horario, indisponivel, bloqueado)
                   }
+                  isAdmin={false}
                 />
               );
-            }
-          })}
-        </div>
+            })}
+          </div>
+        )}
       </main>
 
-      {/* Modais para confirmação, pagamento e fila de espera */}
+      {/* Modais */}
       {modalConfirmarAberto && (
         <ModalConfirmarAgendamento
           isOpen={modalConfirmarAberto}
@@ -176,15 +219,8 @@ export default function NewBooking() {
         <ModalDetalhesPagamento
           isOpen={modalPagamentoAberto}
           onClose={() => setModalPagamentoAberto(false)}
-          quadra={horarioSelecionado.quadra}
-          dataHora={`${formatarDataBrasileira(horarioSelecionado.data)} às ${
-            horarioSelecionado.horario.split(" - ")[0]
-          }`}
-          valorTotal={horarioSelecionado.valor}
-          onConfirmarPagamento={(valor, metodo, mensalista) => {
-            console.log("Pagamento efetuado:", { valor, metodo, mensalista });
-            setModalPagamentoAberto(false);
-          }}
+          dados={horarioSelecionado}
+          onConfirmarPagamento={() => setModalPagamentoAberto(false)}
         />
       )}
 
@@ -197,7 +233,6 @@ export default function NewBooking() {
         />
       )}
 
-      {/* Footer e bottomav */}
       <BottomNav />
       <FooterEuro />
     </div>

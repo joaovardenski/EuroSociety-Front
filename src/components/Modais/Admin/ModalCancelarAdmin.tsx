@@ -66,13 +66,13 @@ export default function ModalCancelarAdmin({
             onClick={onClose}
             className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition"
           >
-            Cancelar
+            Voltar
           </button>
           <button
             onClick={onConfirmar}
             className="w-full py-2 rounded-md bg-yellow-500 text-white font-semibold hover:bg-yellow-600 transition"
           >
-            Cancelar
+            Cancelar reserva
           </button>
         </div>
       </div>

@@ -6,7 +6,8 @@ export const Quadras = {
     status: "disponível",
     horaAbertura: 8,
     horaFechamento: 18,
-    preco: 150,
+    precoNormal: 120,
+    precoNoturno: 150,
     descontoMensalista: 0.15, // 15%
   },
   futevolei1: {
@@ -15,7 +16,8 @@ export const Quadras = {
     status: "disponível",
     horaAbertura: 6,
     horaFechamento: 18,
-    preco: 100,
+    precoNormal: 100,
+    precoNoturno: 120,
     descontoMensalista: 0.1,
   },
   futevolei2: {
@@ -24,7 +26,8 @@ export const Quadras = {
     status: "disponível",
     horaAbertura: 8,
     horaFechamento: 20,
-    preco: 100,
+    precoNormal: 100,
+    precoNoturno: 120,
     descontoMensalista: 0.1,
   },
 };

@@ -1,15 +1,13 @@
 import { gerarHorarios } from "../../utils/Horarios";
 
-// src/components/QuadraDisponivel.tsx
 type Props = {
   nome: string;
   horaAbertura: number;
   horaFechamento: number;
   indisponiveis: string[];
   bloqueados: string[];
-  onHorarioClick: {
-    (horario: string, indisponivel: boolean, bloqueados: boolean): void;
-  };
+  onHorarioClick: (horario: string, indisponivel: boolean, bloqueado: boolean) => void;
+  isAdmin: boolean;
 };
 
 export default function AvailableCourts({
@@ -19,17 +17,23 @@ export default function AvailableCourts({
   indisponiveis,
   bloqueados,
   onHorarioClick,
+  isAdmin,
 }: Props) {
   const horarios = gerarHorarios(horaAbertura, horaFechamento);
 
   return (
     <div>
-      <h2 className="font-bold text-xl text-azulBase mb-1">{nome}</h2>
+      <div className="mb-2">
+        <h2 className="font-bold text-xl text-azulBase">{nome}</h2>
+      </div>
+
       <hr className="border opacity-60 mb-5" />
+
       <div className="flex flex-wrap gap-3">
         {horarios.map((hora) => {
           const isIndisponivel = indisponiveis.includes(hora);
           const isBloqueado = bloqueados.includes(hora);
+
           return (
             <button
               key={hora}
@@ -41,6 +45,7 @@ export default function AvailableCourts({
                   : "bg-white text-azulBase border-azulBase hover:bg-azulBase hover:text-white"
               }`}
               onClick={() => onHorarioClick(hora, isIndisponivel, isBloqueado)}
+              disabled={!isAdmin && isBloqueado}
             >
               {hora}
             </button>

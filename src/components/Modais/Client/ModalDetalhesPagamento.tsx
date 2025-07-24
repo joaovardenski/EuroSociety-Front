@@ -1,13 +1,17 @@
 import { useState } from "react";
 import { CreditCard, DollarSign, Landmark } from "lucide-react";
 import Modal from "../Modal";
+import { formatarDataBrasileira } from "../../../utils/DateUtils";
 
 interface ModalDetalhesPagamentoProps {
   isOpen: boolean;
   onClose: () => void;
-  quadra: string;
-  dataHora: string;
-  valorTotal: number;
+  dados: {
+    quadra: string;
+    data: string;
+    horario: string;
+    valor: number;
+  };
   onConfirmarPagamento: (
     valorPago: number,
     metodo: string,
@@ -18,16 +22,14 @@ interface ModalDetalhesPagamentoProps {
 export default function ModalDetalhesPagamento({
   isOpen,
   onClose,
-  quadra,
-  dataHora,
-  valorTotal,
+  dados,
   onConfirmarPagamento,
 }: ModalDetalhesPagamentoProps) {
   const [mensalista, setMensalista] = useState(false);
   const [percentual, setPercentual] = useState(50);
   const [metodoPagamento, setMetodoPagamento] = useState("pix");
 
-  const valorPago = (valorTotal * percentual) / 100;
+  const valorPago = (dados.valor * percentual) / 100;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -43,14 +45,13 @@ export default function ModalDetalhesPagamento({
       <div className="bg-blue-100/60 text-sm rounded-lg px-4 py-3 mb-6 border border-blue-300">
         <p>
           <span className="font-medium">Quadra:</span>{" "}
-          <span className="text-azulBase">{quadra}</span>
+          <span className="text-azulBase">{dados.quadra}</span>
         </p>
         <p>
-          <span className="font-medium">Data/Hora:</span> {dataHora}
+          <span className="font-medium">Data/Hora:</span> {`${formatarDataBrasileira(dados.data)} às ${dados.horario.split(" - ")[0]}`}
         </p>
         <p>
-          <span className="font-medium">Valor total:</span> R${" "}
-          {valorTotal.toFixed(2)}
+          <span className="font-medium">Valor total:</span> R${dados.valor.toFixed(2)}
         </p>
       </div>
 
@@ -91,8 +92,8 @@ export default function ModalDetalhesPagamento({
           className="w-full mb-2 accent-violet-500"
         />
         <div className="text-xs flex justify-between mb-1">
-          <span>Min: 50% (R$ {(valorTotal * 0.5).toFixed(2)})</span>
-          <span>Total: 100% (R$ {valorTotal.toFixed(2)})</span>
+          <span>Min: 50% (R$ {(dados.valor * 0.5).toFixed(2)})</span>
+          <span>Total: 100% (R$ {dados.valor.toFixed(2)})</span>
         </div>
         <div className="bg-violet-100 rounded-md text-center py-2 font-semibold text-[15px] text-violet-800">
           Valor a pagar:{" "}
