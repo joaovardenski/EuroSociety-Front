@@ -1,36 +1,156 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import HeaderEuro from "../../components/Layout/HeaderEuro";
 import FooterEuro from "../../components/Layout/FooterEuro";
 import AdminSidebar from "../../components/Navigation/AdminSidebar";
-import InputConfig from "../../components/InputConfig";
+import CardQuadraVariaveis from "../../components/CardQuadraVariaveis";
+
+import { Quadras } from "../../data/Variaveis";
+
+// Tipos das quadras
+interface QuadraConfig {
+  precoNormal: number;
+  precoNoturno: number;
+  horaAbertura: string;
+  horaFechamento: string;
+  descontoMensalista: number;
+}
 
 export default function VariablesAdmin() {
-  // Society
-  const [societyPrecoNormal, setSocietyPrecoNormal] = useState(120);
-  const [societyPrecoApos18h, setSocietyPrecoApos18h] = useState(150);
-  const [societyHoraAbertura, setSocietyHoraAbertura] = useState("08:00");
-  const [societyHoraFechamento, setSocietyHoraFechamento] = useState("22:00");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  // Futevôlei 1
-  const [fut1PrecoNormal, setFut1PrecoNormal] = useState(100);
-  const [fut1PrecoApos18h, setFut1PrecoApos18h] = useState(120);
-  const [fut1HoraAbertura, setFut1HoraAbertura] = useState("07:00");
-  const [fut1HoraFechamento, setFut1HoraFechamento] = useState("21:00");
+  // ----------------- STATES -----------------
+  const [society, setSociety] = useState<QuadraConfig>({
+    precoNormal: 0,
+    precoNoturno: 0,
+    horaAbertura: "08:00",
+    horaFechamento: "22:00",
+    descontoMensalista: 0,
+  });
 
-  // Futevôlei 2
-  const [fut2PrecoNormal, setFut2PrecoNormal] = useState(100);
-  const [fut2PrecoApos18h, setFut2PrecoApos18h] = useState(120);
-  const [fut2HoraAbertura, setFut2HoraAbertura] = useState("07:00");
-  const [fut2HoraFechamento, setFut2HoraFechamento] = useState("21:00");
+  const [fut1, setFut1] = useState<QuadraConfig>({
+    precoNormal: 0,
+    precoNoturno: 0,
+    horaAbertura: "07:00",
+    horaFechamento: "21:00",
+    descontoMensalista: 0,
+  });
 
-  // Descontos mensalistas
-  const [descontoSociety, setDescontoSociety] = useState(15);
-  const [descontoFutevolei, setDescontoFutevolei] = useState(15);
+  const [fut2, setFut2] = useState<QuadraConfig>({
+    precoNormal: 0,
+    precoNoturno: 0,
+    horaAbertura: "07:00",
+    horaFechamento: "21:00",
+    descontoMensalista: 0,
+  });
 
+  // ----------------- FETCH INITIAL DATA -----------------
+  useEffect(() => {
+    async function fetchQuadras() {
+      try {
+        setLoading(true);
+        // Simulação de API
+        // const response = await fetch("/api/admin/quadras"); // <-- API real no futuro
+        const response = Quadras;
+        // if (!response.ok) throw new Error("Erro ao buscar dados das quadras");
+
+        //const data = await response.json();
+        const data = response;
+        setSociety({
+          precoNormal: data.society.precoNormal,
+          precoNoturno: data.society.precoNoturno,
+          horaAbertura: formatHora(data.society.horaAbertura),
+          horaFechamento: formatHora(data.society.horaFechamento),
+          descontoMensalista: data.society.descontoMensalista * 100,
+        });
+        setFut1({
+          precoNormal: data.futevolei1.precoNormal,
+          precoNoturno: data.futevolei1.precoNoturno,
+          horaAbertura: formatHora(data.futevolei1.horaAbertura),
+          horaFechamento: formatHora(data.futevolei1.horaFechamento),
+          descontoMensalista: data.futevolei1.descontoMensalista * 100,
+        });
+        setFut2({
+          precoNormal: data.futevolei2.precoNormal,
+          precoNoturno: data.futevolei2.precoNoturno,
+          horaAbertura: formatHora(data.futevolei2.horaAbertura),
+          horaFechamento: formatHora(data.futevolei2.horaFechamento),
+          descontoMensalista: data.futevolei2.descontoMensalista * 100,
+        });
+      } catch (err) {
+        console.error(err);
+        setError("Falha ao carregar dados. Tente novamente.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchQuadras();
+  }, []);
+
+  // ----------------- HELPERS -----------------
+  function formatHora(hora: number): string {
+    return `${String(hora).padStart(2, "0")}:00`;
+  }
+
+  function validarQuadra(q: QuadraConfig): string {
+    if (q.precoNormal <= 0) return "Preço normal deve ser maior que 0";
+    if (q.precoNoturno <= 0) return "Preço noturno deve ser maior que 0";
+    if (q.precoNoturno < q.precoNormal)
+      return "Preço noturno deve ser maior ou igual ao normal";
+    if (!q.horaAbertura || !q.horaFechamento)
+      return "Horários não podem ser vazios";
+    if (q.horaAbertura >= q.horaFechamento)
+      return "Horário de abertura deve ser antes do fechamento";
+    return "";
+  }
+
+  async function salvarAlteracoes(tipo: "society" | "fut1" | "fut2") {
+    const quadra = tipo === "society" ? society : tipo === "fut1" ? fut1 : fut2;
+    const validacao = validarQuadra(quadra);
+    if (validacao) {
+      alert(validacao);
+      return;
+    }
+
+    try {
+      const body = {
+        ...quadra,
+        descontoMensalista: quadra.descontoMensalista / 100, // converter para 0.x
+      };
+      const response = await fetch(`/api/admin/quadras/${tipo}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) throw new Error("Erro ao salvar alterações");
+      alert("Alterações salvas com sucesso!");
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao salvar. Verifique sua conexão.");
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-lg text-gray-600">Carregando dados...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-red-600 font-semibold">{error}</p>
+      </div>
+    );
+  }
+
+  // ----------------- COMPONENT -----------------
   return (
     <div className="flex flex-col min-h-screen bg-[#e6f4ff]">
       <HeaderEuro />
-
       <div className="flex flex-1 overflow-hidden">
         <AdminSidebar />
 
@@ -41,140 +161,31 @@ export default function VariablesAdmin() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Society */}
-            <div className="bg-white p-6 rounded-xl shadow-md">
-              <h2 className="text-lg font-semibold border-b pb-2 mb-4">
-                Quadra Society
-              </h2>
-              <div className="space-y-3">
-                <InputConfig
-                  label="Preço normal (R$/h)"
-                  value={societyPrecoNormal}
-                  onChange={setSocietyPrecoNormal}
-                  type="number"
-                />
-                <InputConfig
-                  label="Preço após 18h (R$/h)"
-                  value={societyPrecoApos18h}
-                  onChange={setSocietyPrecoApos18h}
-                  type="number"
-                />
-                <InputConfig
-                  label="Horário de abertura"
-                  value={societyHoraAbertura}
-                  onChange={setSocietyHoraAbertura}
-                  type="time"
-                />
-                <InputConfig
-                  label="Horário de fechamento"
-                  value={societyHoraFechamento}
-                  onChange={setSocietyHoraFechamento}
-                  type="time"
-                />
-                <button className="mt-2 bg-[#2b4363] text-white px-4 py-2 rounded-md hover:bg-[#1f324b] transition">
-                  Salvar Society
-                </button>
-              </div>
-            </div>
+            <CardQuadraVariaveis
+              titulo="Quadra Society"
+              config={society}
+              setConfig={setSociety}
+              onSave={() => salvarAlteracoes("society")}
+            />
 
             {/* Futevôlei 1 */}
-            <div className="bg-white p-6 rounded-xl shadow-md">
-              <h2 className="text-lg font-semibold border-b pb-2 mb-4">
-                Quadra de Futevôlei 1
-              </h2>
-              <div className="space-y-3">
-                <InputConfig
-                  label="Preço normal (R$/h)"
-                  value={fut1PrecoNormal}
-                  onChange={setFut1PrecoNormal}
-                  type="number"
-                />
-                <InputConfig
-                  label="Preço após 18h (R$/h)"
-                  value={fut1PrecoApos18h}
-                  onChange={setFut1PrecoApos18h}
-                  type="number"
-                />
-                <InputConfig
-                  label="Horário de abertura"
-                  value={fut1HoraAbertura}
-                  onChange={setFut1HoraAbertura}
-                  type="time"
-                />
-                <InputConfig
-                  label="Horário de fechamento"
-                  value={fut1HoraFechamento}
-                  onChange={setFut1HoraFechamento}
-                  type="time"
-                />
-                <button className="mt-2 bg-[#2b4363] text-white px-4 py-2 rounded-md hover:bg-[#1f324b] transition">
-                  Salvar Futevôlei 1
-                </button>
-              </div>
-            </div>
+            <CardQuadraVariaveis
+              titulo="Quadra de Futevôlei 1"
+              config={fut1}
+              setConfig={setFut1}
+              onSave={() => salvarAlteracoes("fut1")}
+            />
 
             {/* Futevôlei 2 */}
-            <div className="bg-white p-6 rounded-xl shadow-md">
-              <h2 className="text-lg font-semibold border-b pb-2 mb-4">
-                Quadra de Futevôlei 2
-              </h2>
-              <div className="space-y-3">
-                <InputConfig
-                  label="Preço normal (R$/h)"
-                  value={fut2PrecoNormal}
-                  onChange={setFut2PrecoNormal}
-                  type="number"
-                />
-                <InputConfig
-                  label="Preço após 18h (R$/h)"
-                  value={fut2PrecoApos18h}
-                  onChange={setFut2PrecoApos18h}
-                  type="number"
-                />
-                <InputConfig
-                  label="Horário de abertura"
-                  value={fut2HoraAbertura}
-                  onChange={setFut2HoraAbertura}
-                  type="time"
-                />
-                <InputConfig
-                  label="Horário de fechamento"
-                  value={fut2HoraFechamento}
-                  onChange={setFut2HoraFechamento}
-                  type="time"
-                />
-                <button className="mt-2 bg-[#2b4363] text-white px-4 py-2 rounded-md hover:bg-[#1f324b] transition">
-                  Salvar Futevôlei 2
-                </button>
-              </div>
-            </div>
-
-            {/* Descontos */}
-            <div className="bg-white p-6 rounded-xl shadow-md">
-              <h2 className="text-lg font-semibold border-b pb-2 mb-4">
-                Planos mensalistas
-              </h2>
-              <div className="space-y-3">
-                <InputConfig
-                  label="Desconto (%) mensalista: Society"
-                  value={descontoSociety}
-                  onChange={setDescontoSociety}
-                  type="number"
-                />
-                <InputConfig
-                  label="Desconto (%) mensalista: Futevôlei"
-                  value={descontoFutevolei}
-                  onChange={setDescontoFutevolei}
-                  type="number"
-                />
-                <button className="mt-2 bg-[#2b4363] text-white px-4 py-2 rounded-md hover:bg-[#1f324b] transition">
-                  Salvar desconto
-                </button>
-              </div>
-            </div>
+            <CardQuadraVariaveis
+              titulo="Quadra de Futevôlei 2"
+              config={fut2}
+              setConfig={setFut2}
+              onSave={() => salvarAlteracoes("fut2")}
+            />
           </div>
         </main>
       </div>
-
       <FooterEuro />
     </div>
   );

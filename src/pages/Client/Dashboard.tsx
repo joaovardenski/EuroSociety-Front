@@ -89,7 +89,7 @@ function Dashboard() {
 
       <main className="flex flex-col items-center flex-grow px-4 py-10 w-full">
         {isLoading ? (
-          <LoadingMessage message="Carregando quadras dados..."/>
+          <LoadingMessage message="Carregando dados..."/>
         ) : (
           <>
             {/* Boas-vindas */}

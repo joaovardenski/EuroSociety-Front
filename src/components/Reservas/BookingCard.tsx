@@ -24,6 +24,19 @@ export default function BookingCard({ reserva, onCancel }: BookingCardProps) {
     (q) => q.nome === reserva.quadra
   );
 
+  function calcularValorReserva(
+    slot: string,
+    quadraInfo: (typeof Quadras)[keyof typeof Quadras] | undefined
+  ) {
+    if (!quadraInfo) return "N/A";
+
+    const [horaInicio] = slot.split(" - "); // ex: "18:00"
+    const hora = parseInt(horaInicio.split(":")[0], 10);
+
+    const preco = hora >= 18 ? quadraInfo.precoNoturno : quadraInfo.precoNormal;
+    return `R$ ${preco.toFixed(2)}`;
+  }
+
   return (
     <div className="flex items-start bg-white shadow-md rounded-xl p-4 justify-between flex-col md:flex-row md:items-center">
       {/* Ícone */}
@@ -45,7 +58,7 @@ export default function BookingCard({ reserva, onCancel }: BookingCardProps) {
         </p>
         <p className="flex items-center gap-2">
           <DollarSign size={16} /> Valor:{" "}
-          {quadraInfo ? `R$ ${quadraInfo.preco.toFixed(2)}` : "N/A"}
+          {calcularValorReserva(reserva.slot, quadraInfo)}
         </p>
         <p className="font-semibold">
           Status:{" "}
