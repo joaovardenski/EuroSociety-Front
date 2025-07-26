@@ -1,6 +1,6 @@
 import Modal from "../Modal";
-
 import { formatarDataBrasileira } from "../../../utils/DateUtils";
+import { Unlock, Info } from "lucide-react";
 
 interface ModalDesbloquearAdminProps {
   isOpen: boolean;
@@ -20,45 +20,64 @@ export default function ModalDesbloquearAdmin({
   dados,
   onConfirmar,
 }: ModalDesbloquearAdminProps) {
-
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <h2 className="text-center text-xl font-semibold text-azulBase mb-5">
-        Desbloquear horário
-      </h2>
+      <div className="flex flex-col items-center text-center">
+        {/* Ícone central */}
+        <div className="bg-green-100 text-green-600 rounded-full p-3 mb-4 shadow-sm">
+          <Unlock size={32} />
+        </div>
 
-      <div className="space-y-2 text-md text-gray-700 mb-6 border-2 border-azulBase rounded-lg p-4 bg-gray-100">
-        <p>
-          <strong>Quadra:</strong>{" "}
-          <span className="text-azulBase">{dados.quadra}</span>
+        <h2 className="text-xl font-semibold text-green-700 mb-2">
+          Desbloquear horário
+        </h2>
+        <p className="text-sm text-gray-700 mb-4 px-4">
+          Ao desbloquear este horário, ele voltará a aparecer para os clientes
+          no sistema de reservas.
         </p>
-        <p>
-          <strong>Data:</strong>{" "}
-          <span className="text-azulBase ">{formatarDataBrasileira(dados.data)}</span>
-        </p>
-        <p>
-          <strong>Horário:</strong>{" "}
-          <span className="text-azulBase">{dados.horario}</span>
-        </p>
-        <p>
-          <strong>Valor:</strong>{" "}
-          <span className="text-azulBase">R$ {dados.valor.toFixed(2)}</span>
-        </p>
-      </div>
 
-      <div className="flex justify-between gap-4">
-        <button
-          onClick={onClose}
-          className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition"
-        >
-          Cancelar
-        </button>
-        <button
-          onClick={onConfirmar}
-          className="w-full py-2 rounded-md bg-azulBase text-white font-semibold hover:bg-azulEscuro transition"
-        >
+        {/* Informações da reserva */}
+        <div className="bg-green-50 border border-green-200 text-sm rounded-lg px-4 py-3 w-full mb-5 shadow-inner text-left">
+          <p>
+            <span className="font-medium">Quadra:</span>{" "}
+            <span className="text-green-700">{dados.quadra}</span>
+          </p>
+          <p>
+            <span className="font-medium">Data:</span>{" "}
+            {formatarDataBrasileira(dados.data)}
+          </p>
+          <p>
+            <span className="font-medium">Horário:</span> {dados.horario}
+          </p>
+          <p>
+            <span className="font-medium">Valor:</span> R${" "}
+            {dados.valor.toFixed(2)}
+          </p>
+        </div>
+
+        {/* Dica informativa */}
+        <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
+          <Info size={14} className="text-green-600" />
+          <span>
+            Clientes podem visualizar este horário imediatamente após o desbloqueio.
+          </span>
+        </div>
+
+        {/* Botões */}
+        <div className="flex justify-between gap-4 w-full">
+          <button
+            onClick={onClose}
+            className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={onConfirmar}
+            className="w-full py-2 rounded-md bg-green-600 text-white font-semibold hover:bg-green-700 transition"
+          >
             Desbloquear
-        </button>
+          </button>
+        </div>
       </div>
     </Modal>
   );

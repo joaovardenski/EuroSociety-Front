@@ -12,10 +12,11 @@ import TableActiveBookings from "../../components/Reservas/TableActiveBookings";
 import { reservasAtivas } from "../../data/Variaveis";
 import ModalRecebimentoAdmin from "../../components/Modais/Admin/ModalRecebimento";
 import ModalCancelarAdmin from "../../components/Modais/Admin/ModalCancelarAdmin";
+import { getCurrentDate } from "../../utils/DateUtils";
 
 export default function ActiveBookingsAdmin() {
   const [tipoSelecionado, setTipoSelecionado] = useState("Todas");
-  const [dataSelecionada, setDataSelecionada] = useState("2025-07-18"); // exemplo fixo
+  const [dataSelecionada, setDataSelecionada] = useState(getCurrentDate);
 
   const [modalRecebimentoOpen, setModalRecebimentoOpen] = useState(false);
   const [modalCancelarOpen, setModalCancelarOpen] = useState(false);
@@ -27,6 +28,14 @@ export default function ActiveBookingsAdmin() {
     horario: string;
     pagamentoFaltante: number;
   } | null>(null);
+
+  function handleSetDataSelecionada(novaData: string) {
+    if (novaData < getCurrentDate()) {
+      alert("Não é possível selecionar uma data passada.");
+      return;
+    }
+    setDataSelecionada(novaData);
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-[#e6f4ff]">
@@ -45,7 +54,7 @@ export default function ActiveBookingsAdmin() {
             <div className="flex items-center gap-4 pl-4">
               <FiltroData
                 dataSelecionada={dataSelecionada}
-                setDataSelecionada={setDataSelecionada}
+                setDataSelecionada={handleSetDataSelecionada}
               />
               <FiltroTipo
                 tipoSelecionado={tipoSelecionado}

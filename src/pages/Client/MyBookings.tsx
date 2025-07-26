@@ -1,6 +1,5 @@
 // Hooks
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 // Icons
 import { ArrowLeft } from "lucide-react";
@@ -15,13 +14,13 @@ import BottomNav from "../../components/Navigation/BottomNav";
 import Modal from "../../components/Modais/Modal";
 import ModalCancelarReserva from "../../components/Modais/Client/ModalCancelarReserva";
 import LoadingMessage from "../../components/LoadingMessage";
+import { Link } from "react-router-dom";
+import { filtrarReservas } from "../../utils/FilterUtils";
 
 // Types
 type FiltroReservas = "Todas" | "Próximas" | "Anteriores";
 
 function MyBookings() {
-  const navigate = useNavigate();
-
   const [modalOpen, setModalOpen] = useState(false);
   const [reservaSelecionada, setReservaSelecionada] = useState<Reserva | null>(null);
   const [reservas, setReservas] = useState<Reserva[]>([]);
@@ -35,6 +34,7 @@ function MyBookings() {
 
   useEffect(() => {
     async function carregarReservas() {
+      //Pega todas minhas reservas com API
       try {
         const reservasAPI = await getMinhasReservas();
         setReservas(reservasAPI);
@@ -62,28 +62,6 @@ function MyBookings() {
     setReservaSelecionada(null);
   }
 
-  function filtrarReservas(reservas: Reserva[], filtro: string): Reserva[] {
-    const agora = new Date();
-
-    return reservas
-      .filter((reserva) => {
-        const [horaInicio] = reserva.slot.split(" - ");
-        const dataHoraReserva = new Date(`${reserva.data}T${horaInicio}:00`);
-
-        if (filtro === "Próximas") return dataHoraReserva >= agora;
-        if (filtro === "Anteriores") return dataHoraReserva < agora;
-        return true;
-      })
-      .sort((a, b) => {
-        const [horaInicioA] = a.slot.split(" - ");
-        const [horaInicioB] = b.slot.split(" - ");
-        const dataHoraA = new Date(`${a.data}T${horaInicioA}:00`).getTime();
-        const dataHoraB = new Date(`${b.data}T${horaInicioB}:00`).getTime();
-
-        return filtro === "Anteriores" ? dataHoraB - dataHoraA : dataHoraA - dataHoraB;
-      });
-  }
-
   const reservasFiltradas = filtrarReservas(reservas, searchOption);
 
   return (
@@ -92,18 +70,18 @@ function MyBookings() {
 
       <main className="flex flex-col flex-grow mb-12 px-4 py-8 max-w-5xl mx-auto w-full md:mb-0">
         {isLoading ? (
-          <LoadingMessage message="Carregando reservas..."/>
+          <LoadingMessage message="Carregando reservas..." />
         ) : (
           <>
             {/* Título e filtros */}
             <div className="flex flex-col items-center justify-center gap-5 md:justify-between md:flex-row mb-3">
               <div className="flex items-center gap-4">
-                <button
-                  onClick={() => navigate(-1)}
+                <Link
+                  to={"/"}
                   className="text-azulBase hover:text-azulEscuro transition"
                 >
                   <ArrowLeft size={23} />
-                </button>
+                </Link>
                 <h1 className="text-2xl font-semibold text-azulBase">
                   Minhas reservas
                 </h1>
@@ -136,12 +114,12 @@ function MyBookings() {
                   <p className="text-lg font-semibold mb-2">
                     Nenhuma reserva encontrada para este filtro.
                   </p>
-                  <a
-                    href="/agendamento"
+                  <Link
+                    to={"/agendamento"}
                     className="text-azulBase hover:text-azulEscuro transition"
                   >
                     Clique aqui para agendar uma nova reserva
-                  </a>
+                  </Link>
                 </div>
               ) : (
                 reservasFiltradas.map((reserva) => (

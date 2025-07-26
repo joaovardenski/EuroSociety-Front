@@ -1,6 +1,5 @@
 // Hooks
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 // Components
 import HeaderEuro from "../../components/Layout/HeaderEuro";
 import FooterEuro from "../../components/Layout/FooterEuro";
@@ -23,14 +22,12 @@ type Reserva = {
 type ReservaComDataHora = Reserva & { dataHora: Date };
 
 function Dashboard() {
-  const navigate = useNavigate();
-
   const [user, setUser] = useState<string>("");
   const [reservas, setReservas] = useState<Reserva[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function carregarDados() {
+    async function carregarDados() { //Carrega user e reservas do usuário com as APIs e salva nos states
       try {
         // Simula chamadas à API
         const usuarioDaAPI = await getUsuario();
@@ -49,21 +46,19 @@ function Dashboard() {
   }, []);
 
   // Simulações de API (substitua com fetch/axios futuramente)
-  async function getUsuario(): Promise<string> {
+  async function getUsuario(): Promise<string> { // Pega nome do usuário
     return "João Victor";
   }
 
-  async function getMinhasReservas(): Promise<Reserva[]> {
+  async function getMinhasReservas(): Promise<Reserva[]> { // Pega todas minhas reservas
     return import("../../data/Variaveis").then((mod) => mod.minhasReservas);
   }
 
-  function getReservasConfirmadas(reservas: Reserva[]): Reserva[] {
+  function getReservasConfirmadas(reservas: Reserva[]): Reserva[] { // Filtra apenas reservas confirmadas
     return reservas.filter((reserva) => reserva.status === "CONFIRMADO");
   }
 
-  function getProximaReserva(
-    reservas: Reserva[]
-  ): ReservaComDataHora | undefined {
+  function getProximaReserva(reservas: Reserva[]): ReservaComDataHora | undefined { // Pega minha próxima reserva
     const agora = new Date();
     return reservas
       .map(adicionarDataHora)
@@ -71,7 +66,7 @@ function Dashboard() {
       .sort((a, b) => a.dataHora.getTime() - b.dataHora.getTime())[0];
   }
 
-  function adicionarDataHora(reserva: Reserva): ReservaComDataHora {
+  function adicionarDataHora(reserva: Reserva): ReservaComDataHora { // Formata DataHora para poder ordenar reservas
     const [horaInicio] = reserva.slot.split(" - ");
     return {
       ...reserva,
@@ -104,11 +99,10 @@ function Dashboard() {
 
             {/* Cards */}
             <div className="flex flex-wrap gap-6 justify-center w-full max-w-6xl mb-10 md:mb-0">
-              <ProximaReservaCard reserva={lastBooking} navigate={navigate} />
-              <CardNovaReserva navigate={navigate} />
+              <ProximaReservaCard reserva={lastBooking}/>
+              <CardNovaReserva/>
               <ReservasAtivasCard
                 count={numberOfActiveBookings}
-                navigate={navigate}
               />
             </div>
           </>

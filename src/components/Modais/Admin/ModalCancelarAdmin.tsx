@@ -1,8 +1,6 @@
 import Modal from "../Modal";
-
 import { formatarDataBrasileira } from "../../../utils/DateUtils";
-
-import { Hourglass } from "lucide-react";
+import { AlertTriangle, User, CalendarClock } from "lucide-react";
 
 interface ModalCancelarAdminProps {
   isOpen: boolean;
@@ -23,24 +21,30 @@ export default function ModalCancelarAdmin({
   dados,
   onConfirmar,
 }: ModalCancelarAdminProps) {
+  const valorPago = 150 - dados.pagamentoFaltante;
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="flex flex-col items-center text-center">
-        <div className="bg-yellow-100 text-yellow-600 rounded-full p-3 mb-4">
-          <Hourglass size={32} />
+        {/* Ícone de alerta */}
+        <div className="bg-red-100 text-red-600 rounded-full p-3 mb-4 shadow-sm">
+          <AlertTriangle size={32} />
         </div>
 
-        <h2 className="text-lg font-bold text-azulBase mb-3">
-          Este horário está ocupado
+        {/* Título */}
+        <h2 className="text-lg font-bold text-red-700 mb-2">
+          Cancelar esta reserva?
         </h2>
-
-        <p className="text-sm text-gray-700 mb-6">
-          Caso você deseja cancelar mesmo assim, o cliente será notificado do cancelamento da reserva.
+        <p className="text-sm text-gray-600 mb-5 px-4">
+          Ao cancelar este horário, o cliente{" "}
+          <span className="font-semibold text-gray-800">{dados.cliente}</span>{" "}
+          será notificado imediatamente.
         </p>
 
         {/* Dados da reserva */}
-        <div className="bg-blue-100/60 text-sm rounded-lg px-4 py-3 w-full mb-6 text-left">
-        <p>
+        <div className="bg-gray-50 border border-gray-200 text-sm rounded-lg px-4 py-3 w-full mb-5 shadow-inner text-left space-y-1">
+          <p className="flex items-center gap-2">
+            <User size={14} className="text-gray-500" />
             <span className="font-medium">Cliente:</span>{" "}
             <span className="text-azulBase">{dados.cliente}</span>
           </p>
@@ -48,17 +52,26 @@ export default function ModalCancelarAdmin({
             <span className="font-medium">Quadra:</span>{" "}
             <span className="text-azulBase">{dados.quadra}</span>
           </p>
-          <p>
-            <span className="font-medium">Data:</span> {formatarDataBrasileira(dados.data)}
+          <p className="flex items-center gap-2">
+            <CalendarClock size={14} className="text-gray-500" />
+            <span className="font-medium">Data:</span>{" "}
+            {formatarDataBrasileira(dados.data)}
           </p>
           <p>
             <span className="font-medium">Horário:</span> {dados.horario}
           </p>
           <p>
-            <span className="font-medium">Valor pago:</span> R${" "}
-            {150 - dados.pagamentoFaltante}
+            <span className="font-medium">Valor pago:</span>{" "}
+            <span className="text-green-600 font-semibold">
+              R$ {valorPago.toFixed(2)}
+            </span>
           </p>
         </div>
+
+        {/* Mensagem de alerta extra */}
+        <p className="text-xs text-red-500 mb-4 font-medium">
+          *Essa ação não pode ser desfeita. Verifique antes de confirmar.
+        </p>
 
         {/* Botões */}
         <div className="flex justify-between gap-4 w-full">
@@ -70,7 +83,7 @@ export default function ModalCancelarAdmin({
           </button>
           <button
             onClick={onConfirmar}
-            className="w-full py-2 rounded-md bg-yellow-500 text-white font-semibold hover:bg-yellow-600 transition"
+            className="w-full py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700 transition"
           >
             Cancelar reserva
           </button>

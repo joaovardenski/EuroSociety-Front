@@ -1,11 +1,11 @@
 import { ClipboardList, List } from "lucide-react";
+import { Link } from "react-router-dom";
 
 type Props = {
   count: number;
-  navigate: (path: string) => void;
 };
 
-export default function ReservasAtivasCard({ count, navigate }: Props) {
+export default function ReservasAtivasCard({ count }: Props) {
   return (
     <div className="flex-1 min-w-[280px] max-w-[350px] bg-white rounded-xl shadow-md p-6 flex flex-col justify-between">
       <div className="text-center">
@@ -19,12 +19,12 @@ export default function ReservasAtivasCard({ count, navigate }: Props) {
           Acompanhe seus horários e gerencie seus jogos.
         </p>
       </div>
-      <button
+      <Link
+        to={"/minhas-reservas"}
         className="w-full font-semibold py-2 rounded bg-white border-2 border-gray-400 text-sm hover:bg-gray-100 flex items-center justify-center gap-2"
-        onClick={() => navigate("/minhas-reservas")}
       >
         <List size={16} /> Ver todas
-      </button>
+      </Link>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { CalendarClock, Eye } from "lucide-react";
 import { formatarDataBrasileira } from "../../utils/DateUtils";
+import { Link } from "react-router-dom";
 
 type Reserva = {
   id: number;
@@ -15,11 +16,9 @@ type ReservaComDataHora = Reserva & { dataHora: Date };
 
 type Props = {
   reserva?: ReservaComDataHora;
-  navigate: (path: string) => void;
 };
 
-export default function ProximaReservaCard({ reserva, navigate }: Props) {
-
+export default function ProximaReservaCard({ reserva }: Props) {
   return (
     <div className="flex-1 min-w-[280px] max-w-[350px] bg-white rounded-xl shadow-md p-6 flex flex-col justify-between">
       <div>
@@ -60,12 +59,12 @@ export default function ProximaReservaCard({ reserva, navigate }: Props) {
           </p>
         )}
       </div>
-      <button
+      <Link
+        to={"/minhas-reservas"}
         className="mt-4 w-full font-semibold py-2 rounded bg-white border-2 border-gray-400 text-sm hover:bg-gray-100 flex items-center justify-center gap-2"
-        onClick={() => navigate("/minhas-reservas")}
       >
         <Eye size={16} /> Ver detalhes
-      </button>
+      </Link>
     </div>
   );
 }

@@ -75,7 +75,9 @@ export default function BookingCard({ reserva, onCancel }: BookingCardProps) {
             className={`font-semibold ${
               reserva.status === "CONFIRMADO"
                 ? "text-green-600"
-                : "text-red-600"
+                : reserva.status === "CANCELADO"
+                ? "text-red-600"
+                : "text-azulBase"
             }`}
           >
             {reserva.status}

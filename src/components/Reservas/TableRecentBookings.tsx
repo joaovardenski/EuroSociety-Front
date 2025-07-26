@@ -13,7 +13,7 @@ interface TableRecentBookingsProps {
 
 export default function TableRecentBookings({ recentBookings }: TableRecentBookingsProps) {
   return (
-    <div className="bg-white shadow-md rounded-xl p-4">
+    <div className="bg-white shadow-md rounded-xl p-4 mb-1">
       <h2 className="text-lg font-bold text-[#052c64] mb-4">
         Agendamentos recentes
       </h2>

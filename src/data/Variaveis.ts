@@ -1,4 +1,16 @@
-export const Quadras = [
+type Quadra = {
+  id: number,
+  nome: string,
+  tipo: string,
+  status: string,
+  horaAbertura: number,
+  horaFechamento: number,
+  precoNormal: number,
+  precoNoturno: number,
+  descontoMensalista: number,
+}
+
+export const Quadras: Quadra[] = [
   {
     id: 1,
     nome: "Quadra Society",
@@ -89,9 +101,18 @@ export const minhasReservas = [
     id: 3,
     usuario: "João Victor",
     quadra: "Quadra Futevôlei 1",
-    data: "2025-07-16",
+    data: "2025-07-30",
     slot: "15:00 - 16:00",
     status: "CONFIRMADO",
+    statusPagamento: "Total",
+  },
+  {
+    id: 4,
+    usuario: "João Victor",
+    quadra: "Quadra Futevôlei 1",
+    data: "2025-07-16",
+    slot: "15:00 - 16:00",
+    status: "CONCLUIDO",
     statusPagamento: "Total",
   },
 ];

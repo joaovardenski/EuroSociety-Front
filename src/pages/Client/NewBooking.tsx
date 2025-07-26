@@ -1,6 +1,6 @@
 // Hooks
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 // Utils
 import { getCurrentDate, gerarHorarioFim } from "../../utils/DateUtils";
@@ -24,7 +24,7 @@ import ModalFilaDeEspera from "../../components/Modais/Client/ModalFilaDeEspera"
 import { ArrowLeft } from "lucide-react";
 
 // Types locais
-type QuadraInfo = {
+type Quadra = {
   id: number;
   nome: string;
   tipo: string;
@@ -40,17 +40,12 @@ type Indisponibilidade = { nome: string; indisponiveis: string[] };
 type Bloqueio = { nome: string; bloqueados: string[] };
 
 export default function NewBooking() {
-  const navigate = useNavigate();
-
   // ----------------- Estados -----------------
   const [tipoSelecionado, setTipoSelecionado] = useState("Todas");
   const [dataSelecionada, setDataSelecionada] = useState(getCurrentDate());
 
-  const [quadras, setQuadras] = useState<QuadraInfo[]>([]);
-
-  const [indisponibilidades, setIndisponibilidades] = useState<
-    Indisponibilidade[]
-  >([]);
+  const [quadras, setQuadras] = useState<Quadra[]>([]);
+  const [indisponibilidades, setIndisponibilidades] = useState<Indisponibilidade[]>([]);
   const [bloqueios, setBloqueios] = useState<Bloqueio[]>([]);
 
   const [isLoading, setIsLoading] = useState(true);
@@ -67,9 +62,9 @@ export default function NewBooking() {
   });
 
   // ----------------- “APIs” locais (substitua por fetch/axios depois) -----------------
-  async function getQuadras(): Promise<QuadraInfo[]> {
+  async function getQuadras(): Promise<Quadra[]> {
     const mod = await import("../../data/Variaveis");
-    return mod.Quadras as QuadraInfo[];
+    return mod.Quadras as Quadra[];
   }
 
   async function getIndisponibilidades(): Promise<Indisponibilidade[]> {
@@ -111,7 +106,7 @@ export default function NewBooking() {
   const getBloqueadas = (nome: string) =>
     bloqueios.find((q) => q.nome === nome)?.bloqueados || [];
 
-  const calcularValor = (quadra: QuadraInfo, horario: string) => {
+  const calcularValor = (quadra: Quadra, horario: string) => {
     const horaInt = parseInt(horario.split(":")[0], 10);
     return horaInt >= 18 ? quadra.precoNoturno : quadra.precoNormal;
   };
@@ -157,12 +152,12 @@ export default function NewBooking() {
       <main className="bg-white mt-7 mb-20 rounded-4xl flex-grow max-w-5xl w-full mx-auto px-4 py-8 shadow-2xl md:mb-10">
         {/* Topo */}
         <div className="relative flex items-center justify-center mb-6">
-          <button
-            onClick={() => navigate("/")}
+          <Link
+            to={"/"}
             className="absolute left-0 text-azulBase hover:text-azulEscuro transition"
           >
             <ArrowLeft size={23} />
-          </button>
+          </Link>
           <h1 className="text-xl font-semibold text-azulBase text-center md:text-2xl">
             Disponibilidade de quadras
           </h1>
@@ -187,12 +182,7 @@ export default function NewBooking() {
           <LoadingMessage message="Carregando quadras disponíveis..." />
         ) : (
           <div className="space-y-6">
-            {quadras
-              .filter(
-                (quadra) =>
-                  tipoSelecionado === "Todas" ||
-                  quadra.tipo.toLowerCase() === tipoSelecionado.toLowerCase()
-              )
+            {quadras.filter((quadra) => tipoSelecionado === "Todas" || quadra.tipo.toLowerCase() === tipoSelecionado.toLowerCase())
               .map((quadra) => (
                 <AvailableCourts
                   key={quadra.id}

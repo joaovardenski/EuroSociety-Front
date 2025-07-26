@@ -65,12 +65,12 @@ export default function AdminBooking() {
   };
 
   const handleHorarioClick = (
-    quadraKey: keyof typeof Quadras,
+    quadraIndex: number,
     horario: string,
     indisponivel: boolean,
     bloqueado: boolean
   ) => {
-    const config = Quadras[quadraKey];
+    const config = Quadras[quadraIndex]; // agora é QuadraInfo certinho
     const valor = calcularValor(config, horario);
 
     setHorarioSelecionado({
@@ -88,6 +88,14 @@ export default function AdminBooking() {
       setModalConfirmarAberto(true);
     }
   };
+
+  function handleSetDataSelecionada(novaData: string) {
+    if (novaData < getCurrentDate()) {
+      alert("Não é possível selecionar uma data passada.");
+      return;
+    }
+    setDataSelecionada(novaData);
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-[#e6f4ff]">
@@ -109,7 +117,7 @@ export default function AdminBooking() {
             />
             <FiltroData
               dataSelecionada={dataSelecionada}
-              setDataSelecionada={setDataSelecionada}
+              setDataSelecionada={handleSetDataSelecionada}
             />
           </div>
 
@@ -117,37 +125,28 @@ export default function AdminBooking() {
 
           {/* Lista de quadras */}
           <div className="space-y-6">
-            {Object.entries(Quadras).map(([key, quadra]) => {
+            {Quadras.map((quadra, index) => {
               if (
                 tipoSelecionado !== "Todas" &&
                 quadra.tipo.toLowerCase() !== tipoSelecionado.toLowerCase()
               ) {
                 return null;
-              } else {
-                return (
-                  <AvailableCourts
-                    key={quadra.nome}
-                    nome={quadra.nome}
-                    horaAbertura={quadra.horaAbertura}
-                    horaFechamento={quadra.horaFechamento}
-                    indisponiveis={getIndisponiveis(quadra.nome)}
-                    bloqueados={getBloqueadas(quadra.nome)}
-                    onHorarioClick={(
-                      horario: string,
-                      indisponivel: boolean,
-                      bloqueados: boolean
-                    ) =>
-                      handleHorarioClick(
-                        key as keyof typeof Quadras,
-                        horario,
-                        indisponivel,
-                        bloqueados
-                      )
-                    }
-                    isAdmin={true}
-                  />
-                );
               }
+
+              return (
+                <AvailableCourts
+                  key={quadra.nome}
+                  nome={quadra.nome}
+                  horaAbertura={quadra.horaAbertura}
+                  horaFechamento={quadra.horaFechamento}
+                  indisponiveis={getIndisponiveis(quadra.nome)}
+                  bloqueados={getBloqueadas(quadra.nome)}
+                  onHorarioClick={(horario, indisponivel, bloqueados) =>
+                    handleHorarioClick(index, horario, indisponivel, bloqueados)
+                  }
+                  isAdmin={true}
+                />
+              );
             })}
           </div>
         </main>

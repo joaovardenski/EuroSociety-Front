@@ -6,9 +6,10 @@ interface InputFieldAuthProps {
   label: string;
   type: string;
   placeholder: string;
-  value: string;
+  value: string | number;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string;
+  disabled?: boolean;
 }
 
 export default function InputFieldAuth({
@@ -19,6 +20,7 @@ export default function InputFieldAuth({
   value,
   onChange,
   error = "",
+  disabled,
 }: InputFieldAuthProps) {
   const [showPassword, setShowPassword] = useState(false);
   const isPassword = type === "password";
@@ -38,6 +40,7 @@ export default function InputFieldAuth({
         className={`w-full p-2 rounded-md outline-0 border ${
           error ? "border-red-500" : "border-gray-300"
         } bg-azulClaro md:bg-gray-200 md:border-2 pr-10`}
+        disabled={disabled}
       />
 
       {isPassword && (

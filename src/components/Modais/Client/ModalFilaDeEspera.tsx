@@ -24,7 +24,7 @@ export default function ModalFilaDeEspera({
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="flex flex-col items-center text-center">
         {/* Ícone central */}
-        <div className="bg-yellow-100 text-yellow-600 rounded-full p-4 mb-4 shadow-md animate-pulse">
+        <div className="bg-yellow-100 text-yellow-600 rounded-full p-4 mb-4 shadow-md">
           <Hourglass size={34} />
         </div>
 
