@@ -37,9 +37,8 @@ export function getNomeError(nome: string): string {
   if (!nome) return "Nome é obrigatório";
   if (nome.length < 2) return "Nome muito curto";
   if (nome.length > 80) return "Nome muito longo";
-  if (!isOnlyLettersAndSpaces(nome)) return "Nome deve conter apenas letras e espaços";
+  if (!isOnlyLettersAndSpaces(nome))
+    return "Nome deve conter apenas letras e espaços";
 
   return "";
 }
-
-

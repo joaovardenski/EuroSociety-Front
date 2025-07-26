@@ -7,6 +7,7 @@ import AdminSidebar from "../../components/Navigation/AdminSidebar";
 export default function ReportAdmin() {
   // const currentYear = new Date().getFullYear();
   const [tipoRelatorio, setTipoRelatorio] = useState("financeiro");
+  const [tipoQuadra, setTipoQuadra] = useState("todas");
   const [dataInicio, setDataInicio] = useState("2025-01-01");
   const [dataFim, setDataFim] = useState("2025-12-31");
 
@@ -23,7 +24,7 @@ export default function ReportAdmin() {
           </h1>
 
           {/* Card de filtros */}
-          <div className="bg-white p-6 rounded-xl shadow-md mb-8 flex flex-col md:flex-row md:items-center gap-4">
+          <div className="bg-white p-6 rounded-xl shadow-md mb-8 flex flex-col md:flex-row md:items-center gap-6">
             <div className="flex flex-col">
               <label className="text-gray-700 font-medium mb-1">
                 Tipo de relatório
@@ -35,6 +36,21 @@ export default function ReportAdmin() {
               >
                 <option value="financeiro">Financeiro</option>
                 <option value="ocupacao">Ocupação</option>
+              </select>
+            </div>
+
+            <div className="flex flex-col">
+              <label className="text-gray-700 font-medium mb-1">
+                Tipo de quadra
+              </label>
+              <select
+                className="border border-gray-300 rounded-md px-4 py-2"
+                onChange={(e) => setTipoQuadra(e.target.value)}
+                value={tipoQuadra}
+              >
+                <option value="financeiro">Todas</option>
+                <option value="society">Society</option>
+                <option value="futevolei">Futevôlei</option>
               </select>
             </div>
 

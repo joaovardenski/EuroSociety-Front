@@ -1,6 +1,7 @@
 import InputConfig from "./InputConfig";
 
 interface QuadraConfig {
+  id: number;
   precoNormal: number;
   precoNoturno: number;
   horaAbertura: string;

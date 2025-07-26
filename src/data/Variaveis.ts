@@ -1,6 +1,6 @@
-export const Quadras = {
-  //Da tabela de quadras
-  society: {
+export const Quadras = [
+  {
+    id: 1,
     nome: "Quadra Society",
     tipo: "Society",
     status: "disponível",
@@ -10,7 +10,8 @@ export const Quadras = {
     precoNoturno: 150,
     descontoMensalista: 0.15, // 15%
   },
-  futevolei1: {
+  {
+    id: 2,
     nome: "Quadra Futevôlei 1",
     tipo: "Futevôlei",
     status: "disponível",
@@ -20,7 +21,8 @@ export const Quadras = {
     precoNoturno: 120,
     descontoMensalista: 0.1,
   },
-  futevolei2: {
+  {
+    id: 3,
     nome: "Quadra Futevôlei 2",
     tipo: "Futevôlei",
     status: "disponível",
@@ -30,7 +32,7 @@ export const Quadras = {
     precoNoturno: 120,
     descontoMensalista: 0.1,
   },
-};
+];
 
 export const indisponibilidadesQuadras = [
   //Pega das reservas já feitas
@@ -69,7 +71,7 @@ export const minhasReservas = [
     id: 1,
     usuario: "João Victor",
     quadra: "Quadra Society",
-    data: "2025-07-30",
+    data: "2025-07-26",
     slot: "10:00 - 11:00",
     status: "CONFIRMADO",
     statusPagamento: "Parcial",
@@ -140,7 +142,6 @@ export const agendamentosRecentes = [
     valor: 100,
     status: "Parcial",
   },
-  
 ];
 
 export const estatisticasDashboard = {
@@ -148,7 +149,7 @@ export const estatisticasDashboard = {
   receitaMes: "R$ 1.850,75",
   novosClientes: 8,
   pagamentosPendentes: 2,
-}
+};
 
 export const reservasAtivas = [
   {
@@ -158,7 +159,7 @@ export const reservasAtivas = [
     data: "2025-07-30",
     slot: "10:00 - 11:00",
     statusPagamento: "Parcial",
-    pagamentoFaltante: 30
+    pagamentoFaltante: 30,
   },
   {
     id: 2,
@@ -167,7 +168,7 @@ export const reservasAtivas = [
     data: "2026-10-01",
     slot: "13:00 - 14:00",
     statusPagamento: "Parcial",
-    pagamentoFaltante: 25
+    pagamentoFaltante: 25,
   },
   {
     id: 3,
@@ -176,6 +177,6 @@ export const reservasAtivas = [
     data: "2025-07-16",
     slot: "15:00 - 16:00",
     statusPagamento: "Completo",
-    pagamentoFaltante: 0
+    pagamentoFaltante: 0,
   },
 ];

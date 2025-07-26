@@ -3,10 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 // Utils
-import {
-  getCurrentDate,
-  gerarHorarioFim,
-} from "../../utils/DateUtils";
+import { getCurrentDate, gerarHorarioFim } from "../../utils/DateUtils";
 
 // Components
 import HeaderEuro from "../../components/Layout/HeaderEuro";
@@ -16,6 +13,7 @@ import AvailableCourts from "../../components/Reservas/AvailableCourts";
 import FooterEuro from "../../components/Layout/FooterEuro";
 import BottomNav from "../../components/Navigation/BottomNav";
 import LegendaReservas from "../../components/Reservas/LegendaReservas";
+import LoadingMessage from "../../components/LoadingMessage";
 
 // Modals
 import ModalConfirmarAgendamento from "../../components/Modais/Client/ModalConfirmarAgendamento";
@@ -24,10 +22,10 @@ import ModalFilaDeEspera from "../../components/Modais/Client/ModalFilaDeEspera"
 
 // Icons
 import { ArrowLeft } from "lucide-react";
-import LoadingMessage from "../../components/LoadingMessage";
 
 // Types locais
 type QuadraInfo = {
+  id: number;
   nome: string;
   tipo: string;
   status: string;
@@ -48,8 +46,11 @@ export default function NewBooking() {
   const [tipoSelecionado, setTipoSelecionado] = useState("Todas");
   const [dataSelecionada, setDataSelecionada] = useState(getCurrentDate());
 
-  const [quadras, setQuadras] = useState<Record<string, QuadraInfo>>({});
-  const [indisponibilidades, setIndisponibilidades] = useState<Indisponibilidade[]>([]);
+  const [quadras, setQuadras] = useState<QuadraInfo[]>([]);
+
+  const [indisponibilidades, setIndisponibilidades] = useState<
+    Indisponibilidade[]
+  >([]);
   const [bloqueios, setBloqueios] = useState<Bloqueio[]>([]);
 
   const [isLoading, setIsLoading] = useState(true);
@@ -66,9 +67,9 @@ export default function NewBooking() {
   });
 
   // ----------------- “APIs” locais (substitua por fetch/axios depois) -----------------
-  async function getQuadras(): Promise<Record<string, QuadraInfo>> {
+  async function getQuadras(): Promise<QuadraInfo[]> {
     const mod = await import("../../data/Variaveis");
-    return mod.Quadras as Record<string, QuadraInfo>;
+    return mod.Quadras as QuadraInfo[];
   }
 
   async function getIndisponibilidades(): Promise<Indisponibilidade[]> {
@@ -116,28 +117,37 @@ export default function NewBooking() {
   };
 
   // ----------------- Handlers -----------------
-  function handleHorarioClick( //Pega as informações da quadra e horário clicado para jogar no modal depois
-    quadraKey: keyof typeof quadras,
+  function handleHorarioClick(
+    quadraId: number,
     horario: string,
     indisponivel: boolean,
     bloqueado: boolean
   ) {
-    const config = quadras[quadraKey];
-    const valor = calcularValor(config, horario);
+    const quadraConfig = quadras.find((q) => q.id === quadraId);
+    if (!quadraConfig) return;
 
+    const valor = calcularValor(quadraConfig, horario);
     setHorarioSelecionado({
-      quadra: config.nome,
+      quadra: quadraConfig.nome,
       horario: `${horario} - ${gerarHorarioFim(horario)}`,
       data: dataSelecionada,
       valor,
     });
 
-    if (bloqueado) return; // apenas ignora clique
+    if (bloqueado) return;
     if (indisponivel) {
       setModalFilaAberto(true);
     } else {
       setModalConfirmarAberto(true);
     }
+  }
+
+  function handleSetDataSelecionada(novaData: string) {
+    if (novaData < getCurrentDate()) {
+      alert("Não é possível selecionar uma data passada.");
+      return;
+    }
+    setDataSelecionada(novaData);
   }
 
   return (
@@ -148,8 +158,8 @@ export default function NewBooking() {
         {/* Topo */}
         <div className="relative flex items-center justify-center mb-6">
           <button
-          onClick={() => navigate("/")}
-          className="absolute left-0 text-azulBase hover:text-azulEscuro transition"
+            onClick={() => navigate("/")}
+            className="absolute left-0 text-azulBase hover:text-azulEscuro transition"
           >
             <ArrowLeft size={23} />
           </button>
@@ -159,14 +169,14 @@ export default function NewBooking() {
         </div>
 
         {/* Filtros */}
-        <div className="bg-blue-100/50 border border-blue-400 rounded-xl p-4 mb-6 space-y-4 md:space-y-0 md:flex md:items-center md:justify-between md:gap-6">
+        <div className="bg-gray-100 shadow-md rounded-lg p-4 mb-6 flex flex-wrap gap-4 md:gap-6 items-center justify-between">
           <FiltroTipo
             tipoSelecionado={tipoSelecionado}
             setTipoSelecionado={setTipoSelecionado}
           />
           <FiltroData
             dataSelecionada={dataSelecionada}
-            setDataSelecionada={setDataSelecionada}
+            setDataSelecionada={handleSetDataSelecionada}
           />
         </div>
 
@@ -174,30 +184,34 @@ export default function NewBooking() {
 
         {/* Conteúdo */}
         {isLoading ? (
-          <LoadingMessage message="Carregando quadras disponíveis..."/>
+          <LoadingMessage message="Carregando quadras disponíveis..." />
         ) : (
           <div className="space-y-6">
-            {Object.entries(quadras).map(([key, quadra]) => {
-              // Filtra por tipo
-              if (tipoSelecionado !== "Todas" && quadra.tipo.toLowerCase() !== tipoSelecionado.toLowerCase()) {
-                return null;
-              }
-
-              return (
+            {quadras
+              .filter(
+                (quadra) =>
+                  tipoSelecionado === "Todas" ||
+                  quadra.tipo.toLowerCase() === tipoSelecionado.toLowerCase()
+              )
+              .map((quadra) => (
                 <AvailableCourts
-                  key={quadra.nome}
+                  key={quadra.id}
                   nome={quadra.nome}
                   horaAbertura={quadra.horaAbertura}
                   horaFechamento={quadra.horaFechamento}
                   indisponiveis={getIndisponiveis(quadra.nome)}
                   bloqueados={getBloqueadas(quadra.nome)}
                   onHorarioClick={(horario, indisponivel, bloqueado) =>
-                    handleHorarioClick(key as keyof typeof quadras, horario, indisponivel, bloqueado)
+                    handleHorarioClick(
+                      quadra.id,
+                      horario,
+                      indisponivel,
+                      bloqueado
+                    )
                   }
                   isAdmin={false}
                 />
-              );
-            })}
+              ))}
           </div>
         )}
       </main>
