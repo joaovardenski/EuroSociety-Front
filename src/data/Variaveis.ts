@@ -167,7 +167,7 @@ export const agendamentosRecentes = [
 
 export const estatisticasDashboard = {
   agendamentosHoje: 12,
-  receitaMes: "R$ 1.850,75",
+  receitaMes: 1850.75,
   novosClientes: 8,
   pagamentosPendentes: 2,
 };

@@ -6,8 +6,8 @@ export interface Reserva {
   id: number;
   usuario: string;
   quadra: string;
-  data: string; // formato YYYY-MM-DD
-  slot: string; // ex: "18:00 - 19:00"
+  data: string;
+  slot: string;
   status: string;
   statusPagamento: string;
 }
