@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // Components
 import HeaderEuro from "../../components/Layout/HeaderEuro";
@@ -9,14 +9,30 @@ import FiltroData from "../../components/Filtros/FiltroData";
 import FiltroTipo from "../../components/Filtros/FiltroTipo";
 import TableActiveBookings from "../../components/Reservas/TableActiveBookings";
 
-import { reservasAtivas } from "../../data/Variaveis";
+// Modais
 import ModalRecebimentoAdmin from "../../components/Modais/Admin/ModalRecebimento";
 import ModalCancelarAdmin from "../../components/Modais/Admin/ModalCancelarAdmin";
+
+// Utils
 import { getCurrentDate } from "../../utils/DateUtils";
+
+// Tipos
+type Agendamento = {
+  id: number;
+  usuario: string;
+  quadra: string;
+  data: string;
+  slot: string;
+  statusPagamento: string;
+  pagamentoFaltante: number;
+};
 
 export default function ActiveBookingsAdmin() {
   const [tipoSelecionado, setTipoSelecionado] = useState("Todas");
   const [dataSelecionada, setDataSelecionada] = useState(getCurrentDate);
+
+  const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [modalRecebimentoOpen, setModalRecebimentoOpen] = useState(false);
   const [modalCancelarOpen, setModalCancelarOpen] = useState(false);
@@ -36,6 +52,27 @@ export default function ActiveBookingsAdmin() {
     }
     setDataSelecionada(novaData);
   }
+
+  // Simulando requisição de dados (trocar por fetch/axios depois)
+  async function getReservasAtivas(): Promise<Agendamento[]> {
+    const mod = await import("../../data/Variaveis");
+    return mod.reservasAtivas;
+  }
+
+  useEffect(() => {
+    async function carregarAgendamentos() {
+      try {
+        const data = await getReservasAtivas();
+        setAgendamentos(data);
+      } catch (error) {
+        console.error("Erro ao carregar agendamentos:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    carregarAgendamentos();
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#e6f4ff]">
@@ -74,41 +111,46 @@ export default function ActiveBookingsAdmin() {
             </div>
           </div>
 
-          <TableActiveBookings
-            agendamentos={reservasAtivas}
-            onReceberClick={(agendamento) => {
-              setAgendamentoSelecionado({
-                cliente: agendamento.usuario,
-                quadra: agendamento.quadra,
-                data: agendamento.data,
-                horario: agendamento.slot,
-                pagamentoFaltante: 40,
-              });
-              setModalRecebimentoOpen(true);
-            }}
-            onCancelarClick={(agendamento) => {
-              setAgendamentoSelecionado({
-                cliente: agendamento.usuario,
-                quadra: agendamento.quadra,
-                data: agendamento.data,
-                horario: agendamento.slot,
-                pagamentoFaltante: 40,
-              });
-              setModalCancelarOpen(true);
-            }}
-          />
+          {isLoading ? (
+            <p className="text-center text-gray-500">Carregando agendamentos...</p>
+          ) : (
+            <TableActiveBookings
+              agendamentos={agendamentos}
+              onReceberClick={(agendamento) => {
+                setAgendamentoSelecionado({
+                  cliente: agendamento.usuario,
+                  quadra: agendamento.quadra,
+                  data: agendamento.data,
+                  horario: agendamento.slot,
+                  pagamentoFaltante: agendamento.pagamentoFaltante,
+                });
+                setModalRecebimentoOpen(true);
+              }}
+              onCancelarClick={(agendamento) => {
+                setAgendamentoSelecionado({
+                  cliente: agendamento.usuario,
+                  quadra: agendamento.quadra,
+                  data: agendamento.data,
+                  horario: agendamento.slot,
+                  pagamentoFaltante: agendamento.pagamentoFaltante,
+                });
+                setModalCancelarOpen(true);
+              }}
+            />
+          )}
         </main>
       </div>
 
       <FooterEuro />
 
+      {/* Modais */}
       {agendamentoSelecionado && (
         <ModalRecebimentoAdmin
           isOpen={modalRecebimentoOpen}
           onClose={() => setModalRecebimentoOpen(false)}
           dados={agendamentoSelecionado}
           onConfirmar={() => {
-            console.log("Confirmado!");
+            console.log("Recebimento confirmado!");
             setModalRecebimentoOpen(false);
           }}
         />
@@ -120,7 +162,7 @@ export default function ActiveBookingsAdmin() {
           onClose={() => setModalCancelarOpen(false)}
           dados={agendamentoSelecionado}
           onConfirmar={() => {
-            console.log("Cancelado!");
+            console.log("Agendamento cancelado!");
             setModalCancelarOpen(false);
           }}
         />

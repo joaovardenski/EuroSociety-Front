@@ -1,15 +1,57 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
+  LineChart, Line, Legend
+} from "recharts";
 
 import HeaderEuro from "../../components/Layout/HeaderEuro";
 import FooterEuro from "../../components/Layout/FooterEuro";
 import AdminSidebar from "../../components/Navigation/AdminSidebar";
 
+type Receita = {
+  mes: string;
+  valor: number;
+}
+
+type Ocupacao = {
+  quadra: string;
+  usos: number;
+}
+
 export default function ReportAdmin() {
-  // const currentYear = new Date().getFullYear();
   const [tipoRelatorio, setTipoRelatorio] = useState("financeiro");
   const [tipoQuadra, setTipoQuadra] = useState("todas");
   const [dataInicio, setDataInicio] = useState("2025-01-01");
   const [dataFim, setDataFim] = useState("2025-12-31");
+
+  const [receitaDados, setReceitaDados] = useState<Receita[]>([]);
+  const [ocupacaoQuadras, setOcupacaoQuadras] = useState<Ocupacao[]>([]);
+
+  async function getReceita(): Promise<Receita[]> {
+    const mod = await import("../../data/Variaveis");
+    return mod.receitaPorMes2025 as Receita[];
+  }
+
+  async function getOcupacao(): Promise<Ocupacao[]> {
+    const mod = await import("../../data/Variaveis");
+    return mod.ocupacaoPorQuadra as Ocupacao[];
+  }
+
+  useEffect(() => {
+    async function carregarDadosRelatorios() {
+      try {
+        const receitaApi = await getReceita();
+        const ocupacaoApi = await getOcupacao();
+
+        setReceitaDados(receitaApi);
+        setOcupacaoQuadras(ocupacaoApi);
+      } catch (error) {
+        console.error("Erro ao carregar dados:", error);
+      }
+    }
+
+    carregarDadosRelatorios();
+  }, [])
 
   return (
     <div className="flex flex-col min-h-screen bg-[#e6f4ff]">
@@ -48,7 +90,7 @@ export default function ReportAdmin() {
                 onChange={(e) => setTipoQuadra(e.target.value)}
                 value={tipoQuadra}
               >
-                <option value="financeiro">Todas</option>
+                <option value="todas">Todas</option>
                 <option value="society">Society</option>
                 <option value="futevolei">Futevôlei</option>
               </select>
@@ -61,9 +103,8 @@ export default function ReportAdmin() {
               <input
                 type="date"
                 className="border border-gray-300 rounded-md px-4 py-2"
-                defaultValue="2025-01-01"
-                onChange={(e) => setDataInicio(e.target.value)}
                 value={dataInicio}
+                onChange={(e) => setDataInicio(e.target.value)}
               />
             </div>
 
@@ -72,9 +113,8 @@ export default function ReportAdmin() {
               <input
                 type="date"
                 className="border border-gray-300 rounded-md px-4 py-2"
-                defaultValue="2025-12-31"
-                onChange={(e) => setDataFim(e.target.value)}
                 value={dataFim}
+                onChange={(e) => setDataFim(e.target.value)}
               />
             </div>
 
@@ -91,18 +131,39 @@ export default function ReportAdmin() {
               <h2 className="text-lg font-semibold text-azulBase mb-4">
                 Receita por período
               </h2>
-              <div className="h-64 flex items-center justify-center text-gray-400">
-                [Gráfico Receita]
-              </div>
+              <ResponsiveContainer width="100%" height={250}>
+                <LineChart data={receitaDados}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="mes" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="valor"
+                    stroke="#2b4363"
+                    name="Receita (R$)"
+                    strokeWidth={3}
+                    activeDot={{ r: 6 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-md">
               <h2 className="text-lg font-semibold text-azulBase mb-4">
-                Ocupação por quadra
+                Ocupação por quadra (mensal)
               </h2>
-              <div className="h-64 flex items-center justify-center text-gray-400">
-                [Gráfico Ocupação]
-              </div>
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={ocupacaoQuadras}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="quadra" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="usos" fill="#3182ce" name="Agendamentos" />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
         </main>

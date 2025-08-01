@@ -201,3 +201,24 @@ export const reservasAtivas = [
     pagamentoFaltante: 0,
   },
 ];
+
+export const receitaPorMes2025 = [
+  { mes: "Jan", valor: 1200 },
+  { mes: "Fev", valor: 950 },
+  { mes: "Mar", valor: 1800 },
+  { mes: "Abr", valor: 1300 },
+  { mes: "Mai", valor: 1650 },
+  { mes: "Jun", valor: 1700 },
+  { mes: "Jul", valor: 2100 },
+  { mes: "Ago", valor: 1850 },
+  { mes: "Set", valor: 1950 },
+  { mes: "Out", valor: 1750 },
+  { mes: "Nov", valor: 1600 },
+  { mes: "Dez", valor: 1900 },
+];
+
+export const ocupacaoPorQuadra = [
+  { quadra: "Society", usos: 120 },
+  { quadra: "Futevôlei 1", usos: 90 },
+  { quadra: "Futevôlei 2", usos: 105 },
+];

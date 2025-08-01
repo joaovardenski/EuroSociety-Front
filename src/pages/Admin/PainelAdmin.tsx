@@ -38,6 +38,7 @@ export default function PainelAdmin() {
     carregarDadosDashboard();
   }, []);
 
+  // Futuramente as chamadas de APIs para coleta de dados será aqui
   async function getAgendamentos(): Promise<number> {
     return import("../../data/Variaveis").then(
       (mod) => mod.estatisticasDashboard.agendamentosHoje
