@@ -4,9 +4,10 @@ interface QuadraConfig {
   id: number;
   precoNormal: number;
   precoNoturno: number;
+  precoMensalNormal: number;
+  precoMensalNoturno: number;
   horaAbertura: string;
   horaFechamento: string;
-  descontoMensalista: number;
 }
 
 export default function CardQuadra({
@@ -49,10 +50,18 @@ export default function CardQuadra({
           type="time"
         />
         <InputConfig
-          label="Desconto (%) mensalista"
-          value={config.descontoMensalista}
+          label="Preço normal mensal (R$/h)"
+          value={config.precoMensalNormal}
           onChange={(val) =>
-            setConfig({ ...config, descontoMensalista: Number(val) })
+            setConfig({ ...config, precoMensalNormal: Number(val) })
+          }
+          type="number"
+        />
+        <InputConfig
+          label="Preço após 18h mensal (R$/h)"
+          value={config.precoMensalNoturno}
+          onChange={(val) =>
+            setConfig({ ...config, precoMensalNoturno: Number(val) })
           }
           type="number"
         />

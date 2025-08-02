@@ -19,17 +19,17 @@ import ModalAgendarAdmin from "../../components/Modais/Admin/ModalAgendarAdmin";
 import ModalAgendarOcupadoAdmin from "../../components/Modais/Admin/ModalAgendarOcupadoAdmin";
 import ModalDesbloquearAdmin from "../../components/Modais/Admin/ModalDesbloquearAdmin";
 
-// Types locais
 type Quadra = {
   id: number;
   nome: string;
   tipo: string;
   status: string;
-  horaAbertura: number;
-  horaFechamento: number;
+  horaAbertura: string;
+  horaFechamento: string;
   precoNormal: number;
   precoNoturno: number;
-  descontoMensalista: number;
+  precoMensalNormal: number;
+  precoMensalNoturno: number;
 };
 
 type Indisponibilidade = { nome: string; indisponiveis: string[] };

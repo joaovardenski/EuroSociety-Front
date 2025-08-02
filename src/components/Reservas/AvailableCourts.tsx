@@ -2,8 +2,8 @@ import { gerarHorarios } from "../../utils/Horarios";
 
 type Props = {
   nome: string;
-  horaAbertura: number;
-  horaFechamento: number;
+  horaAbertura: string;
+  horaFechamento: string;
   indisponiveis: string[];
   bloqueados: string[];
   onHorarioClick: (horario: string, indisponivel: boolean, bloqueado: boolean) => void;

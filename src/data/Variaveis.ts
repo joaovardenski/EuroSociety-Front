@@ -1,14 +1,15 @@
 type Quadra = {
-  id: number,
-  nome: string,
-  tipo: string,
-  status: string,
-  horaAbertura: number,
-  horaFechamento: number,
-  precoNormal: number,
-  precoNoturno: number,
-  descontoMensalista: number,
-}
+  id: number;
+  nome: string;
+  tipo: string;
+  status: string;
+  horaAbertura: string;
+  horaFechamento: string;
+  precoNormal: number;
+  precoNoturno: number;
+  precoMensalNormal: number;
+  precoMensalNoturno: number;
+};
 
 export const Quadras: Quadra[] = [
   {
@@ -16,33 +17,36 @@ export const Quadras: Quadra[] = [
     nome: "Quadra Society",
     tipo: "Society",
     status: "disponível",
-    horaAbertura: 8,
-    horaFechamento: 18,
-    precoNormal: 120,
+    horaAbertura: "08:00",
+    horaFechamento: "18:00",
+    precoNormal: 130,
     precoNoturno: 150,
-    descontoMensalista: 0.15, // 15%
+    precoMensalNormal: 120,
+    precoMensalNoturno: 130,
   },
   {
     id: 2,
     nome: "Quadra Futevôlei 1",
     tipo: "Futevôlei",
     status: "disponível",
-    horaAbertura: 6,
-    horaFechamento: 18,
-    precoNormal: 100,
-    precoNoturno: 120,
-    descontoMensalista: 0.1,
+    horaAbertura: "06:00",
+    horaFechamento: "18:00",
+    precoNormal: 80,
+    precoNoturno: 90,
+    precoMensalNormal: 75,
+    precoMensalNoturno: 80,
   },
   {
     id: 3,
     nome: "Quadra Futevôlei 2",
     tipo: "Futevôlei",
     status: "disponível",
-    horaAbertura: 8,
-    horaFechamento: 20,
-    precoNormal: 100,
-    precoNoturno: 120,
-    descontoMensalista: 0.1,
+    horaAbertura: "08:00",
+    horaFechamento: "20:00",
+    precoNormal: 80,
+    precoNoturno: 90,
+    precoMensalNormal: 75,
+    precoMensalNoturno: 80,
   },
 ];
 
@@ -83,7 +87,7 @@ export const minhasReservas = [
     id: 1,
     usuario: "João Victor",
     quadra: "Quadra Society",
-    data: "2025-07-26",
+    data: "2025-08-26",
     slot: "10:00 - 11:00",
     status: "CONFIRMADO",
     statusPagamento: "Parcial",

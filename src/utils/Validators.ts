@@ -42,3 +42,38 @@ export function getNomeError(nome: string): string {
 
   return "";
 }
+
+// Verifica se o preço é maior que 0
+export function isValidPrice(price: number): boolean {
+  if(price > 0) {
+    return true;
+  } else {
+    alert("O preço não pode ser negativo!");
+    return false;
+  }
+}
+
+export function isValidInterval(start: string, end: string): boolean {
+  // Verifica se os campos foram preenchidos
+  if (!start || !end) {
+    alert("Você precisa preencher os horários de abertura e fechamento.");
+    return false;
+  }
+
+  // Converte para minutos desde 00:00
+  const [startHour, startMin] = start.split(":").map(Number);
+  const [endHour, endMin] = end.split(":").map(Number);
+
+  const startTotal = startHour * 60 + startMin;
+  const endTotal = endHour * 60 + endMin;
+
+  // Verifica se a hora de abertura é antes da hora de fechamento
+  if (startTotal >= endTotal) {
+    alert("A hora de abertura deve ser antes da hora de fechamento.");
+    return false;
+  }
+
+  return true;
+}
+
+

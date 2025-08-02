@@ -29,11 +29,12 @@ type Quadra = {
   nome: string;
   tipo: string;
   status: string;
-  horaAbertura: number;
-  horaFechamento: number;
+  horaAbertura: string;
+  horaFechamento: string;
   precoNormal: number;
   precoNoturno: number;
-  descontoMensalista: number;
+  precoMensalNormal: number;
+  precoMensalNoturno: number;
 };
 
 type Indisponibilidade = { nome: string; indisponiveis: string[] };
