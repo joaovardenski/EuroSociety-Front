@@ -1,5 +1,4 @@
 import Modal from "../Modal";
-import { formatarDataBrasileira } from "../../../utils/DateUtils";
 import { Wallet, Info, CreditCard } from "lucide-react";
 
 interface ModalRecebimentoAdminProps {
@@ -8,7 +7,7 @@ interface ModalRecebimentoAdminProps {
   dados: {
     cliente: string;
     quadra: string;
-    data: string;
+    data: Date;
     horario: string;
     pagamentoFaltante: number;
   };
@@ -56,7 +55,7 @@ export default function ModalRecebimentoAdmin({
           </p>
           <p>
             <span className="font-medium">Data:</span>{" "}
-            {formatarDataBrasileira(dados.data)}
+            {`${dados.data}`}
           </p>
           <p>
             <span className="font-medium">Horário:</span> {dados.horario}

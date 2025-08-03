@@ -8,7 +8,6 @@ import { ArrowLeft } from "lucide-react";
 import HeaderEuro from "../../components/Layout/HeaderEuro";
 import SearchOptionButton from "../../components/SearchOptionButton";
 import BookingCard from "../../components/Reservas/BookingCard";
-import type { Reserva } from "../../components/Reservas/BookingCard";
 import FooterEuro from "../../components/Layout/FooterEuro";
 import BottomNav from "../../components/Navigation/BottomNav";
 import Modal from "../../components/Modais/Modal";
@@ -16,6 +15,7 @@ import ModalCancelarReserva from "../../components/Modais/Client/ModalCancelarRe
 import LoadingMessage from "../../components/LoadingMessage";
 import { Link } from "react-router-dom";
 import { filtrarReservas } from "../../utils/FilterUtils";
+import type { Reserva } from "../../types/interfaces";
 
 // Types
 type FiltroReservas = "Todas" | "Próximas" | "Anteriores";
@@ -141,7 +141,7 @@ function MyBookings() {
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
         {reservaSelecionada && (
           <ModalCancelarReserva
-            quadra={reservaSelecionada.quadra}
+            quadra={reservaSelecionada.quadra.nome}
             data={reservaSelecionada.data}
             horario={reservaSelecionada.slot}
             onClose={() => setModalOpen(false)}

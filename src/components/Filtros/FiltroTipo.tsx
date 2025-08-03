@@ -1,9 +1,9 @@
-type Props = {
+interface FiltroTipoProps {
   tipoSelecionado: string;
   setTipoSelecionado: (value: string) => void;
 };
 
-export default function FiltroTipo({ tipoSelecionado, setTipoSelecionado }: Props) {
+export default function FiltroTipo({ tipoSelecionado, setTipoSelecionado }: FiltroTipoProps) {
   return (
     <div className="flex flex-col gap-1 w-full md:w-auto md:flex-row md:items-center md:gap-3">
       <label htmlFor="tipo" className="text-gray-700 font-medium">

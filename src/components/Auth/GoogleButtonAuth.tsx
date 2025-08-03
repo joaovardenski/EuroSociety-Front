@@ -3,10 +3,7 @@ interface GoogleButtonAuthProps {
   onClick?: () => void;
 }
 
-export default function GoogleButtonAuth({
-  label,
-  onClick,
-}: GoogleButtonAuthProps) {
+export default function GoogleButtonAuth({label, onClick}: GoogleButtonAuthProps) {
   return (
     <button
       type="button"

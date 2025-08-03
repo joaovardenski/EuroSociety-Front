@@ -1,24 +1,14 @@
 // src/components/Tabelas/TabelaAgendamentos.tsx
-import { formatarDataBrasileira } from "../../utils/DateUtils";
-
-interface Agendamento {
-  id: number;
-  usuario: string;
-  quadra: string;
-  data: string;
-  slot: string;
-  statusPagamento: string;
-  pagamentoFaltante: number;
-}
+import type { Reserva } from "../../types/interfaces";
 
 interface Props {
-  agendamentos: Agendamento[];
-  onReceberClick: (agendamento: Agendamento) => void;
-  onCancelarClick: (agendamento: Agendamento) => void;
+  reservas: Reserva[];
+  onReceberClick: (reserva: Reserva) => void;
+  onCancelarClick: (reserva: Reserva) => void;
 }
 
 export default function TableActiveBookings({
-  agendamentos,
+  reservas,
   onReceberClick,
   onCancelarClick,
 }: Props) {
@@ -35,32 +25,30 @@ export default function TableActiveBookings({
           </tr>
         </thead>
         <tbody>
-          {agendamentos.map((ag, index) => (
+          {reservas.map((r, index) => (
             <tr key={index} className="border-t border-gray-200">
-              <td className="px-4 py-2">{ag.usuario}</td>
-              <td className="px-4 py-2">{ag.quadra}</td>
-              <td className="px-4 py-2">{`${formatarDataBrasileira(
-                ag.data
-              )} às ${ag.slot}`}</td>
+              <td className="px-4 py-2">{r.usuario.nome}</td>
+              <td className="px-4 py-2">{r.quadra.nome}</td>
+              <td className="px-4 py-2">{`${r.data} às ${r.slot}`}</td>
               <td className="px-4 py-2">
                 <span
                   className={`text-sm font-medium px-3 py-1 rounded-full
                     ${
-                      ag.statusPagamento === "Completo"
+                      r.statusPagamento === "Completo"
                         ? "bg-green-500 text-white"
-                        : ag.statusPagamento === "Parcial"
+                        : r.statusPagamento === "Parcial"
                         ? "bg-yellow-400 text-white"
                         : "bg-gray-300 text-black"
                     }`}
                 >
-                  {ag.statusPagamento}
+                  {r.statusPagamento}
                 </span>
               </td>
               <td className="px-4 py-2 space-x-3">
                 <button
-                  onClick={() => ag.pagamentoFaltante && onReceberClick(ag)}
+                  onClick={() => r.pagamentoFaltante && onReceberClick(r)}
                   className={`bg-green-200 text-green-800 font-medium px-3 py-1 rounded-lg ${
-                    !ag.pagamentoFaltante
+                    !r.pagamentoFaltante
                       ? "opacity-50 cursor-not-allowed"
                       : "hover:bg-green-300"
                   }`}
@@ -69,7 +57,7 @@ export default function TableActiveBookings({
                 </button>
 
                 <button
-                  onClick={() => onCancelarClick(ag)}
+                  onClick={() => onCancelarClick(r)}
                   className="bg-red-500 text-white font-medium px-3 py-1 rounded-lg hover:bg-red-700"
                 >
                   Cancelar

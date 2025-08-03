@@ -1,15 +1,8 @@
-interface Agendamento {
-  cliente: string;
-  quadra: string;
-  dataHora: string;
-  valor: number;
-  status: "Completo" | "Pendente" | string;
-}
+import type { Reserva } from "../../types/interfaces";
 
 interface TableRecentBookingsProps {
-  recentBookings: Agendamento[];
+  recentBookings: Reserva[];
 }
-
 
 export default function TableRecentBookings({ recentBookings }: TableRecentBookingsProps) {
   return (
@@ -33,11 +26,11 @@ export default function TableRecentBookings({ recentBookings }: TableRecentBooki
             {recentBookings.map((agendamento, index) => (
               <tr key={index} className="border-t">
                 <td className="px-2 py-4 font-medium">
-                  {agendamento.cliente}
+                  {agendamento.usuario.nome}
                 </td>
-                <td className="px-2 py-4">{agendamento.quadra}</td>
-                <td className="px-2 py-4">{agendamento.dataHora}</td>
-                <td className="px-2 py-4">R${agendamento.valor}</td>
+                <td className="px-2 py-4">{agendamento.quadra.nome}</td>
+                <td className="px-2 py-4">{`${agendamento.data} às ${agendamento.slot}`}</td>
+                <td className="px-2 py-4">R${agendamento.pagamento.valor}</td>
                 <td className="px-2 py-4">
                   <span
                     className={`text-white px-3 py-1 rounded-full ${

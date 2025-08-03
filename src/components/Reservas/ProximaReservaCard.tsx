@@ -1,18 +1,8 @@
 import { CalendarClock, Eye } from "lucide-react";
-import { formatarDataBrasileira } from "../../utils/DateUtils";
 import { Link } from "react-router-dom";
+import type { Reserva } from "../../types/interfaces";
 
-type Reserva = {
-  id: number;
-  usuario: string;
-  quadra: string;
-  data: string;
-  slot: string;
-  status: string;
-  statusPagamento: string;
-};
-
-type ReservaComDataHora = Reserva & { dataHora: Date };
+export type ReservaComDataHora = Reserva & { dataHora: Date };
 
 type Props = {
   reserva?: ReservaComDataHora;
@@ -29,12 +19,12 @@ export default function ProximaReservaCard({ reserva }: Props) {
         {reserva ? (
           <>
             <p className="text-sm font-semibold text-gray-700">
-              Quadra: <span className="font-medium">{reserva.quadra}</span>
+              Quadra: <span className="font-medium">{reserva.quadra.nome}</span>
             </p>
             <p className="text-sm font-semibold text-gray-700">
               Data:{" "}
               <span className="font-medium">
-                {formatarDataBrasileira(reserva.data)}
+                {`${reserva.data}`}
               </span>
             </p>
             <p className="text-sm font-semibold text-gray-700">

@@ -1,17 +1,10 @@
-type Quadra = {
-  id: number;
-  nome: string;
-  tipo: string;
-  status: string;
-  horaAbertura: string;
-  horaFechamento: string;
-  precoNormal: number;
-  precoNoturno: number;
-  precoMensalNormal: number;
-  precoMensalNoturno: number;
-};
+import type { Quadra } from "../types/interfaces";
+import type { Usuario } from "../types/interfaces";
+import type { Pagamento } from "../types/interfaces";
+import type { Reserva } from "../types/interfaces";
+import type { FilaEspera } from "../types/interfaces";
 
-export const Quadras: Quadra[] = [
+export const quadras: Quadra[] = [
   {
     id: 1,
     nome: "Quadra Society",
@@ -50,6 +43,101 @@ export const Quadras: Quadra[] = [
   },
 ];
 
+export const usuarios: Usuario[] = [
+  {
+    id: 1,
+    nome: "João Victor",
+    email: "joao@example.com",
+    senha: "123456",
+    permissao: "cliente",
+    metodoLogin: "google",
+  },
+  {
+    id: 2,
+    nome: "Paulo",
+    email: "paulo@example.com",
+    senha: "123456",
+    permissao: "cliente",
+    metodoLogin: "tradicional",
+  },
+  {
+    id: 3,
+    nome: "André",
+    email: "andre@example.com",
+    senha: "123456",
+    permissao: "cliente",
+    metodoLogin: "tradicional",
+  },
+];
+
+export const pagamentos: Pagamento[] = [
+  {
+    id: 1,
+    metodo: "Cartão de Crédito",
+    valor: 120,
+    status: "Parcial",
+  },
+  {
+    id: 2,
+    metodo: "Cartão de Crédito",
+    valor: 75,
+    status: "Parcial",
+  },
+  {
+    id: 3,
+    metodo: "Cartão de Crédito",
+    valor: 150,
+    status: "Total",
+  },
+];
+
+export const reservas: Reserva[] = [
+  {
+    id: 1,
+    usuario: usuarios[0],
+    quadra: quadras[0],
+    pagamento: pagamentos[0],
+    pagamentoFaltante: 30,
+    data: "2025-07-30",
+    slot: "10:00 - 11:00",
+    status: "Confirmado",
+    statusPagamento: "Parcial",
+  },
+  {
+    id: 2,
+    usuario: usuarios[1],
+    quadra: quadras[2],
+    pagamento: pagamentos[1],
+    pagamentoFaltante: 30,
+    data: "2026-10-01",
+    slot: "13:00 - 14:00",
+    status: "Cancelado",
+    statusPagamento: "Reembolsado",
+  },
+  {
+    id: 3,
+    usuario: usuarios[2],
+    quadra: quadras[1],
+    pagamento: pagamentos[2],
+    pagamentoFaltante: 0,
+    data: "2025-07-16",
+    slot: "15:00 - 16:00",
+    status: "Concluido",
+    statusPagamento: "Total",
+  },
+];
+
+export const filaEspera: FilaEspera[] = [
+  {
+    id: 1,
+    usuario: usuarios[0],
+    quadra: quadras[0],
+    data: new Date("2025-08-01"),
+    slot: "13:00 - 14:00",
+    status: "Aguardando",
+  },
+];
+
 export const indisponibilidadesQuadras = [
   //Pega das reservas já feitas
   {
@@ -82,65 +170,49 @@ export const bloqueadasQuadras = [
   },
 ];
 
-export const minhasReservas = [
+export const minhasReservas: Reserva[] = [
   {
     id: 1,
-    usuario: "João Victor",
-    quadra: "Quadra Society",
+    usuario: usuarios[0],
+    quadra: quadras[0],
+    pagamento: pagamentos[0],
+    pagamentoFaltante: 30,
     data: "2025-08-26",
     slot: "10:00 - 11:00",
-    status: "CONFIRMADO",
+    status: "Confirmado",
     statusPagamento: "Parcial",
   },
   {
     id: 2,
-    usuario: "João Victor",
-    quadra: "Quadra Futevôlei 2",
+    usuario: usuarios[0],
+    quadra: quadras[2],
+    pagamento: pagamentos[1],
+    pagamentoFaltante: 30,
     data: "2026-10-01",
     slot: "13:00 - 14:00",
-    status: "CANCELADO",
+    status: "Cancelado",
     statusPagamento: "Reembolsado",
   },
   {
     id: 3,
-    usuario: "João Victor",
-    quadra: "Quadra Futevôlei 1",
+    usuario: usuarios[0],
+    quadra: quadras[1],
+    pagamento: pagamentos[2],
+    pagamentoFaltante: 0,
     data: "2025-07-30",
     slot: "15:00 - 16:00",
-    status: "CONFIRMADO",
+    status: "Confirmado",
     statusPagamento: "Total",
   },
   {
     id: 4,
-    usuario: "João Victor",
-    quadra: "Quadra Futevôlei 1",
+    usuario: usuarios[0],
+    quadra: quadras[1],
+    pagamento: pagamentos[2],
+    pagamentoFaltante: 0,
     data: "2025-07-16",
     slot: "15:00 - 16:00",
-    status: "CONCLUIDO",
-    statusPagamento: "Total",
-  },
-];
-
-export const pagamentos = [
-  {
-    id: 1,
-    idReserva: 1,
-    metodo: "Cartão de Crédito",
-    valor: 120,
-    statusPagamento: "Parcial",
-  },
-  {
-    id: 2,
-    idReserva: 2,
-    metodo: "Cartão de Crédito",
-    valor: 75,
-    statusPagamento: "Parcial",
-  },
-  {
-    id: 3,
-    idReserva: 3,
-    metodo: "Cartão de Crédito",
-    valor: 150,
+    status: "Concluido",
     statusPagamento: "Total",
   },
 ];
@@ -176,33 +248,39 @@ export const estatisticasDashboard = {
   pagamentosPendentes: 2,
 };
 
-export const reservasAtivas = [
+export const reservasAtivas: Reserva[] = [
   {
     id: 1,
-    usuario: "João Victor",
-    quadra: "Quadra Society",
+    usuario: usuarios[0],
+    quadra: quadras[0],
+    pagamento: pagamentos[0],
+    pagamentoFaltante: 30,
     data: "2025-07-30",
     slot: "10:00 - 11:00",
+    status: "Confirmado",
     statusPagamento: "Parcial",
-    pagamentoFaltante: 30,
   },
   {
     id: 2,
-    usuario: "Paulo",
-    quadra: "Quadra Futevôlei 2",
+    usuario: usuarios[1],
+    quadra: quadras[2],
+    pagamento: pagamentos[1],
+    pagamentoFaltante: 30,
     data: "2026-10-01",
     slot: "13:00 - 14:00",
+    status: "Confirmado",
     statusPagamento: "Parcial",
-    pagamentoFaltante: 25,
   },
   {
     id: 3,
-    usuario: "André",
-    quadra: "Quadra Futevôlei 1",
+    usuario: usuarios[2],
+    quadra: quadras[1],
+    pagamento: pagamentos[2],
+    pagamentoFaltante: 0,
     data: "2025-07-16",
     slot: "15:00 - 16:00",
+    status: "Confirmado",
     statusPagamento: "Completo",
-    pagamentoFaltante: 0,
   },
 ];
 

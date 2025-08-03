@@ -1,11 +1,11 @@
 import { ClipboardList, List } from "lucide-react";
 import { Link } from "react-router-dom";
 
-type Props = {
+interface reservasAtivasProps {
   count: number;
-};
+}
 
-export default function ReservasAtivasCard({ count }: Props) {
+export default function ReservasAtivasCard({count}: reservasAtivasProps) {
   return (
     <div className="flex-1 min-w-[280px] max-w-[350px] bg-white rounded-xl shadow-md p-6 flex flex-col justify-between">
       <div className="text-center">

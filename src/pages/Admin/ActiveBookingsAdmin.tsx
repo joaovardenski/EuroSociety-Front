@@ -15,23 +15,13 @@ import ModalCancelarAdmin from "../../components/Modais/Admin/ModalCancelarAdmin
 
 // Utils
 import { getCurrentDate } from "../../utils/DateUtils";
-
-// Tipos
-type Agendamento = {
-  id: number;
-  usuario: string;
-  quadra: string;
-  data: string;
-  slot: string;
-  statusPagamento: string;
-  pagamentoFaltante: number;
-};
+import type { Reserva } from "../../types/interfaces";
 
 export default function ActiveBookingsAdmin() {
   const [tipoSelecionado, setTipoSelecionado] = useState("Todas");
   const [dataSelecionada, setDataSelecionada] = useState(getCurrentDate);
 
-  const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
+  const [agendamentos, setAgendamentos] = useState<Reserva[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const [modalRecebimentoOpen, setModalRecebimentoOpen] = useState(false);
@@ -40,7 +30,7 @@ export default function ActiveBookingsAdmin() {
   const [agendamentoSelecionado, setAgendamentoSelecionado] = useState<{
     cliente: string;
     quadra: string;
-    data: string;
+    data: Date;
     horario: string;
     pagamentoFaltante: number;
   } | null>(null);
@@ -54,7 +44,7 @@ export default function ActiveBookingsAdmin() {
   }
 
   // Simulando requisição de dados (trocar por fetch/axios depois)
-  async function getReservasAtivas(): Promise<Agendamento[]> {
+  async function getReservasAtivas(): Promise<Reserva[]> {
     const mod = await import("../../data/Variaveis");
     return mod.reservasAtivas;
   }
@@ -115,11 +105,11 @@ export default function ActiveBookingsAdmin() {
             <p className="text-center text-gray-500">Carregando agendamentos...</p>
           ) : (
             <TableActiveBookings
-              agendamentos={agendamentos}
+              reservas={agendamentos}
               onReceberClick={(agendamento) => {
                 setAgendamentoSelecionado({
-                  cliente: agendamento.usuario,
-                  quadra: agendamento.quadra,
+                  cliente: agendamento.usuario.nome,
+                  quadra: agendamento.quadra.nome,
                   data: agendamento.data,
                   horario: agendamento.slot,
                   pagamentoFaltante: agendamento.pagamentoFaltante,
@@ -128,8 +118,8 @@ export default function ActiveBookingsAdmin() {
               }}
               onCancelarClick={(agendamento) => {
                 setAgendamentoSelecionado({
-                  cliente: agendamento.usuario,
-                  quadra: agendamento.quadra,
+                  cliente: agendamento.usuario.nome,
+                  quadra: agendamento.quadra.nome,
                   data: agendamento.data,
                   horario: agendamento.slot,
                   pagamentoFaltante: agendamento.pagamentoFaltante,

@@ -1,5 +1,4 @@
 import Modal from "../Modal";
-import { formatarDataBrasileira } from "../../../utils/DateUtils";
 import { AlertTriangle, User, CalendarClock } from "lucide-react";
 
 interface ModalCancelarAdminProps {
@@ -8,7 +7,7 @@ interface ModalCancelarAdminProps {
   dados: {
     cliente: string;
     quadra: string;
-    data: string;
+    data: Date;
     horario: string;
     pagamentoFaltante: number;
   };
@@ -55,7 +54,7 @@ export default function ModalCancelarAdmin({
           <p className="flex items-center gap-2">
             <CalendarClock size={14} className="text-gray-500" />
             <span className="font-medium">Data:</span>{" "}
-            {formatarDataBrasileira(dados.data)}
+            {`${dados.data}`}
           </p>
           <p>
             <span className="font-medium">Horário:</span> {dados.horario}

@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 // Assets
 import euroLogoWhite from "../../assets/euroSocietyWhite.png";
 // Components
-import GoogleButtonAuth from "../../components/Auth/GoogleButtonAuth";
 import InputFieldAuth from "../../components/Auth/InputFieldAuth";
 import SubmitButtonAuth from "../../components/Auth/SubmitButtonAuth";
 // Utils
@@ -13,6 +12,8 @@ import {
   getEmailError,
   getSenhaError,
 } from "../../utils/Validators";
+import { GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 
 function Register() {
   const navigate = useNavigate();
@@ -123,7 +124,16 @@ function Register() {
           </div>
 
           {/* Botão de registrar com Google */}
-          <GoogleButtonAuth label="Entrar com Google" />
+          <GoogleLogin
+            onSuccess={(credentialResponse) => {
+              const decodedCredential = jwtDecode(credentialResponse.credential!);
+              console.log(decodedCredential);
+              //HandleSubmitGoogle(decodedCredential)
+            }}
+            onError={() => {
+              console.log("Login Failed");
+            }}
+          ></GoogleLogin>
 
           {/* Links para entrar no sistema */}
           <div className="text-center text-white text-sm md:text-gray-700">

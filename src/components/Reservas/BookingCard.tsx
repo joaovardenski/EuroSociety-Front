@@ -1,24 +1,13 @@
 import { Calendar, Clock, DollarSign, Eye, CircleX } from "lucide-react";
-import { Quadras } from "../../data/Variaveis";
-import { formatarDataBrasileira } from "../../utils/DateUtils";
-
-export interface Reserva {
-  id: number;
-  usuario: string;
-  quadra: string;
-  data: string;
-  slot: string;
-  status: string;
-  statusPagamento: string;
-}
-
+import { quadras } from "../../data/Variaveis";
+import type { Reserva } from "../../types/interfaces";
 interface BookingCardProps {
   reserva: Reserva;
   onCancel?: (reserva: Reserva) => void;
 }
 
 export default function BookingCard({ reserva, onCancel }: BookingCardProps) {
-  const quadraInfo = Quadras.find((q) => q.nome === reserva.quadra); //Pega informações da quadra que o card está atribuido
+  const quadraInfo = quadras.find((q) => q.nome === reserva.quadra.nome);
 
   function calcularValorReserva(slot: string): string {
     //Pega o valor da reserva baseado no horário
@@ -32,15 +21,17 @@ export default function BookingCard({ reserva, onCancel }: BookingCardProps) {
   }
 
   function reservaJaPassou(): boolean {
-    // Verifica se a reserva já passou
     const [horaInicio] = reserva.slot.split(" - ");
-    const dataHoraReserva = new Date(`${reserva.data}T${horaInicio}:00`);
+    const [ano, mes, dia] = reserva.data.split("-").map(Number);
+    const [hora, minuto] = horaInicio.split(":").map(Number);
+
+    const dataHoraReserva = new Date(ano, mes - 1, dia, hora, minuto);
     return dataHoraReserva < new Date();
   }
 
   function cancelamentoDisponivel(): boolean {
     // Verifica se a reserva já passou ou está cancelada
-    if (reservaJaPassou() || reserva.status === "CANCELADO") {
+    if (reservaJaPassou() || reserva.status === "Cancelado") {
       return false;
     } else {
       return true;
@@ -57,11 +48,17 @@ export default function BookingCard({ reserva, onCancel }: BookingCardProps) {
       {/* Informações da reserva */}
       <div className="flex-1 text-sm text-gray-800 space-y-1">
         <h2 className="font-semibold text-base text-azulBase">
-          {reserva.quadra}
+          {reserva.quadra.nome}
         </h2>
         <p className="flex items-center gap-2">
           <Calendar size={16} /> Data:{" "}
-          <strong>{formatarDataBrasileira(reserva.data)}</strong>
+          <strong>
+            {new Intl.DateTimeFormat("pt-BR", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            }).format(new Date(reserva.data))}
+          </strong>
         </p>
         <p className="flex items-center gap-2">
           <Clock size={16} /> Horário: <strong>{reserva.slot}</strong>
@@ -73,9 +70,9 @@ export default function BookingCard({ reserva, onCancel }: BookingCardProps) {
           Status:{" "}
           <span
             className={`font-semibold ${
-              reserva.status === "CONFIRMADO"
+              reserva.status === "Confirmado"
                 ? "text-green-600"
-                : reserva.status === "CANCELADO"
+                : reserva.status === "Cancelado"
                 ? "text-red-600"
                 : "text-azulBase"
             }`}

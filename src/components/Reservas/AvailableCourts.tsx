@@ -1,6 +1,6 @@
 import { gerarHorarios } from "../../utils/Horarios";
 
-type Props = {
+interface AvailableCourtsProps {
   nome: string;
   horaAbertura: string;
   horaFechamento: string;
@@ -18,7 +18,7 @@ export default function AvailableCourts({
   bloqueados,
   onHorarioClick,
   isAdmin,
-}: Props) {
+}: AvailableCourtsProps) {
   const horarios = gerarHorarios(horaAbertura, horaFechamento);
 
   return (

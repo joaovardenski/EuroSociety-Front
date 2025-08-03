@@ -18,10 +18,6 @@ import VariablesAdmin from "../pages/Admin/VariablesAdmin";
 import Unauthorized from "../pages/Error/Unauthorized";
 import NotAuthenticated from "../pages/Error/NotAuthenticated";
 import NotFound from "../pages/Error/NotFound";
-//import Painel from "./pages/Admin/Painel";
-//import Relatorios from "./pages/Admin/Relatorios";
-//import Configuracoes from "./pages/Admin/Configuracoes";
-//import NotFound from "./pages/NotFound";
 
 const router = createBrowserRouter([
   {
