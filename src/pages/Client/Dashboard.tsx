@@ -8,16 +8,7 @@ import ProximaReservaCard from "../../components/Reservas/ProximaReservaCard";
 import CardNovaReserva from "../../components/Reservas/NovaReservaCard";
 import ReservasAtivasCard from "../../components/Reservas/ReservasAtivasCard";
 import LoadingMessage from "../../components/LoadingMessage";
-// Types
-type Reserva = {
-  id: number;
-  usuario: string;
-  quadra: string;
-  data: string;
-  slot: string;
-  status: string;
-  statusPagamento: string;
-};
+import type { Reserva } from "../../types/interfaces";
 
 type ReservaComDataHora = Reserva & { dataHora: Date };
 
@@ -55,14 +46,14 @@ function Dashboard() {
   }
 
   function getReservasConfirmadas(reservas: Reserva[]): Reserva[] { // Filtra apenas reservas confirmadas
-    return reservas.filter((reserva) => reserva.status === "CONFIRMADO");
+    return reservas.filter((reserva) => reserva.status === "Confirmado");
   }
 
   function getProximaReserva(reservas: Reserva[]): ReservaComDataHora | undefined { // Pega minha próxima reserva
     const agora = new Date();
     return reservas
       .map(adicionarDataHora)
-      .filter((reserva) => reserva.dataHora > agora)
+      .filter((reserva) => reserva.dataHora > agora && reserva.status === "Confirmado")
       .sort((a, b) => a.dataHora.getTime() - b.dataHora.getTime())[0];
   }
 

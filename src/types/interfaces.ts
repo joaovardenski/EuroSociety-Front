@@ -3,6 +3,8 @@ export interface Reserva {
   id: number;
   usuario: Usuario;
   quadra: Quadra;
+  tipoReserva: string;
+  mensalidadeId?: number;
   pagamento: Pagamento;
   pagamentoFaltante: number;
   data: string;
@@ -35,9 +37,10 @@ export interface Usuario {
   id: number;
   nome: string;
   email: string;
-  senha: string;
+  senha: string | null;
   permissao: string;
   metodoLogin: string;
+  googleId: string | null;
 }
 
 export interface FilaEspera {
@@ -48,3 +51,21 @@ export interface FilaEspera {
   slot: string;
   status: string;
 }
+
+export interface Mensalidade {
+  id: number;
+  usuario: Usuario;
+  quadra: Quadra;
+  dataInicio: string;
+  status: string;
+  valorTotal: number;
+  reservasRelacionadas: Reserva[];
+}
+
+export interface AgendaBloqueio {
+  id: number,
+  quadra: Quadra,
+  dataHoraInicio: string,
+}
+
+

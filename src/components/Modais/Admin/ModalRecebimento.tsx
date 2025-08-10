@@ -7,9 +7,10 @@ interface ModalRecebimentoAdminProps {
   dados: {
     cliente: string;
     quadra: string;
-    data: Date;
+    data: string;
     horario: string;
     pagamentoFaltante: number;
+    valorTotal: number;
   };
   onConfirmar: () => void;
 }
@@ -20,8 +21,7 @@ export default function ModalRecebimentoAdmin({
   dados,
   onConfirmar,
 }: ModalRecebimentoAdminProps) {
-  const valorTotal = 150; // Aqui você pode puxar dinamicamente
-  const valorPago = valorTotal - dados.pagamentoFaltante;
+  const valorPago = dados.valorTotal - dados.pagamentoFaltante;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -62,7 +62,7 @@ export default function ModalRecebimentoAdmin({
           </p>
           <p>
             <span className="font-medium">Valor total:</span>{" "}
-            <span className="text-azulBase">R$ {valorTotal.toFixed(2)}</span>
+            <span className="text-azulBase">R$ {dados.valorTotal.toFixed(2)}</span>
           </p>
         </div>
 

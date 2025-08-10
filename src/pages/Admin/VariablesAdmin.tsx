@@ -31,7 +31,7 @@ export default function VariablesAdmin() {
     horaFechamento: "",
   });
 
-  const [fut1, setFut1] = useState<QuadraConfig>({
+  const [areia1, setAreia1] = useState<QuadraConfig>({
     id: 2,
     precoNormal: 0,
     precoNoturno: 0,
@@ -41,7 +41,7 @@ export default function VariablesAdmin() {
     horaFechamento: "",
   });
 
-  const [fut2, setFut2] = useState<QuadraConfig>({
+  const [areia2, setAreia2] = useState<QuadraConfig>({
     id: 3,
     precoNormal: 0,
     precoNoturno: 0,
@@ -54,7 +54,7 @@ export default function VariablesAdmin() {
   // ----------------- FETCH INITIAL DATA -----------------
   async function getQuadras(): Promise<QuadraConfig[]> {
     const mod = await import("../../data/Variaveis");
-    return mod.Quadras as QuadraConfig[];
+    return mod.quadras as QuadraConfig[];
   }
 
   useEffect(() => {
@@ -64,13 +64,13 @@ export default function VariablesAdmin() {
 
         // Encontrar cada quadra pelo ID
         const societyData = quadras.find((q) => q.id === 1);
-        const fut1Data = quadras.find((q) => q.id === 2);
-        const fut2Data = quadras.find((q) => q.id === 3);
+        const areia1Data = quadras.find((q) => q.id === 2);
+        const areia2Data = quadras.find((q) => q.id === 3);
 
         // Atualizar os states
         if (societyData) setSociety(societyData);
-        if (fut1Data) setFut1(fut1Data);
-        if (fut2Data) setFut2(fut2Data);
+        if (areia1Data) setAreia1(areia1Data);
+        if (areia2Data) setAreia2(areia2Data);
       } catch (error) {
         console.error("Erro ao carregar dados:", error);
       } finally {
@@ -120,16 +120,16 @@ export default function VariablesAdmin() {
                   onSave={() => validarQuadra(society)}
                 />
                 <CardQuadraVariaveis
-                  titulo="Quadra de Futevôlei 1"
-                  config={fut1}
-                  setConfig={setFut1}
-                  onSave={() => validarQuadra(fut1)}
+                  titulo="Quadra de Areia 1"
+                  config={areia1}
+                  setConfig={setAreia1}
+                  onSave={() => validarQuadra(areia1)}
                 />
                 <CardQuadraVariaveis
-                  titulo="Quadra de Futevôlei 2"
-                  config={fut2}
-                  setConfig={setFut2}
-                  onSave={() => validarQuadra(fut2)}
+                  titulo="Quadra de Areia 2"
+                  config={areia2}
+                  setConfig={setAreia2}
+                  onSave={() => validarQuadra(areia2)}
                 />
               </div>
             </>

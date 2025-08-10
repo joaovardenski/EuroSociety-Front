@@ -7,9 +7,10 @@ interface ModalCancelarAdminProps {
   dados: {
     cliente: string;
     quadra: string;
-    data: Date;
+    data: string;
     horario: string;
     pagamentoFaltante: number;
+    valorTotal: number;
   };
   onConfirmar: () => void;
 }
@@ -20,7 +21,7 @@ export default function ModalCancelarAdmin({
   dados,
   onConfirmar,
 }: ModalCancelarAdminProps) {
-  const valorPago = 150 - dados.pagamentoFaltante;
+  const valorPago = dados.valorTotal - dados.pagamentoFaltante;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>

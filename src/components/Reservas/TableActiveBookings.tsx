@@ -1,5 +1,6 @@
 // src/components/Tabelas/TabelaAgendamentos.tsx
 import type { Reserva } from "../../types/interfaces";
+import { formatarDataBrasileira } from "../../utils/DateUtils";
 
 interface Props {
   reservas: Reserva[];
@@ -29,7 +30,7 @@ export default function TableActiveBookings({
             <tr key={index} className="border-t border-gray-200">
               <td className="px-4 py-2">{r.usuario.nome}</td>
               <td className="px-4 py-2">{r.quadra.nome}</td>
-              <td className="px-4 py-2">{`${r.data} às ${r.slot}`}</td>
+              <td className="px-4 py-2">{`${formatarDataBrasileira(r.data)} às ${r.slot}`}</td>
               <td className="px-4 py-2">
                 <span
                   className={`text-sm font-medium px-3 py-1 rounded-full

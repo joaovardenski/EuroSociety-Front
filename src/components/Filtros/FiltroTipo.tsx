@@ -17,7 +17,7 @@ export default function FiltroTipo({ tipoSelecionado, setTipoSelecionado }: Filt
       >
         <option value="Todas">Todas</option>
         <option value="Society">Society</option>
-        <option value="Futevôlei">Futevôlei</option>
+        <option value="Areia">Areia</option>
       </select>
     </div>
   );

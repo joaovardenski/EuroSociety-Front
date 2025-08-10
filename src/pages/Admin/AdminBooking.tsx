@@ -56,7 +56,7 @@ export default function AdminBooking() {
 
   async function getQuadras(): Promise<Quadra[]> {
     const mod = await import("../../data/Variaveis");
-    return mod.Quadras as Quadra[];
+    return mod.quadras as Quadra[];
   }
 
   async function getIndisponibilidades(): Promise<Indisponibilidade[]> {

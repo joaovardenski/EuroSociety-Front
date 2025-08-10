@@ -30,9 +30,10 @@ export default function ActiveBookingsAdmin() {
   const [agendamentoSelecionado, setAgendamentoSelecionado] = useState<{
     cliente: string;
     quadra: string;
-    data: Date;
+    data: string;
     horario: string;
     pagamentoFaltante: number;
+    valorTotal: number;
   } | null>(null);
 
   function handleSetDataSelecionada(novaData: string) {
@@ -41,6 +42,15 @@ export default function ActiveBookingsAdmin() {
       return;
     }
     setDataSelecionada(novaData);
+  }
+
+  // Util
+  function calcularValorTotalReserva(reserva: Reserva): number {
+    const [horaInicio] = reserva.slot.split(" - ");
+    const hora = parseInt(horaInicio.split(":")[0]);
+    return hora >= 18
+      ? reserva.quadra.precoNoturno
+      : reserva.quadra.precoNormal;
   }
 
   // Simulando requisição de dados (trocar por fetch/axios depois)
@@ -102,7 +112,9 @@ export default function ActiveBookingsAdmin() {
           </div>
 
           {isLoading ? (
-            <p className="text-center text-gray-500">Carregando agendamentos...</p>
+            <p className="text-center text-gray-500">
+              Carregando agendamentos...
+            </p>
           ) : (
             <TableActiveBookings
               reservas={agendamentos}
@@ -113,6 +125,7 @@ export default function ActiveBookingsAdmin() {
                   data: agendamento.data,
                   horario: agendamento.slot,
                   pagamentoFaltante: agendamento.pagamentoFaltante,
+                  valorTotal: calcularValorTotalReserva(agendamento),
                 });
                 setModalRecebimentoOpen(true);
               }}
@@ -123,6 +136,7 @@ export default function ActiveBookingsAdmin() {
                   data: agendamento.data,
                   horario: agendamento.slot,
                   pagamentoFaltante: agendamento.pagamentoFaltante,
+                  valorTotal: calcularValorTotalReserva(agendamento),
                 });
                 setModalCancelarOpen(true);
               }}

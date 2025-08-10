@@ -1,4 +1,5 @@
 import type { Reserva } from "../../types/interfaces";
+import { formatarDataBrasileira } from "../../utils/DateUtils";
 
 interface TableRecentBookingsProps {
   recentBookings: Reserva[];
@@ -29,17 +30,17 @@ export default function TableRecentBookings({ recentBookings }: TableRecentBooki
                   {agendamento.usuario.nome}
                 </td>
                 <td className="px-2 py-4">{agendamento.quadra.nome}</td>
-                <td className="px-2 py-4">{`${agendamento.data} às ${agendamento.slot}`}</td>
+                <td className="px-2 py-4">{`${formatarDataBrasileira(agendamento.data)} às ${agendamento.slot}`}</td>
                 <td className="px-2 py-4">R${agendamento.pagamento.valor}</td>
                 <td className="px-2 py-4">
                   <span
                     className={`text-white px-3 py-1 rounded-full ${
-                      agendamento.status === "Completo"
+                      agendamento.statusPagamento === "Completo"
                         ? "bg-green-500"
                         : "bg-yellow-500"
                     }`}
                   >
-                    {agendamento.status}
+                    {agendamento.statusPagamento}
                   </span>
                 </td>
               </tr>

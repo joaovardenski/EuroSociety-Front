@@ -1,6 +1,7 @@
 import { Calendar, Clock, DollarSign, Eye, CircleX } from "lucide-react";
 import { quadras } from "../../data/Variaveis";
 import type { Reserva } from "../../types/interfaces";
+import { formatarDataBrasileira } from "../../utils/DateUtils";
 interface BookingCardProps {
   reserva: Reserva;
   onCancel?: (reserva: Reserva) => void;
@@ -53,11 +54,7 @@ export default function BookingCard({ reserva, onCancel }: BookingCardProps) {
         <p className="flex items-center gap-2">
           <Calendar size={16} /> Data:{" "}
           <strong>
-            {new Intl.DateTimeFormat("pt-BR", {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-            }).format(new Date(reserva.data))}
+            {formatarDataBrasileira(reserva.data)}
           </strong>
         </p>
         <p className="flex items-center gap-2">
