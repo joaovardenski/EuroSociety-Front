@@ -1,4 +1,4 @@
-import type { Reserva } from "../components/Reservas/BookingCard";
+import type { Reserva } from "../types/interfaces";
 
 //Filtra por Todas / Próximas / Anteriores
 export function filtrarReservas(reservas: Reserva[], filtro: string): Reserva[] {
@@ -10,7 +10,7 @@ export function filtrarReservas(reservas: Reserva[], filtro: string): Reserva[] 
         const dataHoraReserva = new Date(`${reserva.data}T${horaInicio}:00`);
 
         if (filtro === "Próximas")
-          return dataHoraReserva >= agora && reserva.status !== "CANCELADO";
+          return dataHoraReserva >= agora && reserva.status !== "Cancelado";
         if (filtro === "Anteriores") return dataHoraReserva < agora;
         return true;
       })

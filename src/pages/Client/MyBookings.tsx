@@ -24,7 +24,7 @@ function MyBookings() {
   const [modalOpen, setModalOpen] = useState(false);
   const [reservaSelecionada, setReservaSelecionada] = useState<Reserva | null>(null);
   const [reservas, setReservas] = useState<Reserva[]>([]);
-  const [searchOption, setSearchOption] = useState<FiltroReservas>("Todas");
+  const [searchOption, setSearchOption] = useState<FiltroReservas>("Próximas");
   const [isLoading, setIsLoading] = useState(true);
 
   // Simulação de chamada de API (substitua por fetch/axios depois)
@@ -89,11 +89,6 @@ function MyBookings() {
 
               <div className="flex gap-3">
                 <SearchOptionButton
-                  label="Todas"
-                  isActive={searchOption === "Todas"}
-                  onClick={() => setSearchOption("Todas")}
-                />
-                <SearchOptionButton
                   label="Próximas"
                   isActive={searchOption === "Próximas"}
                   onClick={() => setSearchOption("Próximas")}
@@ -102,6 +97,11 @@ function MyBookings() {
                   label="Anteriores"
                   isActive={searchOption === "Anteriores"}
                   onClick={() => setSearchOption("Anteriores")}
+                />
+                <SearchOptionButton
+                  label="Todas"
+                  isActive={searchOption === "Todas"}
+                  onClick={() => setSearchOption("Todas")}
                 />
               </div>
             </div>
