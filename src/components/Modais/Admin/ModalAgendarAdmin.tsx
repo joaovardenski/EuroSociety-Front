@@ -13,7 +13,7 @@ interface ModalConfirmarAdminProps {
     horario: string;
     valor: number;
   };
-  onConfirmar: (info: { nome: string; telefone: string; valor: number; paraMim: boolean }) => void;
+  onConfirmar: (info: { nome: string; telefone: string; valor: number}) => void;
 }
 
 export default function ModalAgendarAdmin({
@@ -25,10 +25,9 @@ export default function ModalAgendarAdmin({
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [valor, setValor] = useState(dados.valor);
-  const [paraMim, setParaMim] = useState(false);
 
   function handleConfirm() {
-    onConfirmar({ nome, telefone, valor, paraMim });
+    onConfirmar({ nome, telefone, valor});
   }
 
   return (
@@ -62,17 +61,6 @@ export default function ModalAgendarAdmin({
         </p>
       </div>
 
-      {/* Check para "Agendar para mim" */}
-      <label className="flex items-center gap-2 mb-4 text-sm text-gray-700 cursor-pointer">
-        <input
-          type="checkbox"
-          checked={paraMim}
-          onChange={() => setParaMim(!paraMim)}
-          className="accent-blue-600 w-4 h-4"
-        />
-        Agendar para mim
-      </label>
-
       {/* Campos de input */}
       <div className="space-y-3">
         <div className="flex items-center gap-2">
@@ -82,9 +70,8 @@ export default function ModalAgendarAdmin({
             label="Nome do cliente:"
             type="text"
             placeholder="Nome"
-            value={paraMim ? "Administrador" : nome}
+            value={nome}
             onChange={(e) => setNome(e.target.value)}
-            disabled={paraMim}
           />
         </div>
         <div className="flex items-center gap-2">
@@ -94,9 +81,8 @@ export default function ModalAgendarAdmin({
             label="Telefone:"
             type="text"
             placeholder="(xx) xxxxx-xxxx"
-            value={paraMim ? "" : telefone}
+            value={telefone}
             onChange={(e) => setTelefone(e.target.value)}
-            disabled={paraMim}
           />
         </div>
         <div className="flex items-center gap-2">

@@ -68,4 +68,10 @@ export interface AgendaBloqueio {
   dataHoraInicio: string,
 }
 
-
+export interface UserTokens {
+  id: number;
+  usuario: Usuario;
+  refresh: string;
+  expiracao: string;
+  criadoEm: string;
+}

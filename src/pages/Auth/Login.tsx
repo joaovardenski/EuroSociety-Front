@@ -8,15 +8,12 @@ import InputFieldAuth from "../../components/Auth/InputFieldAuth";
 import SubmitButtonAuth from "../../components/Auth/SubmitButtonAuth";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
-// Utils
-import { getEmailError, getSenhaError } from "../../utils/Validators";
+
 
 function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [senhaError, setSenhaError] = useState("");
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -25,24 +22,11 @@ function Login() {
     const trimmedEmail = email.trim();
     const trimmedSenha = senha.trim();
 
-    // Validações
-    const emailValidation = getEmailError(trimmedEmail);
-    const senhaValidation = getSenhaError(trimmedSenha);
+    console.log("Enviar dados:", { email: trimmedEmail, senha: trimmedSenha });
 
-    // Atualiza os estados de erro (se houver)
-    setEmailError(emailValidation);
-    setSenhaError(senhaValidation);
-
-    // Se não houver erros, prossegue com o login
-    if (!emailValidation && !senhaValidation) {
-      console.log("Enviar dados:", {
-        email: trimmedEmail,
-        senha: trimmedSenha,
-      });
-      // lógica de login aqui
-      // handleLogin(trimmedEmail, trimmedSenha);
-      navigate("/");
-    }
+    // lógica de login aqui
+    // handleLogin(trimmedEmail, trimmedSenha);
+    navigate("/");
   }
 
   return (
@@ -77,7 +61,6 @@ function Login() {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              error={emailError}
             />
             <InputFieldAuth
               id="isenha"
@@ -86,7 +69,6 @@ function Login() {
               placeholder="Senha"
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
-              error={senhaError}
             />
             <SubmitButtonAuth
               label="Entrar"
@@ -105,7 +87,10 @@ function Login() {
           {/* Botão de entrar com Google */}
           <GoogleLogin
             onSuccess={(credentialResponse) => {
-              const decodedCredential = jwtDecode(credentialResponse.credential!);
+              console.log(credentialResponse.credential);
+              const decodedCredential = jwtDecode(
+                credentialResponse.credential!
+              );
               console.log(decodedCredential);
               //HandleSubmitGoogle(decodedCredential)
             }}
