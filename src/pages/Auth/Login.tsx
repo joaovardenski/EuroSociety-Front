@@ -8,12 +8,70 @@ import InputFieldAuth from "../../components/Auth/InputFieldAuth";
 import SubmitButtonAuth from "../../components/Auth/SubmitButtonAuth";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
-
+import { AxiosError } from "axios";
+import axios from "axios";
 
 function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [error, setError] = useState("");
+
+  async function handleLogin(email: string, senha: string) {
+    try {
+      const response = await axios.post("http://localhost:8000/api/login", {
+        email: email,
+        password: senha,
+      });
+
+      const data = response.data as { access_token: string };
+      console.log("Login bem-sucedido:", data);
+
+      // Salva o token no localStorage para futuras requisições
+      localStorage.setItem("access_token", data.access_token);
+
+      // Limpa qualquer mensagem de erro
+      setError("");
+
+      navigate("/");
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      if (axiosError.response && axiosError.response.data) {
+        // Se houver uma mensagem de erro na resposta da API
+        setError(axiosError.response.data.message || "Erro desconhecido");
+        console.error("Erro no login:", axiosError.response.data);
+      } else {
+        // Para erros que não vêm da API (ex: problema de rede)
+        setError("Erro ao conectar com o servidor.");
+        console.error("Erro no login:", error);
+      }
+    }
+  }
+
+  async function handleLoginGoogle(decodedCredential: any) {
+    try {
+      const response = await axios.post("http://localhost:8000/api/login", {
+        email: decodedCredential.email,
+        google_id: decodedCredential.sub,
+      });
+
+      const data = response.data as { access_token: string };
+      console.log("Login com Google bem-sucedido:", data);
+
+      localStorage.setItem("access_token", data.access_token);
+      setError(""); // Limpa o erro anterior, se houver
+      navigate("/");
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      if (axiosError.response && axiosError.response.data) {
+        setError(axiosError.response.data.message || "Erro desconhecido");
+        console.error("Erro no login com Google:", axiosError.response.data);
+      } else {
+        setError("Erro ao conectar com o servidor.");
+        console.error("Erro no login com Google:", error);
+      }
+    }
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -22,11 +80,7 @@ function Login() {
     const trimmedEmail = email.trim();
     const trimmedSenha = senha.trim();
 
-    console.log("Enviar dados:", { email: trimmedEmail, senha: trimmedSenha });
-
-    // lógica de login aqui
-    // handleLogin(trimmedEmail, trimmedSenha);
-    navigate("/");
+    handleLogin(trimmedEmail, trimmedSenha);
   }
 
   return (
@@ -53,6 +107,7 @@ function Login() {
           <h1 className="hidden md:block text-2xl font-bold text-black text-center">
             LOGIN
           </h1>
+          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
           <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
             <InputFieldAuth
               id="iemail"
@@ -92,7 +147,7 @@ function Login() {
                 credentialResponse.credential!
               );
               console.log(decodedCredential);
-              //HandleSubmitGoogle(decodedCredential)
+              handleLoginGoogle(decodedCredential);
             }}
             onError={() => {
               console.log("Login Failed");
