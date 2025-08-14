@@ -14,8 +14,15 @@ import {
 } from "../../utils/Validators";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
+import type { JwtPayload } from "jwt-decode";
+import axiosPublic from "../../api/axiosPublic";
 import { AxiosError } from "axios";
-import axios from "axios";
+
+interface GoogleJwtPayload extends JwtPayload {
+  name: string;
+  email: string;
+  sub: string;
+}
 
 function Register() {
   const navigate = useNavigate();
@@ -32,7 +39,7 @@ function Register() {
     senha: string
   ) {
     try {
-      const response = await axios.post("http://localhost:8000/api/register", {
+      const response = await axiosPublic.post("/register", {
         nome: nome,
         email: email,
         senha: senha,
@@ -43,7 +50,7 @@ function Register() {
       const data = response.data as { access_token: string };
       console.log("Registro bem-sucedido:", data);
       localStorage.setItem("access_token", data.access_token);
-      navigate("/login");
+      navigate("/");
     } catch (error) {
       const axiosError = error as AxiosError<{ errors?: { email?: string[] } }>;
       if (
@@ -60,9 +67,9 @@ function Register() {
     }
   }
 
-  async function handleRegisterGoogle(decodedCredential: any) {
+  async function handleRegisterGoogle(decodedCredential: GoogleJwtPayload) {
     try {
-      const response = await axios.post("http://localhost:8000/api/register", {
+      const response = await axiosPublic.post("/register", {
         nome: decodedCredential.name,
         email: decodedCredential.email,
         google_id: decodedCredential.sub,
@@ -185,7 +192,7 @@ function Register() {
           {/* Botão de registrar com Google */}
           <GoogleLogin
             onSuccess={(credentialResponse) => {
-              const decodedCredential = jwtDecode(
+              const decodedCredential = jwtDecode<GoogleJwtPayload>(
                 credentialResponse.credential!
               );
               console.log(decodedCredential);

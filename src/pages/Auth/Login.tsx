@@ -8,8 +8,16 @@ import InputFieldAuth from "../../components/Auth/InputFieldAuth";
 import SubmitButtonAuth from "../../components/Auth/SubmitButtonAuth";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
+import type { JwtPayload } from "jwt-decode";
+import axiosPublic from "../../api/axiosPublic";
+import axiosPrivate from "../../api/axiosPrivate";
 import { AxiosError } from "axios";
-import axios from "axios";
+
+interface GoogleJwtPayload extends JwtPayload {
+  name: string;
+  email: string;
+  sub: string;
+}
 
 function Login() {
   const navigate = useNavigate();
@@ -17,9 +25,19 @@ function Login() {
   const [senha, setSenha] = useState("");
   const [error, setError] = useState("");
 
+  async function fetchUser() {
+    try {
+      const response = await axiosPrivate.get("/user");
+      return response.data as { permissao: "admin" | "user" };
+    } catch (err) {
+      console.error("Erro ao buscar usuário:", err);
+      return null;
+    }
+  }
+
   async function handleLogin(email: string, senha: string) {
     try {
-      const response = await axios.post("http://localhost:8000/api/login", {
+      const response = await axiosPublic.post("/login", {
         email: email,
         password: senha,
       });
@@ -30,10 +48,16 @@ function Login() {
       // Salva o token no localStorage para futuras requisições
       localStorage.setItem("access_token", data.access_token);
 
+      const user = await fetchUser(); // pega a permissão do usuário
+
+      if (user?.permissao === "admin") {
+        navigate("/admin"); // redireciona admins para a página admin
+      } else {
+        navigate("/"); // usuários normais para a home
+      }
+
       // Limpa qualquer mensagem de erro
       setError("");
-
-      navigate("/");
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
       if (axiosError.response && axiosError.response.data) {
@@ -48,9 +72,9 @@ function Login() {
     }
   }
 
-  async function handleLoginGoogle(decodedCredential: any) {
+  async function handleLoginGoogle(decodedCredential: GoogleJwtPayload) {
     try {
-      const response = await axios.post("http://localhost:8000/api/login", {
+      const response = await axiosPublic.post("/login", {
         email: decodedCredential.email,
         google_id: decodedCredential.sub,
       });
@@ -143,7 +167,7 @@ function Login() {
           <GoogleLogin
             onSuccess={(credentialResponse) => {
               console.log(credentialResponse.credential);
-              const decodedCredential = jwtDecode(
+              const decodedCredential = jwtDecode<GoogleJwtPayload>(
                 credentialResponse.credential!
               );
               console.log(decodedCredential);

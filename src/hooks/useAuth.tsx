@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
-
-axios.defaults.withCredentials = true;
+import axiosPrivate from "../api/axiosPrivate";
 
 export interface Usuario {
   id_usuario: number;
   nome: string;
   email: string;
-  permissao: "admin" | "usuario"; // ajuste se usar outro sistema
+  permissao: "admin" | "user";
   metodo_login: string;
 }
 
@@ -18,12 +16,21 @@ export function useAuth() {
 
   useEffect(() => {
     async function checkAuth() {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        setIsAuthenticated(false);
+        setUser(null);
+        setIsLoading(false);
+        return;
+      }
+
       try {
-        const response = await axios.get("http://localhost:8000/api/user");
-        setUser(response.data as Usuario); // espera que o backend retorne { id_usuario, nome, ... }
+        const response = await axiosPrivate.get("/user");
+        setUser(response.data as Usuario);
         setIsAuthenticated(true);
       } catch (err) {
         console.error(err);
+        localStorage.removeItem("access_token"); // limpa token inválido
         setUser(null);
         setIsAuthenticated(false);
       } finally {
