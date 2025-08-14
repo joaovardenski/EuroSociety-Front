@@ -2,9 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserCircle, LogOut } from "lucide-react";
 import euroLogoWhite from "../../assets/euroSocietyWhite.png";
+import { getPrimeiroEUltimoNome } from "../../utils/NameUtils";
 
-export default function HeaderEuro() {
-  const user = "João Victor";
+interface HeaderEuroProps {
+  nome: string;
+}
+
+export default function HeaderEuro({ nome }: HeaderEuroProps) {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -13,9 +17,8 @@ export default function HeaderEuro() {
   }
 
   function handleLogout() {
-    // Limpar cookies e redirecionar para login
-    console.log("Logout...");
     navigate("/login");
+    localStorage.removeItem("access_token");
   }
 
   return (
@@ -29,7 +32,7 @@ export default function HeaderEuro() {
           className="hidden md:flex items-center gap-4 cursor-pointer"
           onClick={toggleMenu}
         >
-          <p className="font-semibold text-lg">Olá, {user}!</p>
+          <p className="font-semibold text-lg">Olá, {getPrimeiroEUltimoNome(nome)}!</p>
           <UserCircle size={40} />
         </div>
         {menuOpen && (

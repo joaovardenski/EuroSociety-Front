@@ -9,60 +9,72 @@ import CardNovaReserva from "../../components/Reservas/NovaReservaCard";
 import ReservasAtivasCard from "../../components/Reservas/ReservasAtivasCard";
 import LoadingMessage from "../../components/LoadingMessage";
 import type { Reserva } from "../../types/interfaces";
+import { useAuth } from "../../hooks/useAuth";
 
 type ReservaComDataHora = Reserva & { dataHora: Date };
 
 function Dashboard() {
-  const [user, setUser] = useState<string>("");
+  const auth = useAuth();
   const [reservas, setReservas] = useState<Reserva[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function carregarDados() { //Carrega user e reservas do usuário com as APIs e salva nos states
+    async function carregarReservas() {
       try {
-        // Simula chamadas à API
-        const usuarioDaAPI = await getUsuario();
         const reservasDaAPI = await getMinhasReservas();
-
-        setUser(usuarioDaAPI);
         setReservas(reservasDaAPI);
       } catch (error) {
-        console.error("Erro ao carregar dados:", error);
+        console.error("Erro ao carregar reservas:", error);
       } finally {
         setIsLoading(false);
       }
     }
 
-    carregarDados();
-  }, []);
+    if (!auth.isLoading && auth.isAuthenticated) {
+      carregarReservas();
+    }
+  }, [auth.isLoading, auth.isAuthenticated]);
 
-  // Simulações de API (substitua com fetch/axios futuramente)
-  async function getUsuario(): Promise<string> { // Pega nome do usuário
-    return "João Victor";
-  }
-
-  async function getMinhasReservas(): Promise<Reserva[]> { // Pega todas minhas reservas
+  async function getMinhasReservas(): Promise<Reserva[]> {
+    // Pega todas minhas reservas
     return import("../../data/Variaveis").then((mod) => mod.minhasReservas);
   }
 
-  function getReservasConfirmadas(reservas: Reserva[]): Reserva[] { // Filtra apenas reservas confirmadas
+  function getReservasConfirmadas(reservas: Reserva[]): Reserva[] {
+    // Filtra apenas reservas confirmadas
     return reservas.filter((reserva) => reserva.status === "Confirmado");
   }
 
-  function getProximaReserva(reservas: Reserva[]): ReservaComDataHora | undefined { // Pega minha próxima reserva
+  function getProximaReserva(
+    reservas: Reserva[]
+  ): ReservaComDataHora | undefined {
+    // Pega minha próxima reserva
     const agora = new Date();
     return reservas
       .map(adicionarDataHora)
-      .filter((reserva) => reserva.dataHora > agora && reserva.status === "Confirmado")
+      .filter(
+        (reserva) => reserva.dataHora > agora && reserva.status === "Confirmado"
+      )
       .sort((a, b) => a.dataHora.getTime() - b.dataHora.getTime())[0];
   }
 
-  function adicionarDataHora(reserva: Reserva): ReservaComDataHora { // Formata DataHora para poder ordenar reservas
+  function adicionarDataHora(reserva: Reserva): ReservaComDataHora {
+    // Formata DataHora para poder ordenar reservas
     const [horaInicio] = reserva.slot.split(" - ");
     return {
       ...reserva,
       dataHora: new Date(`${reserva.data}T${horaInicio}:00`),
     };
+  }
+
+  function getPrimeiroEUltimoNome(nome?: string): string {
+    if (!nome) return "Usuário Desconhecido";
+
+    const partes = nome.trim().split(" ").filter(Boolean);
+
+    if (partes.length === 1) return partes[0];
+
+    return `${partes[0]} ${partes[partes.length - 1]}`;
   }
 
   const activeBookings = getReservasConfirmadas(reservas);
@@ -71,17 +83,24 @@ function Dashboard() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#e1e6f9]">
-      <HeaderEuro />
+      <HeaderEuro nome={auth.user?.nome || ""}/>
 
       <main className="flex flex-col items-center flex-grow px-4 py-10 w-full">
         {isLoading ? (
-          <LoadingMessage message="Carregando dados..."/>
+          <LoadingMessage message="Carregando dados..." />
         ) : (
           <>
             {/* Boas-vindas */}
             <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-4xl text-center mb-8">
               <h1 className="text-2xl font-bold text-gray-900">
-                Seja bem-vindo, <span className="text-azulBase">{user}</span>!
+                Seja bem-vindo,{" "}
+                <span className="text-azulBase">
+                  {auth.isLoading
+                    ? "Carregando..."
+                    : getPrimeiroEUltimoNome(auth.user?.nome) ||
+                      "Usuário Desconhecido"}
+                </span>
+                !
               </h1>
               <p className="text-gray-600 mt-2">
                 Confira seus agendamentos e aproveite nossas quadras.
@@ -90,11 +109,9 @@ function Dashboard() {
 
             {/* Cards */}
             <div className="flex flex-wrap gap-6 justify-center w-full max-w-6xl mb-10 md:mb-0">
-              <ProximaReservaCard reserva={lastBooking}/>
-              <CardNovaReserva/>
-              <ReservasAtivasCard
-                count={numberOfActiveBookings}
-              />
+              <ProximaReservaCard reserva={lastBooking} />
+              <CardNovaReserva />
+              <ReservasAtivasCard count={numberOfActiveBookings} />
             </div>
           </>
         )}

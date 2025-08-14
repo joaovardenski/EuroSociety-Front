@@ -7,7 +7,7 @@ export default function Unauthorized() {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      navigate("/login");
+      navigate(-1);
     }, 8000); // redireciona automaticamente após 8 segundos
 
     return () => clearTimeout(timeout);
@@ -22,10 +22,10 @@ export default function Unauthorized() {
         entre em contato com o suporte ou retorne para a tela de login.
       </p>
       <button
-        onClick={() => navigate("/login")}
-        className="mt-6 bg-[#2b4363] text-white px-6 py-3 rounded-xl hover:bg-[#1f324b] transition"
+        onClick={() => navigate(-1)}
+        className="mt-6 bg-[#2b4363] text-white px-15 py-3 rounded-xl hover:bg-[#1f324b] transition"
       >
-        Voltar para o Login
+        Voltar
       </button>
       <p className="text-sm text-gray-100 mt-4">Você será redirecionado automaticamente em instantes...</p>
     </div>
