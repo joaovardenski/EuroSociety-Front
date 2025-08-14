@@ -14,6 +14,8 @@ import {
 } from "../../utils/Validators";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
+import { AxiosError } from "axios";
+import axios from "axios";
 
 function Register() {
   const navigate = useNavigate();
@@ -23,6 +25,70 @@ function Register() {
   const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [senhaError, setSenhaError] = useState("");
+
+  async function handleRegisterEmail(
+    nome: string,
+    email: string,
+    senha: string
+  ) {
+    try {
+      const response = await axios.post("http://localhost:8000/api/register", {
+        nome: nome,
+        email: email,
+        senha: senha,
+        permissao: "user",
+        metodo_login: "email",
+      });
+
+      const data = response.data as { access_token: string };
+      console.log("Registro bem-sucedido:", data);
+      localStorage.setItem("access_token", data.access_token);
+      navigate("/login");
+    } catch (error) {
+      const axiosError = error as AxiosError<{ errors?: { email?: string[] } }>;
+      if (
+        axiosError.response &&
+        axiosError.response.data &&
+        axiosError.response.data.errors &&
+        axiosError.response.data.errors.email
+      ) {
+        setEmailError(axiosError.response.data.errors.email[0]);
+        console.error("Erro no registro:", axiosError.response.data);
+      } else {
+        console.error("Erro no registro:", error);
+      }
+    }
+  }
+
+  async function handleRegisterGoogle(decodedCredential: any) {
+    try {
+      const response = await axios.post("http://localhost:8000/api/register", {
+        nome: decodedCredential.name,
+        email: decodedCredential.email,
+        google_id: decodedCredential.sub,
+        permissao: "user",
+        metodo_login: "google",
+      });
+
+      const data = response.data as { access_token: string };
+      console.log("Registro com Google bem-sucedido:", data);
+      localStorage.setItem("access_token", data.access_token);
+      navigate("/login");
+    } catch (error) {
+      const axiosError = error as AxiosError<{ errors?: { email?: string[] } }>;
+      if (
+        axiosError.response &&
+        axiosError.response.data &&
+        axiosError.response.data.errors &&
+        axiosError.response.data.errors.email
+      ) {
+        setEmailError(axiosError.response.data.errors.email[0]);
+        console.error("Erro no registro com Google:", axiosError.response.data);
+      } else {
+        console.error("Erro no registro com Google:", error);
+      }
+    }
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -40,14 +106,7 @@ function Register() {
     setSenhaError(senhaValidation);
 
     if (!nameValidation && !emailValidation && !senhaValidation) {
-      console.log("Enviar dados:", {
-        name: trimmedName,
-        email: trimmedEmail,
-        senha: trimmedSenha,
-      });
-      // lógica de cadastro aqui
-      // handleRegister(trimmedName, trimmedEmail, trimmedSenha);
-      navigate("/login");
+      handleRegisterEmail(trimmedName, trimmedEmail, trimmedSenha);
     }
   }
 
@@ -126,9 +185,11 @@ function Register() {
           {/* Botão de registrar com Google */}
           <GoogleLogin
             onSuccess={(credentialResponse) => {
-              const decodedCredential = jwtDecode(credentialResponse.credential!);
+              const decodedCredential = jwtDecode(
+                credentialResponse.credential!
+              );
               console.log(decodedCredential);
-              //HandleSubmitGoogle(decodedCredential)
+              handleRegisterGoogle(decodedCredential);
             }}
             onError={() => {
               console.log("Login Failed");
