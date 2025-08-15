@@ -1,62 +1,71 @@
-// Hooks
 import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 // Assets
 import euroLogoWhite from "../../assets/euroSocietyWhite.png";
 // Components
 import InputFieldAuth from "../../components/Auth/InputFieldAuth";
 import SubmitButtonAuth from "../../components/Auth/SubmitButtonAuth";
 // Utils
-import { getEmailRedefinicaoError } from "../../utils/Validators";
+import { getSenhaRedefinicaoError } from "../../utils/Validators";
 // Axios
 import axiosPublic from "../../api/axiosPublic";
 import { AxiosError } from "axios";
 
-interface RecoverPasswordResponse {
+interface ResetPasswordResponse {
   message?: string;
 }
 
-function RecoverPassword() {
-  const [email, setEmail] = useState("");
-  const [emailError, setEmailError] = useState("");
+function ChangePassword() {
+  const navigate = useNavigate();
+  const { token } = useParams<{ token: string }>(); // pega o token da URL
+  const [senha, setSenha] = useState("");
+  const [confirmacaoSenha, setConfirmacaoSenha] = useState("");
+  const [senhaError, setSenhaError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    const trimmedEmail = email.trim();
-    const validationError = getEmailRedefinicaoError(trimmedEmail);
-    setEmailError(validationError);
+    const trimmedSenha = senha.trim();
+    const trimmedConfirmacaoSenha = confirmacaoSenha.trim();
+
+    const senhaValidation = getSenhaRedefinicaoError(trimmedSenha, trimmedConfirmacaoSenha);
+    setSenhaError(senhaValidation);
     setSuccessMessage("");
 
-    if (validationError) return;
+    if (senhaValidation) return;
+    if (!token) {
+      setSenhaError("Token inválido ou não encontrado na URL.");
+      return;
+    }
 
     setLoading(true);
 
     try {
-      const response = await axiosPublic.post<RecoverPasswordResponse>(
-        "/forgot-password",
-        { email: trimmedEmail }
-      );
+      const response = await axiosPublic.post<ResetPasswordResponse>("/reset-password", {
+        token: token,
+        senha: trimmedSenha,
+        senha_confirmation: trimmedConfirmacaoSenha, // necessário por causa do 'confirmed' no back
+      });
 
-      setSuccessMessage(
-        response.data.message || "Link de recuperação enviado com sucesso!"
-      );
-      setEmail("");
+      setSuccessMessage(response.data.message || "Senha redefinida com sucesso!");
+      setSenha("");
+      setConfirmacaoSenha("");
+
+      // redireciona para login após 2 segundos
+      setTimeout(() => navigate("/login"), 2000);
     } catch (error) {
-      const axiosError = error as AxiosError<
-        RecoverPasswordResponse & { errors?: Record<string, string[]> }
-      >;
-
+      const axiosError = error as AxiosError<ResetPasswordResponse & { errors?: Record<string, string[]> }>;
       if (axiosError.response && axiosError.response.data) {
         const data = axiosError.response.data;
         const msg = data.errors
           ? Object.values(data.errors).flat().join("\n")
-          : data.message || "Erro ao enviar link de recuperação";
-        setEmailError(msg);
+          : data.message || "Erro ao redefinir senha";
+        setSenhaError(msg);
         console.error("Erro na requisição:", data);
       } else {
-        setEmailError("Erro ao conectar com o servidor");
+        setSenhaError("Erro de conexão com o servidor");
         console.error("Erro de rede:", error);
       }
     } finally {
@@ -85,41 +94,42 @@ function RecoverPassword() {
               style={{ height: "calc(100vh / 4)" }}
             />
             <h1 className="text-white text-3xl font-semibold">
-              Recuperar Senha
+              Redefinir Senha
             </h1>
           </div>
 
           <h1 className="hidden md:block text-2xl font-bold text-black text-center">
-            RECUPERAR SENHA
+            REDEFINIR SENHA
           </h1>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
             <InputFieldAuth
-              id="iemail"
-              label="Email:"
-              type="email"
-              placeholder="Digite seu email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              error={emailError}
+              id="isenha"
+              label="Senha:"
+              type="password"
+              placeholder="Senha"
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              error={senhaError}
             />
-
+            <InputFieldAuth
+              id="iconfirmacaosenha"
+              label="Confirme sua senha:"
+              type="password"
+              placeholder="Confirme a senha"
+              value={confirmacaoSenha}
+              onChange={(e) => setConfirmacaoSenha(e.target.value)}
+            />
             <SubmitButtonAuth
-              label={loading ? "Enviando..." : "Enviar link de recuperação"}
+              label={loading ? "Redefinindo..." : "Confirmar redefinição"}
               icon="send"
               onClick={handleSubmit}
               disabled={loading}
             />
           </form>
 
-          {successMessage ? (
-            <p className="text-green-600 text-center mt-2">
-              {successMessage}
-            </p>
-          ) : (
-            <p className="text-white text-[15px] text-center font-semibold md:text-gray-700">
-              Um link de recuperação será enviado no seu endereço de email
-            </p>
+          {successMessage && (
+            <p className="text-green-600 text-center mt-2">{successMessage}</p>
           )}
 
           <div className="text-center text-white text-sm md:text-gray-700">
@@ -138,4 +148,4 @@ function RecoverPassword() {
   );
 }
 
-export default RecoverPassword;
+export default ChangePassword;

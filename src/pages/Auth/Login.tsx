@@ -39,7 +39,7 @@ function Login() {
     try {
       const response = await axiosPublic.post("/login", {
         email: email,
-        password: senha,
+        senha: senha,
       });
 
       const data = response.data as { access_token: string };

@@ -76,4 +76,18 @@ export function isValidInterval(start: string, end: string): boolean {
   return true;
 }
 
+export function getSenhaRedefinicaoError(senha: string, confirmacaoSenha: string): string {
+  if (!senha) return "Senha é obrigatória";
+  if (senha.length < 6) return "Senha deve ter pelo menos 6 caracteres";
+  if (senha.length > 64) return "Senha muito longa";
+  const hasLetter = /[a-zA-Z]/.test(senha);
+  const hasNumber = /\d/.test(senha);
+  if (!hasLetter || !hasNumber) return "A senha deve conter letras e números";
+  if (senha !== confirmacaoSenha) return "As senhas não coincidem";
+  return "";
+}
 
+export function getEmailRedefinicaoError(email: string): string {
+  if (!email || email.length < 5 || email.length > 100 || !isValidEmail(email)) return "Formato de email inválido";
+  return "";
+}

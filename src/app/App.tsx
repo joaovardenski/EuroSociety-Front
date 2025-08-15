@@ -18,6 +18,7 @@ import VariablesAdmin from "../pages/Admin/VariablesAdmin";
 import Unauthorized from "../pages/Error/Unauthorized";
 import NotAuthenticated from "../pages/Error/NotAuthenticated";
 import NotFound from "../pages/Error/NotFound";
+import ChangePassword from "../pages/Auth/ChangePassword";
 
 const router = createBrowserRouter([
   {
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
   {
     path: "/recuperar-senha",
     element: <RecoverPassword />,
+  },
+  {
+    path: "/redefinir-senha/:token",
+    element: <ChangePassword />,
   },
   {
     path: "/",
