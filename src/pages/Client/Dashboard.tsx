@@ -10,14 +10,16 @@ import ReservasAtivasCard from "../../components/Reservas/ReservasAtivasCard";
 import LoadingMessage from "../../components/LoadingMessage";
 import type { Reserva } from "../../types/interfaces";
 import { useAuth } from "../../hooks/useAuth";
+import { getNomeCondensado } from "../../utils/NameUtils";
 
 type ReservaComDataHora = Reserva & { dataHora: Date };
 
 function Dashboard() {
   const auth = useAuth();
+  localStorage.setItem("user_nome", auth.user?.nome || "");
   const [reservas, setReservas] = useState<Reserva[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
+  const username = getNomeCondensado(localStorage.getItem("user_nome") || "Usuário Desconhecido")
   useEffect(() => {
     async function carregarReservas() {
       try {
@@ -67,23 +69,13 @@ function Dashboard() {
     };
   }
 
-  function getPrimeiroEUltimoNome(nome?: string): string {
-    if (!nome) return "Usuário Desconhecido";
-
-    const partes = nome.trim().split(" ").filter(Boolean);
-
-    if (partes.length === 1) return partes[0];
-
-    return `${partes[0]} ${partes[partes.length - 1]}`;
-  }
-
   const activeBookings = getReservasConfirmadas(reservas);
   const numberOfActiveBookings = activeBookings.length;
   const lastBooking = getProximaReserva(activeBookings);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#e1e6f9]">
-      <HeaderEuro nome={auth.user?.nome || ""}/>
+      <HeaderEuro/>
 
       <main className="flex flex-col items-center flex-grow px-4 py-10 w-full">
         {isLoading ? (
@@ -95,10 +87,7 @@ function Dashboard() {
               <h1 className="text-2xl font-bold text-gray-900">
                 Seja bem-vindo,{" "}
                 <span className="text-azulBase">
-                  {auth.isLoading
-                    ? "Carregando..."
-                    : getPrimeiroEUltimoNome(auth.user?.nome) ||
-                      "Usuário Desconhecido"}
+                  {username}
                 </span>
                 !
               </h1>
