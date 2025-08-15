@@ -45,8 +45,8 @@ function ChangePassword() {
     try {
       const response = await axiosPublic.post<ResetPasswordResponse>("/reset-password", {
         token: token,
-        senha: trimmedSenha,
-        senha_confirmation: trimmedConfirmacaoSenha, // necessário por causa do 'confirmed' no back
+        password: trimmedSenha,
+        password_confirmation: trimmedConfirmacaoSenha, // necessário por causa do 'confirmed' no back
       });
 
       setSuccessMessage(response.data.message || "Senha redefinida com sucesso!");
