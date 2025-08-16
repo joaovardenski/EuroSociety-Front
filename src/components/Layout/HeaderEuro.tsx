@@ -36,13 +36,6 @@ export default function HeaderEuro() {
         {menuOpen && (
           <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-md z-10 text-black">
             <button
-              onClick={() => {}}
-              className="flex items-center gap-2 w-full px-4 py-2 hover:bg-gray-100"
-            >
-              <UserCircle size={18} />
-              Perfil
-            </button>
-            <button
               onClick={handleLogout}
               className="flex items-center gap-2 w-full px-4 py-2 hover:bg-gray-100"
             >

@@ -10,14 +10,16 @@ import { getSenhaRedefinicaoError } from "../../utils/Validators";
 // Axios
 import axiosPublic from "../../api/axiosPublic";
 import { AxiosError } from "axios";
+// Lucide Icons
+import { CheckCircle, XCircle } from "lucide-react";
 
 interface ResetPasswordResponse {
   message?: string;
 }
 
-function ChangePassword() {
+export default function ChangePassword() {
   const navigate = useNavigate();
-  const { token } = useParams<{ token: string }>(); // pega o token da URL
+  const { token } = useParams<{ token: string }>();
   const [senha, setSenha] = useState("");
   const [confirmacaoSenha, setConfirmacaoSenha] = useState("");
   const [senhaError, setSenhaError] = useState("");
@@ -46,7 +48,7 @@ function ChangePassword() {
       const response = await axiosPublic.post<ResetPasswordResponse>("/reset-password", {
         token: token,
         password: trimmedSenha,
-        password_confirmation: trimmedConfirmacaoSenha, // necessário por causa do 'confirmed' no back
+        password_confirmation: trimmedConfirmacaoSenha,
       });
 
       setSuccessMessage(response.data.message || "Senha redefinida com sucesso!");
@@ -107,7 +109,7 @@ function ChangePassword() {
               id="isenha"
               label="Senha:"
               type="password"
-              placeholder="Senha"
+              placeholder="Digite sua nova senha"
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
               error={senhaError}
@@ -123,13 +125,28 @@ function ChangePassword() {
             <SubmitButtonAuth
               label={loading ? "Redefinindo..." : "Confirmar redefinição"}
               icon="send"
-              onClick={handleSubmit}
               disabled={loading}
             />
           </form>
 
           {successMessage && (
-            <p className="text-green-600 text-center mt-2">{successMessage}</p>
+            <div className="flex items-center justify-center gap-2 text-green-700 bg-green-100 border border-green-300 rounded-md p-2 text-center mt-2 w-full">
+              <CheckCircle size={20} />
+              <span>{successMessage}</span>
+            </div>
+          )}
+
+          {senhaError && (
+            <div className="flex items-center justify-center gap-2 text-red-700 bg-red-100 border border-red-300 rounded-md p-2 text-center mt-2 w-full">
+              <XCircle size={20} />
+              <span>{senhaError}</span>
+            </div>
+          )}
+
+          {!successMessage && !senhaError && (
+            <p className="text-white text-[15px] text-center font-semibold md:text-gray-700">
+              Crie uma nova senha para sua conta
+            </p>
           )}
 
           <div className="text-center text-white text-sm md:text-gray-700">
@@ -147,5 +164,3 @@ function ChangePassword() {
     </div>
   );
 }
-
-export default ChangePassword;

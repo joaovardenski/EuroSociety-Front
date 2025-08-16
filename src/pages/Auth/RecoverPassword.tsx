@@ -1,4 +1,3 @@
-// Hooks
 import { useState } from "react";
 // Assets
 import euroLogoWhite from "../../assets/euroSocietyWhite.png";
@@ -10,12 +9,14 @@ import { getEmailRedefinicaoError } from "../../utils/Validators";
 // Axios
 import axiosPublic from "../../api/axiosPublic";
 import { AxiosError } from "axios";
+// Lucide Icons
+import { CheckCircle, XCircle } from "lucide-react";
 
 interface RecoverPasswordResponse {
   message?: string;
 }
 
-function RecoverPassword() {
+export default function RecoverPassword() {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -26,12 +27,14 @@ function RecoverPassword() {
 
     const trimmedEmail = email.trim();
     const validationError = getEmailRedefinicaoError(trimmedEmail);
-    setEmailError(validationError);
-    setSuccessMessage("");
-
-    if (validationError) return;
+    if (validationError) {
+      setEmailError(validationError);
+      return;
+    }
 
     setLoading(true);
+    setSuccessMessage("");
+    setEmailError("");
 
     try {
       const response = await axiosPublic.post<RecoverPasswordResponse>(
@@ -107,16 +110,33 @@ function RecoverPassword() {
             <SubmitButtonAuth
               label={loading ? "Enviando..." : "Enviar link de recuperação"}
               icon="send"
-              onClick={handleSubmit}
               disabled={loading}
             />
           </form>
 
-          {successMessage ? (
-            <p className="text-green-600 text-center mt-2">
-              {successMessage}
-            </p>
-          ) : (
+          {successMessage && (
+            <div
+              className="flex items-center justify-center gap-2 text-green-700 bg-green-100 border border-green-300 rounded-md p-2 text-center mt-2 w-full"
+              role="alert"
+              aria-live="polite"
+            >
+              <CheckCircle size={25} />
+              <span>{successMessage}</span>
+            </div>
+          )}
+
+          {emailError && (
+            <div
+              className="flex items-center justify-center gap-2 text-red-700 bg-red-100 border border-red-300 rounded-md p-2 text-center mt-2 w-full"
+              role="alert"
+              aria-live="assertive"
+            >
+              <XCircle size={20} />
+              <span>{emailError}</span>
+            </div>
+          )}
+
+          {!successMessage && !emailError && (
             <p className="text-white text-[15px] text-center font-semibold md:text-gray-700">
               Um link de recuperação será enviado no seu endereço de email
             </p>
@@ -137,5 +157,3 @@ function RecoverPassword() {
     </div>
   );
 }
-
-export default RecoverPassword;

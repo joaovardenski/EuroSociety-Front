@@ -1,11 +1,17 @@
 import { useNavigate, useLocation } from "react-router-dom";
 
-import { Home, Calendar, ClipboardList, User } from "lucide-react";
+import { Home, Calendar, ClipboardList, LogOut } from "lucide-react";
 
 export default function BottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
+
+  function handleLogout() {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user_nome");
+    navigate("/login");
+  }
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-300 shadow md:hidden flex justify-around items-center h-16 z-20">
@@ -40,13 +46,11 @@ export default function BottomNav() {
       </button>
 
       <button
-        onClick={() => navigate("/perfil")}
-        className={`flex flex-col items-center ${
-          isActive("/perfil") ? "text-azulBase" : "text-gray-600"
-        } hover:text-azulBase`}
+        onClick={() => handleLogout()}
+        className={`flex flex-col items-center text-red-500/90`}
       >
-        <User size={22} />
-        <span className="text-xs">Perfil</span>
+        <LogOut size={22} />
+        <span className="text-xs">Sair</span>
       </button>
     </nav>
   );
