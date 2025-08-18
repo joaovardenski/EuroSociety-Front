@@ -7,9 +7,12 @@ import AdminSidebar from "../../components/Navigation/AdminSidebar";
 import TableRecentBookings from "../../components/Reservas/TableRecentBookings";
 import StatisticCard from "../../components/StatisticCard";
 import { useEffect, useState } from "react";
+import { useAuth } from "../../hooks/useAuth";
 import LoadingMessage from "../../components/LoadingMessage";
 
 export default function PainelAdmin() {
+  const auth = useAuth();
+  localStorage.setItem("user_nome", auth.user?.nome || "");
   const [agendamentosHoje, setAgendamentosHoje] = useState(0);
   const [receitaMes, setReceitaMes] = useState(0);
   const [novosClientes, setNovosClientes] = useState(0);
