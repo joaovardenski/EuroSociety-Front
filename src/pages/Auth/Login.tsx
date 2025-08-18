@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 // Assets
 import euroLogoWhite from "../../assets/euroSocietyWhite.png";
@@ -27,6 +27,22 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    async function autoLogin() {
+      const token = localStorage.getItem("access_token");
+      if (!token) return;
+
+      // se existir token, tenta buscar o usuário
+      const user = await fetchUser();
+      if (user?.permissao === "admin") navigate("/admin");
+      else if (user) navigate("/home");
+      // se o user for null significa que o token não é válido → opcionalmente pode remover do localStorage
+      else localStorage.removeItem("access_token");
+    }
+
+    autoLogin();
+  }, [navigate]);
+
   async function fetchUser() {
     try {
       const response = await axiosPrivate.get("/user");
@@ -49,7 +65,6 @@ export default function Login() {
       const user = await fetchUser();
       if (user?.permissao === "admin") navigate("/admin");
       else navigate("/home");
-
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
       if (axiosError.response && axiosError.response.data) {
@@ -75,7 +90,7 @@ export default function Login() {
       });
       const data = response.data as { access_token: string };
       localStorage.setItem("access_token", data.access_token);
-      navigate("/");
+      navigate("/home");
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;
       if (axiosError.response && axiosError.response.data) {
@@ -100,17 +115,27 @@ export default function Login() {
       <div className="w-full max-w-md px-4 flex flex-col gap-6 md:max-w-5xl md:flex-row md:rounded-2xl md:px-0 md:mx-6 md:overflow-hidden md:shadow-2xl md:bg-white">
         {/* Lado esquerdo */}
         <div className="hidden md:flex w-1/2 bg-azulBase rounded-l-2xl items-center justify-center p-8">
-          <img src={euroLogoWhite} alt="Logo da Euro Society" className="max-w-[90%] h-auto" />
+          <img
+            src={euroLogoWhite}
+            alt="Logo da Euro Society"
+            className="max-w-[90%] h-auto"
+          />
         </div>
 
         {/* Formulário */}
-        <div className="w-full md:w-1/2 flex flex-col items-center gap-6 py-10 md:py-16 px-6">
+        <div className="w-full md:w-1/2 flex flex-col items-center gap-6 py-10 md:py-12 px-6">
           <div className="flex flex-col items-center gap-3 md:hidden">
-            <img src={euroLogoWhite} alt="Logo da Euro Society" style={{ height: "calc(100vh / 4)" }} />
+            <img
+              src={euroLogoWhite}
+              alt="Logo da Euro Society"
+              style={{ height: "calc(100vh / 4)" }}
+            />
             <h1 className="text-white text-3xl font-semibold">Login</h1>
           </div>
 
-          <h1 className="hidden md:block text-2xl font-bold text-black text-center">LOGIN</h1>
+          <h1 className="hidden md:block text-2xl font-bold text-black text-center">
+            LOGIN
+          </h1>
 
           {error && (
             <div className="flex items-center justify-center gap-2 text-red-700 bg-red-100 border border-red-300 rounded-md p-2 text-center w-full transition-opacity duration-500 opacity-100">
@@ -146,14 +171,18 @@ export default function Login() {
           {/* Separador */}
           <div className="flex items-center w-full">
             <hr className="flex-grow border-gray-400 md:border-gray-300" />
-            <span className="mx-2 text-white md:text-gray-600 font-medium">ou</span>
+            <span className="mx-2 text-white md:text-gray-600 font-medium">
+              ou
+            </span>
             <hr className="flex-grow border-gray-400 md:border-gray-300" />
           </div>
 
           {/* Login com Google */}
           <GoogleLogin
             onSuccess={(credentialResponse) => {
-              const decodedCredential = jwtDecode<GoogleJwtPayload>(credentialResponse.credential!);
+              const decodedCredential = jwtDecode<GoogleJwtPayload>(
+                credentialResponse.credential!
+              );
               handleLoginGoogle(decodedCredential);
             }}
             onError={() => console.log("Login Google falhou")}
@@ -163,10 +192,20 @@ export default function Login() {
           <div className="text-center text-white text-sm md:text-gray-700 mt-4">
             <p>
               Não tem uma conta?{" "}
-              <a href="/registrar" className="text-blue-300 md:text-blue-500 hover:underline">Cadastre-se</a>
+              <a
+                href="/registrar"
+                className="text-blue-300 md:text-blue-500 hover:underline"
+              >
+                Cadastre-se
+              </a>
             </p>
             <p className="mt-2">
-              <a href="/recuperar-senha" className="text-blue-300 md:text-blue-500 hover:underline">Esqueceu sua senha?</a>
+              <a
+                href="/recuperar-senha"
+                className="text-blue-300 md:text-blue-500 hover:underline"
+              >
+                Esqueceu sua senha?
+              </a>
             </p>
           </div>
         </div>
