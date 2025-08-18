@@ -10,15 +10,15 @@ export default function BottomNav() {
   function handleLogout() {
     localStorage.removeItem("access_token");
     localStorage.removeItem("user_nome");
-    navigate("/login");
+    navigate("/");
   }
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-300 shadow md:hidden flex justify-around items-center h-16 z-20">
       <button
-        onClick={() => navigate("/")}
+        onClick={() => navigate("/home")}
         className={`flex flex-col items-center ${
-          isActive("/") ? "text-azulBase" : "text-gray-600"
+          isActive("/home") ? "text-azulBase" : "text-gray-600"
         } hover:text-azulBase`}
       >
         <Home size={22} />

@@ -46,7 +46,7 @@ export default function Register() {
 
       const data = response.data as { access_token: string };
       localStorage.setItem("access_token", data.access_token);
-      navigate("/"); // redireciona após registro
+      navigate("/home"); // redireciona após registro
     } catch (error) {
       const axiosError = error as AxiosError<{ errors?: { email?: string[] } }>;
       if (
@@ -76,7 +76,7 @@ export default function Register() {
 
       const data = response.data as { access_token: string };
       localStorage.setItem("access_token", data.access_token);
-      navigate("/login");
+      navigate("/home");
     } catch (error) {
       const axiosError = error as AxiosError<{ errors?: { email?: string[] } }>;
       if (
@@ -191,7 +191,7 @@ export default function Register() {
           <div className="text-center text-white text-sm md:text-gray-700 mt-4">
             <p>
               Já tem uma conta?{" "}
-              <a href="/login" className="text-blue-300 md:text-blue-500 hover:underline">Entrar</a>
+              <a href="/" className="text-blue-300 md:text-blue-500 hover:underline">Entrar</a>
             </p>
           </div>
         </div>

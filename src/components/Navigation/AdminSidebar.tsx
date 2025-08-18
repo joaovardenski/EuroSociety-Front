@@ -17,7 +17,7 @@ export default function AdminSidebar() {
   const handleLogout = () => {
     // Implement logout logic here
     console.log("Logout clicked");
-    navigate("/login");
+    navigate("/");
   };
 
   return (

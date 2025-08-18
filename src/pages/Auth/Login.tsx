@@ -48,7 +48,7 @@ export default function Login() {
 
       const user = await fetchUser();
       if (user?.permissao === "admin") navigate("/admin");
-      else navigate("/");
+      else navigate("/home");
 
     } catch (error) {
       const axiosError = error as AxiosError<{ message?: string }>;

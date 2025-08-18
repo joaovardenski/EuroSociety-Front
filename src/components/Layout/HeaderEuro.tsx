@@ -14,7 +14,7 @@ export default function HeaderEuro() {
   }
 
   function handleLogout() {
-    navigate("/login");
+    navigate("/");
     localStorage.removeItem("access_token");
     localStorage.removeItem("user_nome");
   }

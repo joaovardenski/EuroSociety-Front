@@ -7,7 +7,7 @@ export default function NotAuthenticated() {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      navigate("/login");
+      navigate("/");
     }, 7000); // redirecionamento automático após 7 segundos
 
     return () => clearTimeout(timeout);
@@ -21,7 +21,7 @@ export default function NotAuthenticated() {
         Você precisa estar logado para acessar esta página. Por favor, entre com sua conta para continuar.
       </p>
       <button
-        onClick={() => navigate("/login")}
+        onClick={() => navigate("/")}
         className="mt-6 bg-[#2b4363] text-white px-6 py-3 rounded-xl hover:bg-[#1f324b] transition"
       >
         Ir para Login

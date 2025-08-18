@@ -14,13 +14,13 @@ export default function NotFound() {
       </p>
       <div className="flex flex-col sm:flex-row gap-4">
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/home")}
           className="bg-[#2b4363] text-white px-6 py-3 rounded-lg hover:bg-[#1f324b] transition"
         >
           Ir para página inicial
         </button>
         <button
-          onClick={() => navigate("/login")}
+          onClick={() => navigate("/")}
           className="bg-white text-[#2b4363] border border-[#2b4363] px-6 py-3 rounded-lg hover:bg-[#f0f4f8] transition"
         >
           Fazer login

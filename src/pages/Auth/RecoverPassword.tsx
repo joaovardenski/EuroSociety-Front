@@ -145,7 +145,7 @@ export default function RecoverPassword() {
           <div className="text-center text-white text-sm md:text-gray-700">
             <p className="mt-2">
               <a
-                href="/login"
+                href="/"
                 className="text-blue-300 md:text-blue-500 hover:underline"
               >
                 Voltar para o Login

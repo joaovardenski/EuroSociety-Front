@@ -154,7 +154,7 @@ export default function NewBooking() {
         {/* Topo */}
         <div className="relative flex items-center justify-center mb-6">
           <Link
-            to={"/"}
+            to={"/home"}
             className="absolute left-0 text-azulBase hover:text-azulEscuro transition"
           >
             <ArrowLeft size={23} />

@@ -56,7 +56,7 @@ export default function ChangePassword() {
       setConfirmacaoSenha("");
 
       // redireciona para login após 2 segundos
-      setTimeout(() => navigate("/login"), 2000);
+      setTimeout(() => navigate("/"), 2000);
     } catch (error) {
       const axiosError = error as AxiosError<ResetPasswordResponse & { errors?: Record<string, string[]> }>;
       if (axiosError.response && axiosError.response.data) {
@@ -152,7 +152,7 @@ export default function ChangePassword() {
           <div className="text-center text-white text-sm md:text-gray-700">
             <p className="mt-2">
               <a
-                href="/login"
+                href="/"
                 className="text-blue-300 md:text-blue-500 hover:underline"
               >
                 Voltar para o Login

@@ -22,7 +22,7 @@ import ChangePassword from "../pages/Auth/ChangePassword";
 
 const router = createBrowserRouter([
   {
-    path: "/login",
+    path: "/",
     element: <Login />,
   },
   {
@@ -38,7 +38,7 @@ const router = createBrowserRouter([
     element: <ChangePassword />,
   },
   {
-    path: "/",
+    path: "/home",
     element: (
       <PrivateRoute>
         <Dashboard />

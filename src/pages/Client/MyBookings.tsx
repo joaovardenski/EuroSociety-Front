@@ -77,7 +77,7 @@ function MyBookings() {
             <div className="flex flex-col items-center justify-center gap-5 md:justify-between md:flex-row mb-3">
               <div className="flex items-center gap-4">
                 <Link
-                  to={"/"}
+                  to={"/home"}
                   className="text-azulBase hover:text-azulEscuro transition"
                 >
                   <ArrowLeft size={23} />
