@@ -19,6 +19,7 @@ import Unauthorized from "../pages/Error/Unauthorized";
 import NotAuthenticated from "../pages/Error/NotAuthenticated";
 import NotFound from "../pages/Error/NotFound";
 import ChangePassword from "../pages/Auth/ChangePassword";
+import ResultadoPagamento from "../pages/Payment/ResultadoPagamento";
 
 const router = createBrowserRouter([
   {
@@ -58,6 +59,14 @@ const router = createBrowserRouter([
     element: (
       <PrivateRoute>
         <MyBookings />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/resultado-pagamento",
+    element: (
+      <PrivateRoute>
+        <ResultadoPagamento />
       </PrivateRoute>
     ),
   },
