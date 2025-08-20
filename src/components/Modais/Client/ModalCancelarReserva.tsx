@@ -1,4 +1,5 @@
 import { Calendar, Clock, XCircle, ArrowLeft } from "lucide-react";
+import { formatarDataBrasileira } from "../../../utils/DateUtils";
 
 interface ModalCancelarReservaProps {
   quadra: string;
@@ -46,7 +47,7 @@ export default function ModalCancelarReserva({
       <div className="bg-gray-100 rounded-lg p-4 shadow-inner flex flex-col gap-2 text-gray-800 text-sm">
         <p className="flex items-center justify-center gap-2">
           <Calendar size={18} className="text-blue-600" />{" "}
-          <strong>{`${data}`}</strong>
+          <strong>{`${formatarDataBrasileira(data)}`}</strong>
         </p>
         <p className="flex items-center justify-center gap-2">
           <Clock size={18} className="text-blue-600" /> <strong>{horario}</strong>
@@ -71,13 +72,13 @@ export default function ModalCancelarReserva({
           className="text-sm min-w-[175px] bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 flex items-center justify-center gap-2 font-medium shadow-md transition"
           onClick={onClose}
         >
-          <ArrowLeft size={18} /> Manter
+          <ArrowLeft size={18} /> Voltar
         </button>
         <button
           className="text-sm min-w-[175px] bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center justify-center gap-2 font-medium shadow-md transition"
           onClick={onConfirm}
         >
-          <XCircle size={18} /> Cancelar
+          <XCircle size={18} /> Confirmar
         </button>
       </div>
     </div>

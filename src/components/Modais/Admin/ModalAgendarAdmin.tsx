@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { User, Phone, DollarSign, CalendarCheck } from "lucide-react";
+import { User, DollarSign, CalendarCheck, ArrowLeftIcon, Mail } from "lucide-react";
 import Modal from "../Modal";
 import InputFieldAuth from "../../Auth/InputFieldAuth";
 import { formatarDataBrasileira } from "../../../utils/DateUtils";
@@ -13,7 +13,7 @@ interface ModalConfirmarAdminProps {
     horario: string;
     valor: number;
   };
-  onConfirmar: (info: { nome: string; telefone: string; valor: number}) => void;
+  onConfirmar: (info: { nome: string; email: string; valor: number}) => void;
 }
 
 export default function ModalAgendarAdmin({
@@ -23,11 +23,11 @@ export default function ModalAgendarAdmin({
   onConfirmar,
 }: ModalConfirmarAdminProps) {
   const [nome, setNome] = useState("");
-  const [telefone, setTelefone] = useState("");
+  const [email, setEmail] = useState("");
   const [valor, setValor] = useState(dados.valor);
 
   function handleConfirm() {
-    onConfirmar({ nome, telefone, valor});
+    onConfirmar({ nome, email, valor});
   }
 
   return (
@@ -41,7 +41,7 @@ export default function ModalAgendarAdmin({
           Agendar horário
         </h2>
         <p className="text-gray-600 text-sm mt-1">
-          Preencha os dados do cliente ou marque para agendar para você.
+          Preencha os dados do cliente.
         </p>
       </div>
 
@@ -75,14 +75,14 @@ export default function ModalAgendarAdmin({
           />
         </div>
         <div className="flex items-center gap-2">
-          <Phone className="text-blue-600" size={18} />
+          <Mail className="text-blue-600" size={18} />
           <InputFieldAuth
-            id="itelefone"
-            label="Telefone:"
+            id="iemail"
+            label="Email:"
             type="text"
-            placeholder="(xx) xxxxx-xxxx"
-            value={telefone}
-            onChange={(e) => setTelefone(e.target.value)}
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </div>
         <div className="flex items-center gap-2">
@@ -102,9 +102,9 @@ export default function ModalAgendarAdmin({
       <div className="flex justify-between gap-4 mt-8">
         <button
           onClick={onClose}
-          className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition"
+          className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition flex items-center justify-center gap-2"
         >
-          Cancelar
+          <ArrowLeftIcon size={18}/> Voltar
         </button>
         <button
           onClick={handleConfirm}

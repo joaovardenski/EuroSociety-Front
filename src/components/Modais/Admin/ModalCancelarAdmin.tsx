@@ -1,5 +1,6 @@
+import { formatarDataBrasileira } from "../../../utils/DateUtils";
 import Modal from "../Modal";
-import { AlertTriangle, User, CalendarClock } from "lucide-react";
+import { AlertTriangle, User, CalendarClock, ArrowLeftIcon, CircleX } from "lucide-react";
 
 interface ModalCancelarAdminProps {
   isOpen: boolean;
@@ -43,8 +44,7 @@ export default function ModalCancelarAdmin({
 
         {/* Dados da reserva */}
         <div className="bg-gray-50 border border-gray-200 text-sm rounded-lg px-4 py-3 w-full mb-5 shadow-inner text-left space-y-1">
-          <p className="flex items-center gap-2">
-            <User size={14} className="text-gray-500" />
+          <p>
             <span className="font-medium">Cliente:</span>{" "}
             <span className="text-azulBase">{dados.cliente}</span>
           </p>
@@ -52,10 +52,9 @@ export default function ModalCancelarAdmin({
             <span className="font-medium">Quadra:</span>{" "}
             <span className="text-azulBase">{dados.quadra}</span>
           </p>
-          <p className="flex items-center gap-2">
-            <CalendarClock size={14} className="text-gray-500" />
+          <p>
             <span className="font-medium">Data:</span>{" "}
-            {`${dados.data}`}
+            {`${formatarDataBrasileira(dados.data)}`}
           </p>
           <p>
             <span className="font-medium">Horário:</span> {dados.horario}
@@ -77,15 +76,15 @@ export default function ModalCancelarAdmin({
         <div className="flex justify-between gap-4 w-full">
           <button
             onClick={onClose}
-            className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition"
+            className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition flex items-center justify-center gap-2"
           >
-            Voltar
+            <ArrowLeftIcon size={18} /> Voltar
           </button>
           <button
             onClick={onConfirmar}
-            className="w-full py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700 transition"
+            className="w-full py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700 transition flex items-center justify-center gap-2"
           >
-            Cancelar reserva
+            <CircleX size={18} /> Confirmar
           </button>
         </div>
       </div>

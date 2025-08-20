@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Calendar, UserPlus, ShieldBan } from "lucide-react";
+import { Calendar, UserPlus, ShieldBan, ArrowLeftIcon } from "lucide-react";
 import Modal from "../Modal";
 import { formatarDataBrasileira } from "../../../utils/DateUtils";
 
@@ -43,7 +43,7 @@ export default function ModalConfirmarAdmin({
       </div>
 
       {/* Dados da reserva */}
-      <div className="space-y-2 text-md text-gray-700 mb-6 border-2 border-blue-300 rounded-lg p-4 bg-blue-50 shadow-inner">
+      <div className="space-y-1 text-md text-gray-700 mb-6 border-2 border-blue-300 rounded-lg p-4 bg-blue-50 shadow-inner">
         <p>
           <strong>Quadra:</strong>{" "}
           <span className="text-azulBase">{dados.quadra}</span>
@@ -92,9 +92,9 @@ export default function ModalConfirmarAdmin({
       <div className="flex justify-between gap-4">
         <button
           onClick={onClose}
-          className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition"
+          className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition flex items-center justify-center gap-2"
         >
-          Voltar
+          <ArrowLeftIcon size={18}/> Voltar
         </button>
         <button
           onClick={onlyCancel ? onBloquear : onConfirmar}

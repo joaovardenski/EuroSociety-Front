@@ -1,6 +1,6 @@
 import Modal from "../Modal";
 import { formatarDataBrasileira } from "../../../utils/DateUtils";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, ArrowLeftIcon, CalendarCheck } from "lucide-react";
 
 interface ModalAgendarOcupadoAdminProps {
   isOpen: boolean;
@@ -66,15 +66,15 @@ export default function ModalAgendarOcupadoAdmin({
         <div className="flex justify-between gap-4 w-full">
           <button
             onClick={onClose}
-            className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition"
+            className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition flex items-center justify-center gap-2"
           >
-            Voltar
+            <ArrowLeftIcon size={18} /> Voltar
           </button>
           <button
             onClick={onConfirmar}
-            className="w-full py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700 transition"
+            className="w-full py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700 transition flex items-center justify-center gap-2"
           >
-            Cancelar
+            <CalendarCheck size={18} /> Confirmar
           </button>
         </div>
       </div>

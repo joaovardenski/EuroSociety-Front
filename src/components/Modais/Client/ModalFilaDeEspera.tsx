@@ -1,6 +1,6 @@
 import Modal from "../Modal";
 import { formatarDataBrasileira } from "../../../utils/DateUtils";
-import { Hourglass, BellRing } from "lucide-react";
+import { Hourglass, BellRing, ArrowLeft, AlarmClockCheckIcon } from "lucide-react";
 
 interface ModalFilaDeEsperaProps {
   isOpen: boolean;
@@ -69,15 +69,15 @@ export default function ModalFilaDeEspera({
         <div className="flex justify-between gap-4 w-full">
           <button
             onClick={onClose}
-            className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition"
+            className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition flex items-center justify-center gap-1"
           >
-            Voltar
+            <ArrowLeft size={18} /> Voltar
           </button>
           <button
             onClick={onEntrarFila}
-            className="w-full py-2 rounded-md bg-yellow-500 text-white font-semibold hover:bg-yellow-600 transition transform hover:scale-[1.02]"
+            className="w-full py-2 rounded-md bg-yellow-500 text-white font-semibold hover:bg-yellow-600 transition transform hover:scale-[1.02] flex items-center justify-center gap-2"
           >
-            Entrar na fila de espera
+            <AlarmClockCheckIcon size={18} /> Entrar na fila
           </button>
         </div>
       </div>

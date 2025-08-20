@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CreditCard, DollarSign, Landmark, CalendarCheck2, ShieldCheck } from "lucide-react";
+import { DollarSign, CalendarCheck2, ShieldCheck, DollarSignIcon } from "lucide-react";
 import Modal from "../Modal";
 import { formatarDataBrasileira } from "../../../utils/DateUtils";
 
@@ -14,7 +14,6 @@ interface ModalDetalhesPagamentoProps {
   };
   onConfirmarPagamento: (
     valorPago: number,
-    metodo: string,
     mensalista: boolean
   ) => void;
 }
@@ -27,7 +26,6 @@ export default function ModalDetalhesPagamento({
 }: ModalDetalhesPagamentoProps) {
   const [mensalista, setMensalista] = useState(false);
   const [percentual, setPercentual] = useState(50);
-  const [metodoPagamento, setMetodoPagamento] = useState("pix");
 
   const valorPago = mensalista ? dados.valor : (dados.valor * percentual) / 100;
 
@@ -56,7 +54,7 @@ export default function ModalDetalhesPagamento({
         <p>
           <span className="font-medium">Valor total:</span>{" "}
           <span className="text-green-600 font-semibold">
-            R${dados.valor.toFixed(2)}
+            R$ {dados.valor.toFixed(2)}
           </span>
         </p>
       </div>
@@ -91,8 +89,8 @@ export default function ModalDetalhesPagamento({
 
       {/* Valor a pagar */}
       <div className="mb-5">
-        <h3 className="font-medium text-sm mb-1">
-          2. Escolha o valor de pagamento
+        <h3 className="font-medium text-sm mb-1 flex items-center gap-2">
+          <DollarSignIcon size={17} className="text-green-600" /> Escolha o valor de pagamento
         </h3>
         {!mensalista && (
           <>
@@ -121,60 +119,12 @@ export default function ModalDetalhesPagamento({
         </div>
       </div>
 
-      {/* Método de pagamento */}
-      <div className="mb-5">
-        <h3 className="font-medium text-sm mb-2">
-          3. Escolha o método de pagamento
-        </h3>
-        <div className="flex flex-col gap-2">
-          <label
-            className={`flex items-center gap-3 border rounded-md px-3 py-2 cursor-pointer transition ${
-              metodoPagamento === "pix"
-                ? "border-blue-600 bg-blue-50"
-                : "border-gray-300"
-            }`}
-          >
-            <input
-              type="radio"
-              name="metodo"
-              value="pix"
-              checked={metodoPagamento === "pix"}
-              onChange={(e) => setMetodoPagamento(e.target.value)}
-              className="accent-blue-600"
-            />
-            <Landmark size={18} className="text-blue-600" />
-            <span className="text-sm font-medium">PIX</span>
-          </label>
-
-          <label
-            className={`flex items-center gap-3 border rounded-md px-3 py-2 cursor-pointer transition ${
-              metodoPagamento === "cartao"
-                ? "border-blue-600 bg-blue-50"
-                : "border-gray-300"
-            }`}
-          >
-            <input
-              type="radio"
-              name="metodo"
-              value="cartao"
-              checked={metodoPagamento === "cartao"}
-              onChange={(e) => setMetodoPagamento(e.target.value)}
-              className="accent-blue-600"
-            />
-            <CreditCard size={18} className="text-blue-600" />
-            <span className="text-sm font-medium">
-              Cartão de crédito/débito
-            </span>
-          </label>
-        </div>
-      </div>
-
       {/* Botão de pagar */}
       <button
         onClick={() =>
-          onConfirmarPagamento(valorPago, metodoPagamento, mensalista)
+          onConfirmarPagamento(valorPago, mensalista)
         }
-        className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-md font-semibold transition flex items-center justify-center gap-2"
+        className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-md font-semibold transition flex items-center justify-center gap-1"
       >
         <DollarSign size={18} />
         Pagar R$ {valorPago.toFixed(2)}

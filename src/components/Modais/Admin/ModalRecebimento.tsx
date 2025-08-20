@@ -1,5 +1,6 @@
+import { formatarDataBrasileira } from "../../../utils/DateUtils";
 import Modal from "../Modal";
-import { Wallet, Info, CreditCard } from "lucide-react";
+import { Wallet, Info, ArrowLeftIcon, DollarSignIcon } from "lucide-react";
 
 interface ModalRecebimentoAdminProps {
   isOpen: boolean;
@@ -55,7 +56,7 @@ export default function ModalRecebimentoAdmin({
           </p>
           <p>
             <span className="font-medium">Data:</span>{" "}
-            {`${dados.data}`}
+            {`${formatarDataBrasileira(dados.data)}`}
           </p>
           <p>
             <span className="font-medium">Horário:</span> {dados.horario}
@@ -79,15 +80,15 @@ export default function ModalRecebimentoAdmin({
         <div className="flex justify-between gap-4 w-full">
           <button
             onClick={onClose}
-            className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition"
+            className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition flex items-center justify-center gap-2"
           >
-            Cancelar
+            <ArrowLeftIcon size={18} /> Voltar
           </button>
           <button
             onClick={onConfirmar}
             className="w-full py-2 rounded-md bg-green-600 text-white font-semibold hover:bg-green-700 transition flex items-center justify-center gap-2"
           >
-            <CreditCard size={18} />
+            <DollarSignIcon size={18 }/>
             Receber R$ {dados.pagamentoFaltante}
           </button>
         </div>

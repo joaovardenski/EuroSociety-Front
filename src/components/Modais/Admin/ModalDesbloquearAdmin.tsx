@@ -1,6 +1,6 @@
 import Modal from "../Modal";
 import { formatarDataBrasileira } from "../../../utils/DateUtils";
-import { Unlock, Info } from "lucide-react";
+import { Unlock, Info, ArrowLeftIcon, LockOpenIcon } from "lucide-react";
 
 interface ModalDesbloquearAdminProps {
   isOpen: boolean;
@@ -67,15 +67,15 @@ export default function ModalDesbloquearAdmin({
         <div className="flex justify-between gap-4 w-full">
           <button
             onClick={onClose}
-            className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition"
+            className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition flex items-center justify-center gap-2"
           >
-            Cancelar
+            <ArrowLeftIcon size={18} /> Voltar
           </button>
           <button
             onClick={onConfirmar}
-            className="w-full py-2 rounded-md bg-green-600 text-white font-semibold hover:bg-green-700 transition"
+            className="w-full py-2 rounded-md bg-green-600 text-white font-semibold hover:bg-green-700 transition flex items-center justify-center gap-2"
           >
-            Desbloquear
+            <LockOpenIcon size={18} /> Desbloquear
           </button>
         </div>
       </div>

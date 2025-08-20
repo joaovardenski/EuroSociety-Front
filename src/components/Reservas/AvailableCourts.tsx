@@ -39,9 +39,9 @@ export default function AvailableCourts({
               key={hora}
               className={`flex items-center justify-center px-5 py-2.5 w-18 rounded-lg border text-[14px] md:text-base font-semibold transition-all md:w-22 ${
                 isIndisponivel
-                  ? "bg-yellow-200 text-gray-600"
+                  ? "bg-yellow-200 text-gray-600 hover:bg-yellow-300/80"
                   : isBloqueado
-                  ? "bg-gray-300 text-gray-600 line-through cursor-not-allowed"
+                  ? "bg-gray-300 text-gray-600 cursor-not-allowed"
                   : "bg-white text-azulBase border-azulBase hover:bg-azulBase hover:text-white"
               }`}
               onClick={() => onHorarioClick(hora, isIndisponivel, isBloqueado)}

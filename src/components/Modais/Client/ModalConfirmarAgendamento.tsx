@@ -1,5 +1,5 @@
 import Modal from "../Modal";
-import { Calendar, Clock, DollarSign, MapPin, CheckCircle } from "lucide-react";
+import { Calendar, Clock, DollarSign, MapPin, CheckCircle, ArrowLeft } from "lucide-react";
 import { formatarDataBrasileira } from "../../../utils/DateUtils";
 
 interface ModalConfirmarAgendamentoProps {
@@ -63,9 +63,9 @@ export default function ModalConfirmarAgendamento({
       <div className="flex justify-between gap-4">
         <button
           onClick={onClose}
-          className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition"
+          className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition flex items-center justify-center gap-1"
         >
-          Alterar horário
+          <ArrowLeft size={18} /> Voltar
         </button>
         <button
           onClick={onConfirmar}
