@@ -140,8 +140,10 @@ export default function NewBooking() {
     data: string,
     slot: string,
     valor: number,
-    quantidade_pagamento: number
+    quantidade_pagamento: number,
+    mensalista: boolean
   ) {
+    console.log(`2) Entrou no HandlePagamento com os dados: ${usuarioId}, ${quadraId}, ${data}, ${slot}, ${valor}, ${quantidade_pagamento}, ${mensalista}`)
     try {
       const reservaResponse = await axiosPrivate.post<ReservaPendente>("/reservas", {
         user_id: usuarioId,
@@ -149,14 +151,19 @@ export default function NewBooking() {
         data: data,
         slot: slot,
         valor: valor,
+        tipo_reserva: mensalista ? "mensal" : "unica",
       });
 
       const reservaCriada = reservaResponse.data;
 
-      const pagamentoResponse = await axiosPrivate.post<PreferenceResponse>("/pagamento/pagar", {
+      console.log("3) Reserva criada:", reservaCriada);
+
+      const pagamentoResponse = await axiosPrivate.post<PreferenceResponse>("/pagamentos/pagar", {
         reserva_id: reservaCriada.id,
         quantidade_pagamento: quantidade_pagamento,
       });
+
+      console.log("4) Resposta do pagamento:", pagamentoResponse.data);
 
       const { init_point } = pagamentoResponse.data;
       window.location.href = init_point;
@@ -171,7 +178,8 @@ export default function NewBooking() {
     horario: string,
     data: string,
     valor: number,
-    quantidade_pagamento: number
+    quantidade_pagamento: number,
+    mensalista: boolean
   ) {
     // Encontre o ID da quadra pelo nome
     const quadraConfig = quadras.find((q) => q.nome === quadraNome);
@@ -182,15 +190,17 @@ export default function NewBooking() {
       );
       return;
     }
+    console.log(`1) Entrou no HandleConfirmarPagamento com os dados: ${quadraNome}, ${horario}, ${data}, ${valor}, ${quantidade_pagamento}, ${mensalista} e o user id: ${user.id}`)
 
     // Chame a função de pagamento com os dados necessários
     handlePagamento(
-      user.id_usuario,
+      user.id,
       quadraConfig.id,
       data,
       horario.split(" - ")[0], // Pega apenas a hora de início
       valor,
-      quantidade_pagamento
+      quantidade_pagamento,
+      mensalista
     );
     setModalPagamentoAberto(false);
   }
@@ -314,13 +324,14 @@ export default function NewBooking() {
           onClose={() => setModalPagamentoAberto(false)}
           dados={horarioSelecionado}
           // Chame a função auxiliar para confirmar o pagamento
-          onConfirmarPagamento={(valorPago) => {
+          onConfirmarPagamento={(valorPago, mensalista) => {
             handleConfirmarPagamento(
               horarioSelecionado.quadra,
               horarioSelecionado.horario,
               horarioSelecionado.data,
               horarioSelecionado.valor,
-              valorPago
+              valorPago,
+              mensalista
             )
           }
           }

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axiosPrivate from "../api/axiosPrivate";
 
 export interface Usuario {
-  id_usuario: number;
+  id: number;   // em vez de id_usuario
   nome: string;
   email: string;
   permissao: "admin" | "user";
