@@ -1,6 +1,6 @@
 import { formatarDataBrasileira } from "../../../utils/DateUtils";
 import Modal from "../Modal";
-import { AlertTriangle, User, CalendarClock, ArrowLeftIcon, CircleX } from "lucide-react";
+import { AlertTriangle, ArrowLeftIcon, CircleX } from "lucide-react";
 
 interface ModalCancelarAdminProps {
   isOpen: boolean;

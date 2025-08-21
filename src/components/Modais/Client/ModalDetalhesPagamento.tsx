@@ -14,7 +14,6 @@ interface ModalDetalhesPagamentoProps {
   };
   onConfirmarPagamento: (
     valorPago: number,
-    mensalista: boolean
   ) => void;
 }
 
@@ -122,7 +121,7 @@ export default function ModalDetalhesPagamento({
       {/* Botão de pagar */}
       <button
         onClick={() =>
-          onConfirmarPagamento(valorPago, mensalista)
+          onConfirmarPagamento(valorPago)
         }
         className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-md font-semibold transition flex items-center justify-center gap-1"
       >

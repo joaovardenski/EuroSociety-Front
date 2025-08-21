@@ -23,6 +23,9 @@ import ModalFilaDeEspera from "../../components/Modais/Client/ModalFilaDeEspera"
 // Icons
 import { ArrowLeft } from "lucide-react";
 
+import axiosPrivate from "../../api/axiosPrivate";
+import { useAuth } from "../../hooks/useAuth";
+
 // Types locais
 type Quadra = {
   id: number;
@@ -40,13 +43,30 @@ type Quadra = {
 type Indisponibilidade = { nome: string; indisponiveis: string[] };
 type Bloqueio = { nome: string; bloqueados: string[] };
 
+interface ReservaPendente {
+  id: number;
+  user_id: number;
+  quadra_id: number;
+  data: string;
+  slot: string;
+  valor: number;
+  status: string;
+}
+
+interface PreferenceResponse {
+  preferenceId: string;
+  init_point: string;
+}
+
 export default function NewBooking() {
   // ----------------- Estados -----------------
   const [tipoSelecionado, setTipoSelecionado] = useState("Todas");
   const [dataSelecionada, setDataSelecionada] = useState(getCurrentDate());
 
   const [quadras, setQuadras] = useState<Quadra[]>([]);
-  const [indisponibilidades, setIndisponibilidades] = useState<Indisponibilidade[]>([]);
+  const [indisponibilidades, setIndisponibilidades] = useState<
+    Indisponibilidade[]
+  >([]);
   const [bloqueios, setBloqueios] = useState<Bloqueio[]>([]);
 
   const [isLoading, setIsLoading] = useState(true);
@@ -61,6 +81,8 @@ export default function NewBooking() {
     data: dataSelecionada,
     valor: 0,
   });
+
+  const { user, isLoading: isLoadingAuth } = useAuth();
 
   // ----------------- “APIs” locais (substitua por fetch/axios depois) -----------------
   async function getQuadras(): Promise<Quadra[]> {
@@ -111,6 +133,67 @@ export default function NewBooking() {
     const horaInt = parseInt(horario.split(":")[0], 10);
     return horaInt >= 18 ? quadra.precoNoturno : quadra.precoNormal;
   };
+
+  async function handlePagamento(
+    usuarioId: number,
+    quadraId: number,
+    data: string,
+    slot: string,
+    valor: number,
+    quantidade_pagamento: number
+  ) {
+    try {
+      const reservaResponse = await axiosPrivate.post<ReservaPendente>("/reservas", {
+        user_id: usuarioId,
+        quadra_id: quadraId,
+        data: data,
+        slot: slot,
+        valor: valor,
+      });
+
+      const reservaCriada = reservaResponse.data;
+
+      const pagamentoResponse = await axiosPrivate.post<PreferenceResponse>("/pagamento/pagar", {
+        reserva_id: reservaCriada.id,
+        quantidade_pagamento: quantidade_pagamento,
+      });
+
+      const { init_point } = pagamentoResponse.data;
+      window.location.href = init_point;
+    } catch (error) {
+      console.error("Erro ao processar o pagamento:", error);
+      alert("Ocorreu um erro ao tentar agendar. Por favor, tente novamente.");
+    }
+  }
+
+  function handleConfirmarPagamento(
+    quadraNome: string,
+    horario: string,
+    data: string,
+    valor: number,
+    quantidade_pagamento: number
+  ) {
+    // Encontre o ID da quadra pelo nome
+    const quadraConfig = quadras.find((q) => q.nome === quadraNome);
+
+    if (!user || !quadraConfig) {
+      alert(
+        "Dados de usuário ou quadra não encontrados. Por favor, recarregue a página."
+      );
+      return;
+    }
+
+    // Chame a função de pagamento com os dados necessários
+    handlePagamento(
+      user.id_usuario,
+      quadraConfig.id,
+      data,
+      horario.split(" - ")[0], // Pega apenas a hora de início
+      valor,
+      quantidade_pagamento
+    );
+    setModalPagamentoAberto(false);
+  }
 
   // ----------------- Handlers -----------------
   function handleHorarioClick(
@@ -179,11 +262,16 @@ export default function NewBooking() {
         <LegendaReservas />
 
         {/* Conteúdo */}
-        {isLoading ? (
+        {isLoading || isLoadingAuth ? (
           <LoadingMessage message="Carregando quadras disponíveis..." />
         ) : (
           <div className="space-y-6">
-            {quadras.filter((quadra) => tipoSelecionado === "Todas" || quadra.tipo.toLowerCase() === tipoSelecionado.toLowerCase())
+            {quadras
+              .filter(
+                (quadra) =>
+                  tipoSelecionado === "Todas" ||
+                  quadra.tipo.toLowerCase() === tipoSelecionado.toLowerCase()
+              )
               .map((quadra) => (
                 <AvailableCourts
                   key={quadra.id}
@@ -225,7 +313,17 @@ export default function NewBooking() {
           isOpen={modalPagamentoAberto}
           onClose={() => setModalPagamentoAberto(false)}
           dados={horarioSelecionado}
-          onConfirmarPagamento={() => setModalPagamentoAberto(false)}
+          // Chame a função auxiliar para confirmar o pagamento
+          onConfirmarPagamento={(valorPago) => {
+            handleConfirmarPagamento(
+              horarioSelecionado.quadra,
+              horarioSelecionado.horario,
+              horarioSelecionado.data,
+              horarioSelecionado.valor,
+              valorPago
+            )
+          }
+          }
         />
       )}
 
