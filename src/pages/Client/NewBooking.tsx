@@ -158,7 +158,7 @@ export default function NewBooking() {
 
       console.log("3) Reserva criada:", reservaCriada);
 
-      const pagamentoResponse = await axiosPrivate.post<PreferenceResponse>("/pagamentos/pagar", {
+      const pagamentoResponse = await axiosPrivate.post<PreferenceResponse>("/mercado-pago/pagar", {
         reserva_id: reservaCriada.id,
         quantidade_pagamento: quantidade_pagamento,
       });
