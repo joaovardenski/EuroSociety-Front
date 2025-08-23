@@ -160,7 +160,7 @@ export default function NewBooking() {
 
       const pagamentoResponse = await axiosPrivate.post<PreferenceResponse>("/mercado-pago/pagar", {
         reserva_id: reservaCriada.id,
-        quantidade_pagamento: quantidade_pagamento,
+        quantidade_pagamento: 0.01, // Teste de pagamento
       });
 
       console.log("4) Resposta do pagamento:", pagamentoResponse.data);
