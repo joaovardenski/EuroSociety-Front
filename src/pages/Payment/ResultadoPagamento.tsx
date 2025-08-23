@@ -26,6 +26,7 @@ export default function ResultadoPagamento() {
       color = "text-yellow-500";
       break;
     case "rejected":
+    case "null":
       mensagem = "Pagamento rejeitado. Tente novamente.";
       Icon = XCircle;
       color = "text-red-500";
@@ -40,19 +41,23 @@ export default function ResultadoPagamento() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
       <div className="bg-white shadow-lg rounded-2xl p-8 max-w-md w-full text-center">
-        <div className={`mb-6 mx-auto w-24 h-24 flex items-center justify-center rounded-full border-4 ${color} border-current`}>
+        <div
+          className={`mb-6 mx-auto w-24 h-24 flex items-center justify-center rounded-full border-4 ${color} border-current`}
+        >
           <Icon size={48} className={color} />
         </div>
         <h1 className="text-2xl font-bold mb-4">{mensagem}</h1>
         <div className="text-gray-600 space-y-2">
           {externalReference && (
             <p>
-              <span className="font-semibold">Reserva:</span> {externalReference}
+              <span className="font-semibold">Reserva:</span>{" "}
+              {externalReference}
             </p>
           )}
           {preferenceId && (
             <p>
-              <span className="font-semibold">Preference ID:</span> {preferenceId}
+              <span className="font-semibold">Preference ID:</span>{" "}
+              {preferenceId}
             </p>
           )}
         </div>
