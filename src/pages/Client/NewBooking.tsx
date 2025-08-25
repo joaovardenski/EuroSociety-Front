@@ -80,6 +80,7 @@ export default function NewBooking() {
     horario: "",
     data: dataSelecionada,
     valor: 0,
+    mensalistaDisponivel: false,
   });
 
   const { user, isLoading: isLoadingAuth } = useAuth();
@@ -143,25 +144,33 @@ export default function NewBooking() {
     quantidade_pagamento: number,
     mensalista: boolean
   ) {
-    console.log(`2) Entrou no HandlePagamento com os dados: ${usuarioId}, ${quadraId}, ${data}, ${slot}, ${valor}, ${quantidade_pagamento}, ${mensalista}`)
+    console.log(
+      `2) Entrou no HandlePagamento com os dados: ${usuarioId}, ${quadraId}, ${data}, ${slot}, ${valor}, ${quantidade_pagamento}, ${mensalista}`
+    );
     try {
-      const reservaResponse = await axiosPrivate.post<ReservaPendente>("/reservas", {
-        user_id: usuarioId,
-        quadra_id: quadraId,
-        data: data,
-        slot: slot,
-        valor: valor,
-        tipo_reserva: mensalista ? "mensal" : "unica",
-      });
+      const reservaResponse = await axiosPrivate.post<ReservaPendente>(
+        "/reservas",
+        {
+          user_id: usuarioId,
+          quadra_id: quadraId,
+          data: data,
+          slot: slot,
+          valor: valor,
+          tipo_reserva: mensalista ? "mensal" : "unica",
+        }
+      );
 
       const reservaCriada = reservaResponse.data;
 
       console.log("3) Reserva criada:", reservaCriada);
 
-      const pagamentoResponse = await axiosPrivate.post<PreferenceResponse>("/mercado-pago/pagar", {
-        reserva_id: reservaCriada.id,
-        quantidade_pagamento: 0.01, // Teste de pagamento
-      });
+      const pagamentoResponse = await axiosPrivate.post<PreferenceResponse>(
+        "/mercado-pago/pagar",
+        {
+          reserva_id: reservaCriada.id,
+          quantidade_pagamento: 0.01, // Teste de pagamento
+        }
+      );
 
       console.log("4) Resposta do pagamento:", pagamentoResponse.data);
 
@@ -190,7 +199,9 @@ export default function NewBooking() {
       );
       return;
     }
-    console.log(`1) Entrou no HandleConfirmarPagamento com os dados: ${quadraNome}, ${horario}, ${data}, ${valor}, ${quantidade_pagamento}, ${mensalista} e o user id: ${user.id}`)
+    console.log(
+      `1) Entrou no HandleConfirmarPagamento com os dados: ${quadraNome}, ${horario}, ${data}, ${valor}, ${quantidade_pagamento}, ${mensalista} e o user id: ${user.id}`
+    );
 
     // Chame a função de pagamento com os dados necessários
     handlePagamento(
@@ -206,7 +217,7 @@ export default function NewBooking() {
   }
 
   // ----------------- Handlers -----------------
-  function handleHorarioClick(
+  async function handleHorarioClick(
     quadraId: number,
     horario: string,
     indisponivel: boolean,
@@ -216,18 +227,60 @@ export default function NewBooking() {
     if (!quadraConfig) return;
 
     const valor = calcularValor(quadraConfig, horario);
+
+    // Inicializa mensalistaDisponivel como false
     setHorarioSelecionado({
       quadra: quadraConfig.nome,
       horario: `${horario} - ${gerarHorarioFim(horario)}`,
       data: dataSelecionada,
       valor,
+      mensalistaDisponivel: false,
     });
 
     if (bloqueado) return;
     if (indisponivel) {
       setModalFilaAberto(true);
-    } else {
+      return;
+    }
+
+    try {
+      console.log("Verificando disponibilidade de mensalista...");
+      const response = await axiosPrivate.post(
+        "/mensalidades/check-disponibilidade",
+        {
+          quadra_id: quadraId,
+          data_inicio: dataSelecionada,
+          horario: horario,
+        }
+      );
+
+      const mensalistaDisponivel = response.data.disponivel;
+
+      // Atualiza apenas o campo mensalistaDisponivel
+      setHorarioSelecionado((prev) => ({
+        ...prev,
+        mensalistaDisponivel,
+      }));
+
       setModalConfirmarAberto(true);
+      setModalPagamentoAberto(false);
+    } catch (error: any) {
+      console.error("Erro ao verificar disponibilidade mensalista:", error);
+
+      // Se for conflito de horário/mensalidade (status 409), apenas mantém mensalistaDisponivel como false
+      if (error.response?.status === 409) {
+        setHorarioSelecionado((prev) => ({
+          ...prev,
+          mensalistaDisponivel: false,
+        }));
+        setModalConfirmarAberto(true);
+      } else {
+        // Para outros erros de servidor, ainda dá o alert
+        alert(
+          "Ocorreu um erro ao verificar a disponibilidade. Por favor, tente novamente."
+        );
+        setModalConfirmarAberto(true);
+      }
     }
   }
 
@@ -323,6 +376,7 @@ export default function NewBooking() {
           isOpen={modalPagamentoAberto}
           onClose={() => setModalPagamentoAberto(false)}
           dados={horarioSelecionado}
+          mensalistaDisponivel={horarioSelecionado.mensalistaDisponivel}
           // Chame a função auxiliar para confirmar o pagamento
           onConfirmarPagamento={(valorPago, mensalista) => {
             handleConfirmarPagamento(
@@ -332,9 +386,8 @@ export default function NewBooking() {
               horarioSelecionado.valor,
               valorPago,
               mensalista
-            )
-          }
-          }
+            );
+          }}
         />
       )}
 
