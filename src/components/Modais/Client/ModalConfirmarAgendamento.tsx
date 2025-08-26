@@ -1,12 +1,13 @@
 import Modal from "../Modal";
 import { Calendar, Clock, DollarSign, MapPin, CheckCircle, ArrowLeft } from "lucide-react";
 import { formatarDataBrasileira } from "../../../utils/DateUtils";
+import type { Quadra } from "../../../types/interfaces";
 
 interface ModalConfirmarAgendamentoProps {
   isOpen: boolean;
   onClose: () => void;
   dados: {
-    quadra: string;
+    quadra: Quadra | null;
     data: string;
     horario: string;
     valor: number;
@@ -38,7 +39,7 @@ export default function ModalConfirmarAgendamento({
         <p className="flex items-center gap-2">
           <MapPin size={18} className="text-blue-600" /> 
           <strong className="text-gray-800">Quadra:</strong>
-          <span className="text-azulBase font-medium">{dados.quadra}</span>
+          <span className="text-azulBase font-medium">{dados.quadra?.nome}</span>
         </p>
         <p className="flex items-center gap-2">
           <Calendar size={18} className="text-blue-600" /> 

@@ -1,12 +1,13 @@
 import Modal from "../Modal";
 import { formatarDataBrasileira } from "../../../utils/DateUtils";
 import { Hourglass, BellRing, ArrowLeft, AlarmClockCheckIcon } from "lucide-react";
+import type { Quadra } from "../../../types/interfaces";
 
 interface ModalFilaDeEsperaProps {
   isOpen: boolean;
   onClose: () => void;
   dados: {
-    quadra: string;
+    quadra: Quadra | null;
     data: string;
     horario: string;
     valor: number;
@@ -42,7 +43,7 @@ export default function ModalFilaDeEspera({
         <div className="bg-blue-50 border border-blue-200 text-sm rounded-lg px-4 py-3 w-full mb-5 text-left shadow-inner">
           <p>
             <span className="font-medium">Quadra:</span>{" "}
-            <span className="text-azulBase">{dados.quadra}</span>
+            <span className="text-azulBase">{dados.quadra?.nome}</span>
           </p>
           <p>
             <span className="font-medium">Data:</span>{" "}

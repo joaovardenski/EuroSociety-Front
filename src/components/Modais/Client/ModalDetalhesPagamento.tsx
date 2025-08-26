@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   DollarSign,
   CalendarCheck2,
@@ -7,17 +7,19 @@ import {
 } from "lucide-react";
 import Modal from "../Modal";
 import { formatarDataBrasileira } from "../../../utils/DateUtils";
+import type { Quadra } from "../../../types/interfaces";
+import { calcularValor } from "../../../utils/Calculate";
 
 interface ModalDetalhesPagamentoProps {
   isOpen: boolean;
   onClose: () => void;
   dados: {
-    quadra: string;
+    quadra: Quadra | null;
     data: string;
     horario: string;
     valor: number;
   };
-  mensalistaDisponivel: boolean; // novo prop
+  mensalistaDisponivel: boolean;
   onConfirmarPagamento: (valorPago: number, mensalista: boolean) => void;
 }
 
@@ -30,8 +32,15 @@ export default function ModalDetalhesPagamento({
 }: ModalDetalhesPagamentoProps) {
   const [mensalista, setMensalista] = useState(false);
   const [percentual, setPercentual] = useState(50);
+  const [valorPago, setValorPago] = useState(dados.valor * (percentual / 100));
 
-  const valorPago = mensalista ? dados.valor : (dados.valor * percentual) / 100;
+  useEffect(() => {
+    if (mensalista && dados.quadra) {
+      setValorPago(calcularValor(dados.quadra, dados.horario.split(" - ")[0], true));
+    } else {
+      setValorPago((dados.valor * percentual) / 100);
+    }
+  }, [mensalista, percentual, dados]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -53,7 +62,7 @@ export default function ModalDetalhesPagamento({
       <div className="bg-blue-50 border border-blue-300 text-sm rounded-lg px-4 py-3 mb-5 shadow-inner">
         <p>
           <span className="font-medium">Quadra:</span>{" "}
-          <span className="text-azulBase">{dados.quadra}</span>
+          <span className="text-azulBase">{dados.quadra?.nome}</span>
         </p>
         <p>
           <span className="font-medium">Data/Hora:</span>{" "}

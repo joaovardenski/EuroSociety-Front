@@ -25,6 +25,7 @@ import { ArrowLeft } from "lucide-react";
 
 import axiosPrivate from "../../api/axiosPrivate";
 import { useAuth } from "../../hooks/useAuth";
+import { calcularValor } from "../../utils/Calculate";
 
 // Types locais
 type Quadra = {
@@ -75,8 +76,14 @@ export default function NewBooking() {
   const [modalPagamentoAberto, setModalPagamentoAberto] = useState(false);
   const [modalFilaAberto, setModalFilaAberto] = useState(false);
 
-  const [horarioSelecionado, setHorarioSelecionado] = useState({
-    quadra: "",
+  const [horarioSelecionado, setHorarioSelecionado] = useState<{
+    quadra: Quadra | null; // <-- agora guarda a quadra inteira
+    horario: string;
+    data: string;
+    valor: number;
+    mensalistaDisponivel: boolean;
+  }>({
+    quadra: null,
     horario: "",
     data: dataSelecionada,
     valor: 0,
@@ -130,11 +137,6 @@ export default function NewBooking() {
   const getBloqueadas = (nome: string) =>
     bloqueios.find((q) => q.nome === nome)?.bloqueados || [];
 
-  const calcularValor = (quadra: Quadra, horario: string) => {
-    const horaInt = parseInt(horario.split(":")[0], 10);
-    return horaInt >= 18 ? quadra.precoNoturno : quadra.precoNormal;
-  };
-
   async function handlePagamento(
     usuarioId: number,
     quadraId: number,
@@ -183,30 +185,28 @@ export default function NewBooking() {
   }
 
   function handleConfirmarPagamento(
-    quadraNome: string,
+    quadra: Quadra | null,
     horario: string,
     data: string,
     valor: number,
     quantidade_pagamento: number,
     mensalista: boolean
   ) {
-    // Encontre o ID da quadra pelo nome
-    const quadraConfig = quadras.find((q) => q.nome === quadraNome);
 
-    if (!user || !quadraConfig) {
+    if (!user || !quadra) {
       alert(
         "Dados de usuário ou quadra não encontrados. Por favor, recarregue a página."
       );
       return;
     }
     console.log(
-      `1) Entrou no HandleConfirmarPagamento com os dados: ${quadraNome}, ${horario}, ${data}, ${valor}, ${quantidade_pagamento}, ${mensalista} e o user id: ${user.id}`
+      `1) Entrou no HandleConfirmarPagamento com os dados: ${quadra.nome}, ${horario}, ${data}, ${valor}, ${quantidade_pagamento}, ${mensalista} e o user id: ${user.id}`
     );
 
     // Chame a função de pagamento com os dados necessários
     handlePagamento(
       user.id,
-      quadraConfig.id,
+      quadra.id,
       data,
       horario.split(" - ")[0], // Pega apenas a hora de início
       valor,
@@ -226,11 +226,11 @@ export default function NewBooking() {
     const quadraConfig = quadras.find((q) => q.id === quadraId);
     if (!quadraConfig) return;
 
-    const valor = calcularValor(quadraConfig, horario);
+    const valor = calcularValor(quadraConfig, horario, false);
 
     // Inicializa mensalistaDisponivel como false
     setHorarioSelecionado({
-      quadra: quadraConfig.nome,
+      quadra: quadraConfig,
       horario: `${horario} - ${gerarHorarioFim(horario)}`,
       data: dataSelecionada,
       valor,
