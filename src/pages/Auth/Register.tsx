@@ -46,7 +46,7 @@ export default function Register() {
 
       console.log("Registro bem-sucedido:", response.data);
 
-      navigate("/home"); // redireciona após registro
+      navigate("/"); // redireciona após registro
     } catch (error) {
       const axiosError = error as AxiosError<{ errors?: { email?: string[] } }>;
       if (
