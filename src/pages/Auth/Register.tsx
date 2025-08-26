@@ -46,7 +46,9 @@ export default function Register() {
 
       console.log("Registro bem-sucedido:", response.data);
 
-      navigate("/"); // redireciona após registro
+      //const data = response.data as { access_token: string };
+      //localStorage.setItem("access_token", data.access_token);
+      navigate("/"); // redireciona após registro para a pagina de login
     } catch (error) {
       const axiosError = error as AxiosError<{ errors?: { email?: string[] } }>;
       if (
