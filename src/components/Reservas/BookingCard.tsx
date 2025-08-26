@@ -49,7 +49,7 @@ export default function BookingCard({ reserva, onCancel }: BookingCardProps) {
       {/* Informações da reserva */}
       <div className="flex-1 text-sm text-gray-800 space-y-1">
         <h2 className="font-semibold text-base text-azulBase">
-          {reserva.quadra.nome}
+          {reserva.quadra?.nome ?? "Quadra Desconhecida"}
         </h2>
         <p className="flex items-center gap-2">
           <Calendar size={16} /> Data:{" "}
