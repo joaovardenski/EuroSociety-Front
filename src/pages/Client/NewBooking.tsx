@@ -150,7 +150,7 @@ export default function NewBooking() {
       `2) Entrou no HandlePagamento com os dados: ${usuarioId}, ${quadraId}, ${data}, ${slot}, ${valor}, ${quantidade_pagamento}, ${mensalista}`
     );
     try {
-      const reservaResponse = await axiosPrivate.post<ReservaPendente>(
+      const reservaResponse = await axiosPrivate.post<ReservaPendente | ReservaPendente[]>(
         "/reservas",
         {
           user_id: usuarioId,
@@ -166,10 +166,14 @@ export default function NewBooking() {
 
       console.log("3) Reserva criada:", reservaCriada);
 
+      const reservaId = Array.isArray(reservaCriada)
+        ? reservaCriada[0].id
+        : reservaCriada.id;
+
       const pagamentoResponse = await axiosPrivate.post<PreferenceResponse>(
         "/mercado-pago/pagar",
         {
-          reserva_id: reservaCriada.id,
+          reserva_id: reservaId,
           quantidade_pagamento: 0.01, // Teste de pagamento
         }
       );
