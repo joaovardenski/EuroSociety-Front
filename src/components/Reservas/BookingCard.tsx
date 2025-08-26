@@ -1,7 +1,8 @@
 import { Calendar, Clock, DollarSign, Eye, CircleX } from "lucide-react";
 import { quadras } from "../../data/Variaveis";
 import type { Reserva } from "../../types/interfaces";
-import { formatarDataBrasileira } from "../../utils/DateUtils";
+import { formatarDataIso } from "../../utils/DateUtils";
+import { capitalizeFirstLetter } from "../../utils/StringUtils";
 interface BookingCardProps {
   reserva: Reserva;
   onCancel?: (reserva: Reserva) => void;
@@ -22,21 +23,18 @@ export default function BookingCard({ reserva, onCancel }: BookingCardProps) {
   }
 
   function reservaJaPassou(): boolean {
-    const [horaInicio] = reserva.slot.split(" - ");
-    const [ano, mes, dia] = reserva.data.split("-").map(Number);
+    const [horaInicio] = reserva.slot.split(" - "); // "18:00"
     const [hora, minuto] = horaInicio.split(":").map(Number);
 
+    const [ano, mes, dia] = reserva.data.split("T")[0].split("-").map(Number);
     const dataHoraReserva = new Date(ano, mes - 1, dia, hora, minuto);
-    return dataHoraReserva < new Date();
+
+    return dataHoraReserva.getTime() < Date.now();
   }
 
   function cancelamentoDisponivel(): boolean {
     // Verifica se a reserva já passou ou está cancelada
-    if (reservaJaPassou() || reserva.status === "Cancelado") {
-      return false;
-    } else {
-      return true;
-    }
+    return !(reservaJaPassou() || reserva.status.toLowerCase() === "cancelada" || reserva.status.toLowerCase() === "pendente");
   }
 
   return (
@@ -53,9 +51,7 @@ export default function BookingCard({ reserva, onCancel }: BookingCardProps) {
         </h2>
         <p className="flex items-center gap-2">
           <Calendar size={16} /> Data:{" "}
-          <strong>
-            {formatarDataBrasileira(reserva.data)}
-          </strong>
+          <strong>{formatarDataIso(reserva.data)}</strong>
         </p>
         <p className="flex items-center gap-2">
           <Clock size={16} /> Horário: <strong>{reserva.slot}</strong>
@@ -67,14 +63,14 @@ export default function BookingCard({ reserva, onCancel }: BookingCardProps) {
           Status:{" "}
           <span
             className={`font-semibold ${
-              reserva.status === "Confirmado"
+              reserva.status === "confirmada"
                 ? "text-green-600"
-                : reserva.status === "Cancelado"
+                : reserva.status === "cancelada"
                 ? "text-red-600"
                 : "text-azulBase"
             }`}
           >
-            {reserva.status}
+            {capitalizeFirstLetter(reserva.status)}
           </span>
         </p>
       </div>

@@ -1,5 +1,5 @@
 import { Calendar, Clock, XCircle, ArrowLeft } from "lucide-react";
-import { formatarDataBrasileira } from "../../../utils/DateUtils";
+import { formatarDataIso, formatarDataIsoAmericana } from "../../../utils/DateUtils";
 
 interface ModalCancelarReservaProps {
   quadra: string;
@@ -47,7 +47,7 @@ export default function ModalCancelarReserva({
       <div className="bg-gray-100 rounded-lg p-4 shadow-inner flex flex-col gap-2 text-gray-800 text-sm">
         <p className="flex items-center justify-center gap-2">
           <Calendar size={18} className="text-blue-600" />{" "}
-          <strong>{`${formatarDataBrasileira(data)}`}</strong>
+          <strong>{`${formatarDataIso(data)}`}</strong>
         </p>
         <p className="flex items-center justify-center gap-2">
           <Clock size={18} className="text-blue-600" /> <strong>{horario}</strong>
@@ -56,7 +56,7 @@ export default function ModalCancelarReserva({
       </div>
 
       {/* Aviso de reembolso */}
-      {reembolsoPermitido(data, horario) ? (
+      {reembolsoPermitido(formatarDataIsoAmericana(data), horario) ? (
         <p className="text-green-700 font-semibold text-sm mt-3">
           Cancelamento com reembolso disponível (até 7h antes).
         </p>

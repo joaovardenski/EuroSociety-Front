@@ -16,7 +16,9 @@ type FiltroReservas = "Todas" | "Próximas" | "Anteriores";
 
 function MyBookings() {
   const [modalOpen, setModalOpen] = useState(false);
-  const [reservaSelecionada, setReservaSelecionada] = useState<Reserva | null>(null);
+  const [reservaSelecionada, setReservaSelecionada] = useState<Reserva | null>(
+    null
+  );
   const [reservas, setReservas] = useState<Reserva[]>([]);
   const [searchOption, setSearchOption] = useState<FiltroReservas>("Próximas");
   const [isLoading, setIsLoading] = useState(true);
@@ -46,6 +48,31 @@ function MyBookings() {
     }
   }
 
+  async function cancelarReservaAPI(reservaId: number) {
+    try {
+      console.log("Tentando cancelar reserva com ID:", reservaId);
+      const token = localStorage.getItem("token");
+      const response = await axiosPrivate.post(
+        `/reservas/${reservaId}`,
+        {}, // corpo vazio
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { reembolso: true },
+        }
+      );
+
+      console.log("Resposta do cancelamento:", response.data);
+
+      setReservas((prev) => prev.filter((r) => r.id !== reservaId));
+    } catch (error) {
+      console.error(
+        "Erro ao cancelar reserva:",
+        error.response?.data || error.message
+      );
+      alert("Não foi possível cancelar a reserva. Tente novamente.");
+    }
+  }
+
   useEffect(() => {
     async function carregarReservas() {
       setIsLoading(true);
@@ -64,7 +91,7 @@ function MyBookings() {
 
   function confirmarCancelamento() {
     if (reservaSelecionada) {
-      setReservas((prev) => prev.filter((r) => r.id !== reservaSelecionada.id));
+      cancelarReservaAPI(reservaSelecionada.id);
     }
     setModalOpen(false);
     setReservaSelecionada(null);
