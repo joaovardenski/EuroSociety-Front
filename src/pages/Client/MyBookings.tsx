@@ -10,6 +10,7 @@ import ModalCancelarReserva from "../../components/Modais/Client/ModalCancelarRe
 import LoadingMessage from "../../components/LoadingMessage";
 import { Link } from "react-router-dom";
 import type { Reserva } from "../../types/interfaces";
+import axios from "axios";
 import axiosPrivate from "../../api/axiosPrivate";
 
 type FiltroReservas = "Todas" | "Próximas" | "Anteriores";
@@ -64,11 +65,18 @@ function MyBookings() {
       console.log("Resposta do cancelamento:", response.data);
 
       setReservas((prev) => prev.filter((r) => r.id !== reservaId));
-    } catch (error) {
-      console.error(
-        "Erro ao cancelar reserva:",
-        error.response?.data || error.message
-      );
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        console.error(
+          "Erro ao cancelar reserva:",
+          error.response?.data || error.message
+        );
+      } else if (error instanceof Error) {
+        console.error("Erro ao cancelar reserva:", error.message);
+      } else {
+        console.error("Erro ao cancelar reserva:", error);
+      }
+
       alert("Não foi possível cancelar a reserva. Tente novamente.");
     }
   }
