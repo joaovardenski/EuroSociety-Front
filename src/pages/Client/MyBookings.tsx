@@ -1,10 +1,5 @@
-// Hooks
 import { useEffect, useState } from "react";
-
-// Icons
 import { ArrowLeft } from "lucide-react";
-
-// Components
 import HeaderEuro from "../../components/Layout/HeaderEuro";
 import SearchOptionButton from "../../components/SearchOptionButton";
 import BookingCard from "../../components/Reservas/BookingCard";
@@ -14,10 +9,9 @@ import Modal from "../../components/Modais/Modal";
 import ModalCancelarReserva from "../../components/Modais/Client/ModalCancelarReserva";
 import LoadingMessage from "../../components/LoadingMessage";
 import { Link } from "react-router-dom";
-import { filtrarReservas } from "../../utils/FilterUtils";
 import type { Reserva } from "../../types/interfaces";
+import axiosPrivate from "../../api/axiosPrivate";
 
-// Types
 type FiltroReservas = "Todas" | "Próximas" | "Anteriores";
 
 function MyBookings() {
@@ -27,26 +21,41 @@ function MyBookings() {
   const [searchOption, setSearchOption] = useState<FiltroReservas>("Próximas");
   const [isLoading, setIsLoading] = useState(true);
 
-  // Simulação de chamada de API (substitua por fetch/axios depois)
-  async function getMinhasReservas(): Promise<Reserva[]> {
-    return import("../../data/Variaveis").then((mod) => mod.minhasReservas);
+  // Pega reservas da API
+  async function getMinhasReservas(filtro: FiltroReservas): Promise<Reserva[]> {
+    try {
+      const token = localStorage.getItem("token"); // ou onde você salva o token no login
+
+      // Mapear filtro do frontend → filtro da API
+      let filtroAPI = "ativas";
+      if (filtro === "Próximas") filtroAPI = "ativas";
+      if (filtro === "Anteriores") filtroAPI = "passadas";
+      if (filtro === "Todas") filtroAPI = "todas";
+
+      const response = await axiosPrivate.get(
+        `/user/bookings?filter=${filtroAPI}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      return response.data.data;
+    } catch (error) {
+      console.error("Erro ao buscar reservas:", error);
+      return [];
+    }
   }
 
   useEffect(() => {
     async function carregarReservas() {
-      //Pega todas minhas reservas com API
-      try {
-        const reservasAPI = await getMinhasReservas();
-        setReservas(reservasAPI);
-      } catch (error) {
-        console.error("Erro ao carregar reservas:", error);
-      } finally {
-        setIsLoading(false);
-      }
+      setIsLoading(true);
+      const reservasAPI = await getMinhasReservas(searchOption);
+      setReservas(reservasAPI);
+      setIsLoading(false);
     }
 
     carregarReservas();
-  }, []);
+  }, [searchOption]);
 
   function abrirModal(reserva: Reserva) {
     setReservaSelecionada(reserva);
@@ -57,12 +66,9 @@ function MyBookings() {
     if (reservaSelecionada) {
       setReservas((prev) => prev.filter((r) => r.id !== reservaSelecionada.id));
     }
-
     setModalOpen(false);
     setReservaSelecionada(null);
   }
-
-  const reservasFiltradas = filtrarReservas(reservas, searchOption);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f3f7ff]">
@@ -109,7 +115,7 @@ function MyBookings() {
 
             {/* Cards de reservas filtradas */}
             <div className="space-y-4">
-              {reservasFiltradas.length === 0 ? (
+              {reservas.length === 0 ? (
                 <div className="flex flex-col bg-white items-center justify-center text-center text-gray-600 py-16">
                   <p className="text-lg font-semibold mb-2">
                     Nenhuma reserva encontrada para este filtro.
@@ -122,7 +128,7 @@ function MyBookings() {
                   </Link>
                 </div>
               ) : (
-                reservasFiltradas.map((reserva) => (
+                reservas.map((reserva) => (
                   <BookingCard
                     key={reserva.id}
                     reserva={reserva}
