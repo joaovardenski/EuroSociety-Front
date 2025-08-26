@@ -44,6 +44,8 @@ export default function Register() {
         metodo_login: "email",
       });
 
+      console.log("Registro bem-sucedido:", response.data);
+
       //const data = response.data as { access_token: string };
       //localStorage.setItem("access_token", data.access_token);
       navigate("/"); // redireciona após registro para a pagina de login
