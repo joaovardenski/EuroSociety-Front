@@ -44,8 +44,8 @@ export default function Register() {
         metodo_login: "email",
       });
 
-      const data = response.data as { access_token: string };
-      localStorage.setItem("access_token", data.access_token);
+      console.log("Registro bem-sucedido:", response.data);
+
       navigate("/home"); // redireciona após registro
     } catch (error) {
       const axiosError = error as AxiosError<{ errors?: { email?: string[] } }>;
