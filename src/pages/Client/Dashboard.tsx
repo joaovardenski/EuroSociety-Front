@@ -11,6 +11,7 @@ import LoadingMessage from "../../components/LoadingMessage";
 import type { Reserva } from "../../types/interfaces";
 import { useAuth } from "../../hooks/useAuth";
 import { getNomeCondensado } from "../../utils/NameUtils";
+import axiosPrivate from "../../api/axiosPrivate";
 
 type ReservaComDataHora = Reserva & { dataHora: Date };
 
@@ -38,8 +39,16 @@ function Dashboard() {
   }, [auth.isLoading, auth.isAuthenticated]);
 
   async function getMinhasReservas(): Promise<Reserva[]> {
+    const token = localStorage.getItem("token");
+
+      const response = await axiosPrivate.get(
+        `/user/bookings?filter=ativas`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
     // Pega todas minhas reservas
-    return import("../../data/Variaveis").then((mod) => mod.minhasReservas);
+    return response.data;
   }
 
   function getReservasConfirmadas(reservas: Reserva[]): Reserva[] {
