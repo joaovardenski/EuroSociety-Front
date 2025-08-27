@@ -103,7 +103,7 @@ export default function NewBooking() {
     console.log("Resposta da API /quadras:", response.data);
 
     // Adapta os nomes para o front
-    return response.data.map((q: any) => ({
+    return response.data.data.map((q: any) => ({
       id: q.id,
       nome: q.nome,
       tipo: q.tipo || "",
@@ -202,7 +202,7 @@ export default function NewBooking() {
     }
 
     carregarHorarios();
-  }, [dataSelecionada]); // Only dataSelecionada is a dependency here
+  }, [dataSelecionada]);
 
   // ----------------- Helpers -----------------
   const getIndisponiveis = (nome: string) =>

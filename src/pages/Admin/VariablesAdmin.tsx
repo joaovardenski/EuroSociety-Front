@@ -5,16 +5,20 @@ import AdminSidebar from "../../components/Navigation/AdminSidebar";
 import CardQuadraVariaveis from "../../components/CardQuadraVariaveis";
 import LoadingMessage from "../../components/LoadingMessage";
 import { isValidInterval, isValidPrice } from "../../utils/Validators";
+import axiosPrivate from "../../api/axiosPrivate";
 
 // Tipos das quadras
 interface QuadraConfig {
   id: number;
-  precoNormal: number;
-  precoNoturno: number;
-  precoMensalNormal: number;
-  precoMensalNoturno: number;
-  horaAbertura: string;
-  horaFechamento: string;
+  nome: string;
+  tipo: string;
+  status: string;
+  preco_normal: number;
+  preco_noturno: number;
+  preco_normal_mensal: number; // Troca aqui
+  preco_noturno_mensal: number; // Troca aqui
+  hora_abertura: string;
+  hora_fechamento: string;
 }
 
 export default function VariablesAdmin() {
@@ -23,38 +27,53 @@ export default function VariablesAdmin() {
   // ----------------- STATES -----------------
   const [society, setSociety] = useState<QuadraConfig>({
     id: 1,
-    precoNormal: 0,
-    precoNoturno: 0,
-    precoMensalNormal: 0,
-    precoMensalNoturno: 0,
-    horaAbertura: "",
-    horaFechamento: "",
+    nome: "Quadra Society",
+    tipo: "society",
+    status: "ativo",
+    preco_normal: 0,
+    preco_noturno: 0,
+    preco_normal_mensal: 0, // Troca aqui
+    preco_noturno_mensal: 0, // Troca aqui
+    hora_abertura: "",
+    hora_fechamento: "",
   });
 
   const [areia1, setAreia1] = useState<QuadraConfig>({
     id: 2,
-    precoNormal: 0,
-    precoNoturno: 0,
-    precoMensalNormal: 0,
-    precoMensalNoturno: 0,
-    horaAbertura: "",
-    horaFechamento: "",
+    nome: "Quadra de Areia 1",
+    tipo: "areia",
+    status: "ativo",
+    preco_normal: 0,
+    preco_noturno: 0,
+    preco_normal_mensal: 0, // Troca aqui
+    preco_noturno_mensal: 0, // Troca aqui
+    hora_abertura: "",
+    hora_fechamento: "",
   });
 
   const [areia2, setAreia2] = useState<QuadraConfig>({
     id: 3,
-    precoNormal: 0,
-    precoNoturno: 0,
-    precoMensalNormal: 0,
-    precoMensalNoturno: 0,
-    horaAbertura: "",
-    horaFechamento: "",
+    nome: "Quadra de Areia 2",
+    tipo: "areia",
+    status: "ativo",
+    preco_normal: 0,
+    preco_noturno: 0,
+    preco_normal_mensal: 0, // Troca aqui
+    preco_noturno_mensal: 0, // Troca aqui
+    hora_abertura: "",
+    hora_fechamento: "",
   });
 
   // ----------------- FETCH INITIAL DATA -----------------
   async function getQuadras(): Promise<QuadraConfig[]> {
-    const mod = await import("../../data/Variaveis");
-    return mod.quadras as QuadraConfig[];
+    try {
+      const response = await axiosPrivate.get("/quadras");
+      console.log("Dados das quadras recebidos:", response.data);
+      return response.data.data;
+    } catch (error) {
+      console.error("Erro ao buscar dados das quadras:", error);
+      return [];
+    }
   }
 
   useEffect(() => {
@@ -62,15 +81,17 @@ export default function VariablesAdmin() {
       try {
         const quadras = await getQuadras();
 
-        // Encontrar cada quadra pelo ID
         const societyData = quadras.find((q) => q.id === 1);
         const areia1Data = quadras.find((q) => q.id === 2);
         const areia2Data = quadras.find((q) => q.id === 3);
 
-        // Atualizar os states
         if (societyData) setSociety(societyData);
         if (areia1Data) setAreia1(areia1Data);
         if (areia2Data) setAreia2(areia2Data);
+        console.log("Estados atualizados com os dados das quadras.");
+        console.log("Society:", societyData);
+        console.log("Areia 1:", areia1Data);
+        console.log("Areia 2:", areia2Data);
       } catch (error) {
         console.error("Erro ao carregar dados:", error);
       } finally {
@@ -83,19 +104,38 @@ export default function VariablesAdmin() {
 
   function validarQuadra(quadra: QuadraConfig) {
     const precos = [
-      quadra.precoNormal,
-      quadra.precoNoturno,
-      quadra.precoMensalNormal,
-      quadra.precoMensalNoturno,
+      quadra.preco_normal,
+      quadra.preco_noturno,
+      quadra.preco_normal_mensal, // Troca aqui
+      quadra.preco_noturno_mensal, // Troca aqui
     ];
 
     const todosPrecosValidos = precos.every(isValidPrice);
     const intervaloValido = isValidInterval(
-      quadra.horaAbertura,
-      quadra.horaFechamento
+      quadra.hora_abertura,
+      quadra.hora_fechamento
     );
 
     return todosPrecosValidos && intervaloValido;
+  }
+
+  async function salvarVariaveis(quadra: QuadraConfig) {
+    if (!validarQuadra(quadra)) {
+      alert("Dados inválidos. Verifique os preços e horários.");
+      return;
+    }
+
+    // O objeto para a API já está formatado corretamente
+    console.log("Salvando dados da quadra:", quadra);
+
+    try {
+      const response = await axiosPrivate.put(`/quadras/${quadra.id}`, quadra);
+      console.log("Dados salvos com sucesso:", response.data);
+      alert("Configurações salvas com sucesso!");
+    } catch (error) {
+      console.error("Erro ao salvar as configurações:", error);
+      alert("Erro ao salvar. Tente novamente.");
+    }
   }
 
   return (
@@ -103,7 +143,6 @@ export default function VariablesAdmin() {
       <HeaderEuro />
       <div className="flex flex-1 overflow-hidden">
         <AdminSidebar />
-
         <main className="flex-1 p-8 overflow-y-auto max-h-130">
           {isLoading ? (
             <LoadingMessage message="Carregando configurações..." />
@@ -117,19 +156,19 @@ export default function VariablesAdmin() {
                   titulo="Quadra Society"
                   config={society}
                   setConfig={setSociety}
-                  onSave={() => validarQuadra(society)}
+                  onSave={() => salvarVariaveis(society)}
                 />
                 <CardQuadraVariaveis
                   titulo="Quadra de Areia 1"
                   config={areia1}
                   setConfig={setAreia1}
-                  onSave={() => validarQuadra(areia1)}
+                  onSave={() => salvarVariaveis(areia1)}
                 />
                 <CardQuadraVariaveis
                   titulo="Quadra de Areia 2"
                   config={areia2}
                   setConfig={setAreia2}
-                  onSave={() => validarQuadra(areia2)}
+                  onSave={() => salvarVariaveis(areia2)}
                 />
               </div>
             </>

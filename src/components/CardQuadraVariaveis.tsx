@@ -1,12 +1,15 @@
 import InputConfig from "./InputConfig";
 interface QuadraConfig {
   id: number;
-  precoNormal: number;
-  precoNoturno: number;
-  precoMensalNormal: number;
-  precoMensalNoturno: number;
-  horaAbertura: string;
-  horaFechamento: string;
+  nome: string;
+  tipo: string;
+  status: string;
+  preco_normal: number;
+  preco_noturno: number;
+  preco_normal_mensal: number; // Troca aqui
+  preco_noturno_mensal: number; // Troca aqui
+  hora_abertura: string;
+  hora_fechamento: string;
 }
 
 export default function CardQuadra({
@@ -26,41 +29,41 @@ export default function CardQuadra({
       <div className="space-y-3">
         <InputConfig
           label="Preço normal (R$/h)"
-          value={config.precoNormal}
-          onChange={(val) => setConfig({ ...config, precoNormal: Number(val) })}
+          value={config.preco_normal}
+          onChange={(val) => setConfig({ ...config, preco_normal: Number(val) })}
           type="number"
         />
         <InputConfig
           label="Preço após 18h (R$/h)"
-          value={config.precoNoturno}
-          onChange={(val) => setConfig({ ...config, precoNoturno: Number(val) })}
+          value={config.preco_noturno}
+          onChange={(val) => setConfig({ ...config, preco_noturno: Number(val) })}
           type="number"
         />
         <InputConfig
           label="Horário de abertura"
-          value={config.horaAbertura}
-          onChange={(val) => setConfig({ ...config, horaAbertura: val })}
+          value={config.hora_abertura}
+          onChange={(val) => setConfig({ ...config, hora_abertura: val })}
           type="time"
         />
         <InputConfig
           label="Horário de fechamento"
-          value={config.horaFechamento}
-          onChange={(val) => setConfig({ ...config, horaFechamento: val })}
+          value={config.hora_fechamento}
+          onChange={(val) => setConfig({ ...config, hora_fechamento: val })}
           type="time"
         />
         <InputConfig
-          label="Preço normal mensal (R$/h)"
-          value={config.precoMensalNormal}
+          label="Preço mensal normal (R$/h)" // Troca aqui
+          value={config.preco_normal_mensal} // Troca aqui
           onChange={(val) =>
-            setConfig({ ...config, precoMensalNormal: Number(val) })
+            setConfig({ ...config, preco_normal_mensal: Number(val) }) // Troca aqui
           }
           type="number"
         />
         <InputConfig
-          label="Preço após 18h mensal (R$/h)"
-          value={config.precoMensalNoturno}
+          label="Preço mensal após 18h (R$/h)" // Troca aqui
+          value={config.preco_noturno_mensal} // Troca aqui
           onChange={(val) =>
-            setConfig({ ...config, precoMensalNoturno: Number(val) })
+            setConfig({ ...config, preco_noturno_mensal: Number(val) }) // Troca aqui
           }
           type="number"
         />
