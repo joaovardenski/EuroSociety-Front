@@ -20,7 +20,9 @@ function Dashboard() {
   localStorage.setItem("user_nome", auth.user?.nome || "");
   const [reservas, setReservas] = useState<Reserva[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const username = getNomeCondensado(localStorage.getItem("user_nome") || "Usuário Desconhecido")
+  const username = getNomeCondensado(
+    localStorage.getItem("user_nome") || "Usuário Desconhecido"
+  );
   useEffect(() => {
     async function carregarReservas() {
       try {
@@ -40,15 +42,14 @@ function Dashboard() {
 
   async function getMinhasReservas(): Promise<Reserva[]> {
     const token = localStorage.getItem("token");
+    const response = await axiosPrivate.get(`/user/bookings?filter=ativas`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    console.log("Resposta da API /user/bookings?filter=ativas:", response.data);
 
-      const response = await axiosPrivate.get(
-        `/user/bookings?filter=ativas`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-    // Pega todas minhas reservas
-    return response.data;
+    // garante que sempre será um array
+    const data = response.data;
+    return Array.isArray(data) ? data : [];
   }
 
   function getReservasConfirmadas(reservas: Reserva[]): Reserva[] {
@@ -78,13 +79,13 @@ function Dashboard() {
     };
   }
 
-  const activeBookings = getReservasConfirmadas(reservas);
+  const activeBookings = getReservasConfirmadas(reservas || []);
   const numberOfActiveBookings = activeBookings.length;
   const lastBooking = getProximaReserva(activeBookings);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#e1e6f9]">
-      <HeaderEuro/>
+      <HeaderEuro />
 
       <main className="flex flex-col items-center flex-grow px-4 py-10 w-full">
         {isLoading ? (
@@ -95,10 +96,7 @@ function Dashboard() {
             <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-4xl text-center mb-8">
               <h1 className="text-2xl font-bold text-gray-900">
                 Seja bem-vindo,{" "}
-                <span className="text-azulBase">
-                  {username}
-                </span>
-                !
+                <span className="text-azulBase">{username}</span>!
               </h1>
               <p className="text-gray-600 mt-2">
                 Confira seus agendamentos e aproveite nossas quadras.
