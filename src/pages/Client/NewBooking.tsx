@@ -168,6 +168,24 @@ export default function NewBooking() {
 
   // Novo useEffect para carregar indisponibilidades E bloqueios quando a data muda.
   useEffect(() => {
+    // Define the functions *inside* the useEffect
+    async function getBloqueios() {
+      const response = await axiosPrivate.get(
+        "/agenda-bloqueios/bloqueados-por-data",
+        {
+          params: { data: dataSelecionada },
+        }
+      );
+      return response.data as Bloqueio[];
+    }
+
+    async function getIndisponibilidades() {
+      const response = await axiosPrivate.get("/reservas/indisponiveis", {
+        params: { data: dataSelecionada },
+      });
+      return response.data as Indisponibilidade[];
+    }
+
     async function carregarHorarios() {
       setIsLoading(true);
       try {
@@ -182,8 +200,9 @@ export default function NewBooking() {
         setIsLoading(false);
       }
     }
+
     carregarHorarios();
-  }, [dataSelecionada]); // Roda sempre que a dataSelecionada muda
+  }, [dataSelecionada]); // Only dataSelecionada is a dependency here
 
   // ----------------- Helpers -----------------
   const getIndisponiveis = (nome: string) =>

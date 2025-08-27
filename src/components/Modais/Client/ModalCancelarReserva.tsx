@@ -1,28 +1,20 @@
 import { Calendar, Clock, XCircle, ArrowLeft } from "lucide-react";
-import { formatarDataIso, formatarDataIsoAmericana } from "../../../utils/DateUtils";
+import { formatarDataIso } from "../../../utils/DateUtils";
 
 interface ModalCancelarReservaProps {
   quadra: string;
   data: string;
   horario: string;
+  podeReembolso: boolean;
   onClose: () => void;
   onConfirm: () => void;
-}
-
-function reembolsoPermitido(data: string, slot: string): boolean {
-  const agora = new Date();
-  const [horaInicio] = slot.split(" - ");
-  const dataHoraReserva = new Date(`${data}T${horaInicio}:00`);
-
-  if (dataHoraReserva <= agora) return false;
-  const diferencaHoras = (dataHoraReserva.getTime() - agora.getTime()) / (1000 * 60 * 60);
-  return diferencaHoras >= 7;
 }
 
 export default function ModalCancelarReserva({
   quadra,
   data,
   horario,
+  podeReembolso,
   onClose,
   onConfirm,
 }: ModalCancelarReservaProps) {
@@ -56,7 +48,7 @@ export default function ModalCancelarReserva({
       </div>
 
       {/* Aviso de reembolso */}
-      {reembolsoPermitido(formatarDataIsoAmericana(data), horario) ? (
+      {podeReembolso ? (
         <p className="text-green-700 font-semibold text-sm mt-3">
           Cancelamento com reembolso disponível (até 7h antes).
         </p>

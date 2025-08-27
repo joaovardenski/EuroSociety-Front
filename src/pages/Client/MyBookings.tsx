@@ -14,12 +14,14 @@ import axios from "axios";
 import axiosPrivate from "../../api/axiosPrivate";
 
 type FiltroReservas = "Todas" | "Próximas" | "Anteriores";
+// Add this new type definition near the top of MyBookings.tsx
+type ReservaComReembolso = Reserva & {
+  podeReembolso: boolean;
+};
 
 function MyBookings() {
   const [modalOpen, setModalOpen] = useState(false);
-  const [reservaSelecionada, setReservaSelecionada] = useState<Reserva | null>(
-    null
-  );
+  const [reservaSelecionada, setReservaSelecionada] = useState<ReservaComReembolso | null>(null);
   const [reservas, setReservas] = useState<Reserva[]>([]);
   const [searchOption, setSearchOption] = useState<FiltroReservas>("Próximas");
   const [isLoading, setIsLoading] = useState(true);
@@ -93,7 +95,8 @@ function MyBookings() {
   }, [searchOption]);
 
   function abrirModal(reserva: Reserva) {
-    setReservaSelecionada(reserva);
+    const podeReembolso = podeTerReembolso(reserva);
+    setReservaSelecionada({ ...reserva, podeReembolso });
     setModalOpen(true);
   }
 
@@ -103,6 +106,22 @@ function MyBookings() {
     }
     setModalOpen(false);
     setReservaSelecionada(null);
+  }
+
+  function podeTerReembolso(reserva: Reserva): boolean {
+    // A sua lógica aqui está correta. Mantenha-a como está.
+    const [horaInicio] = reserva.slot.split(" - ");
+    const [hora, minuto] = horaInicio.split(":").map(Number);
+    const [ano, mes, dia] = reserva.data.split("T")[0].split("-").map(Number);
+    const dataHoraReserva = new Date(ano, mes - 1, dia, hora, minuto);
+
+    const diffMilissegundos = dataHoraReserva.getTime() - Date.now();
+    const seteHorasMilissegundos = 7 * 60 * 60 * 1000;
+
+    return (
+      diffMilissegundos > seteHorasMilissegundos &&
+      reserva.status.toLowerCase() === "confirmada"
+    );
   }
 
   return (
@@ -185,6 +204,7 @@ function MyBookings() {
             quadra={reservaSelecionada.quadra.nome}
             data={reservaSelecionada.data}
             horario={reservaSelecionada.slot}
+            podeReembolso={reservaSelecionada.podeReembolso}
             onClose={() => setModalOpen(false)}
             onConfirm={confirmarCancelamento}
           />
