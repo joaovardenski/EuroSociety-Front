@@ -1,46 +1,103 @@
 import { useEffect, useState } from "react";
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
-  LineChart, Line, Legend
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  LineChart,
+  Line,
+  Legend,
 } from "recharts";
 
 import HeaderEuro from "../../components/Layout/HeaderEuro";
 import FooterEuro from "../../components/Layout/FooterEuro";
 import AdminSidebar from "../../components/Navigation/AdminSidebar";
+import axiosPrivate from "../../api/axiosPrivate";
 
 type Receita = {
   mes: string;
   valor: number;
-}
+};
 
 type Ocupacao = {
   quadra: string;
   usos: number;
-}
+};
 
 export default function ReportAdmin() {
   const [tipoRelatorio, setTipoRelatorio] = useState("financeiro");
   const [tipoQuadra, setTipoQuadra] = useState("todas");
   const [dataInicio, setDataInicio] = useState("2025-01-01");
   const [dataFim, setDataFim] = useState("2025-12-31");
+  const [loading, setLoading] = useState(false);
 
   const [receitaDados, setReceitaDados] = useState<Receita[]>([]);
   const [ocupacaoQuadras, setOcupacaoQuadras] = useState<Ocupacao[]>([]);
 
-  async function getReceita(): Promise<Receita[]> {
-    const mod = await import("../../data/Variaveis");
-    return mod.receitaPorMes2025 as Receita[];
+  async function getReceitaMensal(): Promise<Receita[]> {
+    const year = new Date().getFullYear();
+    try {
+      const response = await axiosPrivate.get(
+        `/admin/report/receitaMensal?year=${year}`
+      );
+      return response.data.report as Receita[];
+    } catch (error) {
+      console.error("Erro ao buscar receita mensal:", error);
+      return [];
+    }
   }
 
   async function getOcupacao(): Promise<Ocupacao[]> {
-    const mod = await import("../../data/Variaveis");
-    return mod.ocupacaoPorQuadra as Ocupacao[];
+    try {
+      const response = await axiosPrivate.get("/admin/report/ocupacaoQuadras");
+      return response.data.report as Ocupacao[];
+    } catch (error) {
+      console.error("Erro ao buscar ocupação por quadra:", error);
+      return [];
+    }
+  }
+
+  async function gerarRelatorio() {
+    setLoading(true);
+
+    try {
+      const params = {
+        tipo_relatorio: tipoRelatorio,
+        tipo_quadra: tipoQuadra,
+        data_inicio: dataInicio,
+        data_fim: dataFim,
+      };
+
+      const response = await axiosPrivate.get("/admin/report/generate", {
+        params,
+        responseType: "blob",
+      });
+
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `relatorio_${tipoRelatorio}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url); // libera memória
+    } catch (error) {
+      console.error("Erro ao gerar relatório:", error);
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
     async function carregarDadosRelatorios() {
       try {
-        const receitaApi = await getReceita();
+        const receitaApi = await getReceitaMensal();
         const ocupacaoApi = await getOcupacao();
 
         setReceitaDados(receitaApi);
@@ -51,7 +108,7 @@ export default function ReportAdmin() {
     }
 
     carregarDadosRelatorios();
-  }, [])
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#e6f4ff]">
@@ -119,8 +176,12 @@ export default function ReportAdmin() {
             </div>
 
             <div className="mt-4 md:mt-6">
-              <button className="bg-[#2b4363] text-white px-6 py-2 rounded-md font-medium hover:bg-[#1f324b] transition">
-                Gerar
+              <button
+                onClick={gerarRelatorio}
+                disabled={loading}
+                className="bg-[#2b4363] text-white px-6 py-2 rounded-md font-medium hover:bg-[#1f324b] transition"
+              >
+                {loading ? "Gerando..." : "Gerar"}
               </button>
             </div>
           </div>
