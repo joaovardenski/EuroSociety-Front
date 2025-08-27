@@ -1,7 +1,8 @@
 import { CalendarClock, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { Reserva } from "../../types/interfaces";
-import { formatarDataBrasileira } from "../../utils/DateUtils";
+import { formatarDataIso } from "../../utils/DateUtils";
+import { capitalizeFirstLetter } from "../../utils/StringUtils";
 
 export type ReservaComDataHora = Reserva & { dataHora: Date };
 
@@ -25,7 +26,7 @@ export default function ProximaReservaCard({ reserva }: Props) {
             <p className="text-sm font-semibold text-gray-700">
               Data:{" "}
               <span className="font-medium">
-                {formatarDataBrasileira(reserva.data)}
+                {formatarDataIso(reserva.data)}
               </span>
             </p>
             <p className="text-sm font-semibold text-gray-700">
@@ -34,7 +35,7 @@ export default function ProximaReservaCard({ reserva }: Props) {
             <p className="text-sm font-semibold text-gray-700">
               Status:{" "}
               <span className="text-green-600">
-                {reserva.status}
+                {capitalizeFirstLetter(reserva.status)}
               </span>
             </p>
           </>

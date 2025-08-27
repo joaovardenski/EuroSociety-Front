@@ -28,6 +28,7 @@ function Dashboard() {
       try {
         const reservasDaAPI = await getMinhasReservas();
         setReservas(reservasDaAPI);
+        console.log("1) Reservas carregadas:", reservasDaAPI);
       } catch (error) {
         console.error("Erro ao carregar reservas:", error);
       } finally {
@@ -46,7 +47,10 @@ function Dashboard() {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    console.log("Resposta da API /user/bookings?filter=ativas:", response.data);
+    console.log(
+      "0) Resposta da API /user/bookings?filter=ativas:",
+      response.data
+    );
 
     // acessa o campo 'data' da resposta
     const reservas = response.data.data;
@@ -64,6 +68,7 @@ function Dashboard() {
   ): ReservaComDataHora | undefined {
     // Pega minha próxima reserva
     const agora = new Date();
+    console.log("2) Reservas para processar:", reservas);
     return reservas
       .map(adicionarDataHora)
       .filter(
@@ -76,15 +81,19 @@ function Dashboard() {
   }
 
   function adicionarDataHora(reserva: Reserva): ReservaComDataHora {
-    // Formata DataHora para poder ordenar reservas
     const [horaInicio] = reserva.slot.split(" - ");
+
+    // Extrai só o "YYYY-MM-DD" da data ISO que vem da API
+    const dataApenas = reserva.data.split("T")[0];
+
     return {
       ...reserva,
-      dataHora: new Date(`${reserva.data}T${horaInicio}:00`),
+      dataHora: new Date(`${dataApenas}T${horaInicio}:00`),
     };
   }
 
   const activeBookings = getReservasConfirmadas(reservas || []);
+  console.log("3) Reservas ativas:", activeBookings);
   const numberOfActiveBookings = activeBookings.length;
   const lastBooking = getProximaReserva(activeBookings);
 
