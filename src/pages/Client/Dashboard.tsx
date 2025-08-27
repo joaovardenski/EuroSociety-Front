@@ -42,7 +42,7 @@ function Dashboard() {
   }, [auth.isLoading, auth.isAuthenticated]);
 
   async function getMinhasReservas(): Promise<Reserva[]> {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("access_token");
     const response = await axiosPrivate.get(`/user/bookings?filter=ativas`, {
       headers: { Authorization: `Bearer ${token}` },
     });

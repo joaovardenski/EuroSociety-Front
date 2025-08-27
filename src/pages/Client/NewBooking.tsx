@@ -94,41 +94,96 @@ export default function NewBooking() {
 
   // ----------------- “APIs” locais (substitua por fetch/axios depois) -----------------
   async function getQuadras(): Promise<Quadra[]> {
-    const mod = await import("../../data/Variaveis");
-    return mod.quadras as Quadra[];
+    const token = localStorage.getItem("access_token");
+
+    const response = await axiosPrivate.get("/quadras", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    console.log("Resposta da API /quadras:", response.data);
+
+    // Adapta os nomes para o front
+    return response.data.map((q: any) => ({
+      id: q.id,
+      nome: q.nome,
+      tipo: q.tipo || "",
+      status: q.status || "ativa",
+      horaAbertura: q.hora_abertura,
+      horaFechamento: q.hora_fechamento,
+      precoNormal: Number(q.preco_normal),
+      precoNoturno: Number(q.preco_noturno),
+      precoMensalNormal: Number(q.preco_normal_mensal),
+      precoMensalNoturno: Number(q.preco_noturno_mensal),
+    }));
   }
 
   async function getIndisponibilidades(): Promise<Indisponibilidade[]> {
-    const mod = await import("../../data/Variaveis");
-    return mod.indisponibilidadesQuadras as Indisponibilidade[];
+    const token = localStorage.getItem("access_token");
+    const response = await axiosPrivate.get("/reservas/indisponiveis", {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { data: dataSelecionada },
+    });
+    console.log("Resposta da API /reservas/indisponiveis:", response.data);
+
+    return response.data as Indisponibilidade[];
   }
 
   async function getBloqueios(): Promise<Bloqueio[]> {
-    const mod = await import("../../data/Variaveis");
-    return mod.bloqueadasQuadras as Bloqueio[];
+    const token = localStorage.getItem("access_token");
+    const response = await axiosPrivate.get(
+      "/agenda-bloqueios/bloqueados-por-data",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { data: dataSelecionada }, // Passa a data selecionada como parâmetro
+      }
+    );
+    console.log(
+      "Resposta da API /agenda-bloqueios/bloqueados-por-data:",
+      response.data
+    );
+
+    return response.data as Bloqueio[];
   }
 
   // ----------------- Efeito de entrada ----------------- (Pega os dados iniciais e coloca no estado)
+  // ----------------- Efeito para carregar quadras apenas uma vez -----------------
   useEffect(() => {
-    async function carregarDados() {
+    async function carregarQuadras() {
+      setIsLoading(true);
       try {
-        const [quadras, indisponiveis, bloqueados] = await Promise.all([
-          getQuadras(),
-          getIndisponibilidades(),
-          getBloqueios(),
-        ]);
-        setQuadras(quadras);
-        setIndisponibilidades(indisponiveis);
-        setBloqueios(bloqueados);
+        const quadrasData = await getQuadras();
+        setQuadras(quadrasData);
+        const indisponiveisData = await getIndisponibilidades();
+        setIndisponibilidades(indisponiveisData);
+        const bloqueiosData = await getBloqueios();
+        setBloqueios(bloqueiosData);
       } catch (error) {
-        console.error("Erro ao carregar dados:", error);
+        console.error("Erro ao carregar quadras:", error);
       } finally {
         setIsLoading(false);
       }
     }
-
-    carregarDados();
+    carregarQuadras();
   }, []);
+
+  // Novo useEffect para carregar indisponibilidades E bloqueios quando a data muda.
+  useEffect(() => {
+    async function carregarHorarios() {
+      setIsLoading(true);
+      try {
+        const indisponiveisData = await getIndisponibilidades();
+        setIndisponibilidades(indisponiveisData);
+
+        const bloqueiosData = await getBloqueios();
+        setBloqueios(bloqueiosData);
+      } catch (error) {
+        console.error("Erro ao carregar horários:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    carregarHorarios();
+  }, [dataSelecionada]); // Roda sempre que a dataSelecionada muda
 
   // ----------------- Helpers -----------------
   const getIndisponiveis = (nome: string) =>
@@ -150,17 +205,16 @@ export default function NewBooking() {
       `2) Entrou no HandlePagamento com os dados: ${usuarioId}, ${quadraId}, ${data}, ${slot}, ${valor}, ${quantidade_pagamento}, ${mensalista}`
     );
     try {
-      const reservaResponse = await axiosPrivate.post<ReservaPendente | ReservaPendente[]>(
-        "/reservas",
-        {
-          user_id: usuarioId,
-          quadra_id: quadraId,
-          data: data,
-          slot: slot,
-          valor: valor,
-          tipo_reserva: mensalista ? "mensal" : "unica",
-        }
-      );
+      const reservaResponse = await axiosPrivate.post<
+        ReservaPendente | ReservaPendente[]
+      >("/reservas", {
+        user_id: usuarioId,
+        quadra_id: quadraId,
+        data: data,
+        slot: slot,
+        valor: valor,
+        tipo_reserva: mensalista ? "mensal" : "unica",
+      });
 
       const reservaCriada = reservaResponse.data;
 
@@ -196,7 +250,6 @@ export default function NewBooking() {
     quantidade_pagamento: number,
     mensalista: boolean
   ) {
-
     if (!user || !quadra) {
       alert(
         "Dados de usuário ou quadra não encontrados. Por favor, recarregue a página."
