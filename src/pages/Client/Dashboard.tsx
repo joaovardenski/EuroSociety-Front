@@ -45,16 +45,18 @@ function Dashboard() {
     const response = await axiosPrivate.get(`/user/bookings?filter=ativas`, {
       headers: { Authorization: `Bearer ${token}` },
     });
+
     console.log("Resposta da API /user/bookings?filter=ativas:", response.data);
 
-    // garante que sempre será um array
-    const data = response.data;
-    return Array.isArray(data) ? data : [];
+    // acessa o campo 'data' da resposta
+    const reservas = response.data.data;
+    return Array.isArray(reservas) ? reservas : [];
   }
 
   function getReservasConfirmadas(reservas: Reserva[]): Reserva[] {
-    // Filtra apenas reservas confirmadas
-    return reservas.filter((reserva) => reserva.status === "Confirmado");
+    return reservas.filter(
+      (reserva) => reserva.status.toLowerCase() === "confirmada"
+    );
   }
 
   function getProximaReserva(
@@ -65,8 +67,11 @@ function Dashboard() {
     return reservas
       .map(adicionarDataHora)
       .filter(
-        (reserva) => reserva.dataHora > agora && reserva.status === "Confirmado"
+        (reserva) =>
+          reserva.dataHora > agora &&
+          reserva.status.toLowerCase() === "confirmada"
       )
+
       .sort((a, b) => a.dataHora.getTime() - b.dataHora.getTime())[0];
   }
 
