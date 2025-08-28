@@ -149,7 +149,7 @@ export default function ReportAdmin() {
               >
                 <option value="todas">Todas</option>
                 <option value="society">Society</option>
-                <option value="futevolei">Areia</option>
+                <option value="areia">Areia</option>
               </select>
             </div>
 
