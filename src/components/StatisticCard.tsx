@@ -9,7 +9,7 @@ type StatisticCardProps = {
 
 export default function StatisticCard({ icon, value, label, bg }: StatisticCardProps) {
   return (
-    <div className="rounded-xl shadow-md p-4 bg-white flex flex-col items-center text-center">
+    <div className="rounded-xl shadow-md p-4 bg-white flex flex-col items-center text-center hover:scale-104 hover:shadow-lg transition">
       <div className={`text-azulBase mb-2 p-4 rounded-[50%] ${bg}`}>
         {icon}
       </div>

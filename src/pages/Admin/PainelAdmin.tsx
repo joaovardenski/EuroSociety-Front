@@ -2,13 +2,13 @@ import { CalendarDays, DollarSign, Users, AlertTriangle } from "lucide-react";
 import HeaderEuro from "../../components/Layout/HeaderEuro";
 import FooterEuro from "../../components/Layout/FooterEuro";
 
-import { agendamentosRecentes } from "../../data/Variaveis";
 import AdminSidebar from "../../components/Navigation/AdminSidebar";
 import TableRecentBookings from "../../components/Reservas/TableRecentBookings";
 import StatisticCard from "../../components/StatisticCard";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import LoadingMessage from "../../components/LoadingMessage";
+import axiosPrivate from "../../api/axiosPrivate";
 
 export default function PainelAdmin() {
   const auth = useAuth();
@@ -17,20 +17,20 @@ export default function PainelAdmin() {
   const [receitaMes, setReceitaMes] = useState(0);
   const [novosClientes, setNovosClientes] = useState(0);
   const [pagamentosPendentes, setPagamentosPendentes] = useState(0);
+  const [agendamentosRecentes, setAgendamentosRecentes] = useState([])
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function carregarDadosDashboard() {
       try {
-        const agendamentosAPI = await getAgendamentos();
-        const receitaAPI = await getReceita();
-        const novosClientesAPI = await getNovosClientes();
-        const pendentesAPI = await getPendentes();
+        const response = await axiosPrivate.get("/admin/dashboard");
+        const data = response.data.data;
 
-        setAgendamentosHoje(agendamentosAPI);
-        setReceitaMes(receitaAPI);
-        setNovosClientes(novosClientesAPI);
-        setPagamentosPendentes(pendentesAPI);
+        setAgendamentosHoje(data.agendamentosHoje);
+        setReceitaMes(data.receitaMes);
+        setNovosClientes(data.novosClientes);
+        setPagamentosPendentes(data.pagamentosPendentes);
+        setAgendamentosRecentes(data.ultimasReservas); // <-- aqui
       } catch (error) {
         console.error("Erro ao carregar dados:", error);
       } finally {
@@ -40,31 +40,6 @@ export default function PainelAdmin() {
 
     carregarDadosDashboard();
   }, []);
-
-  // Futuramente as chamadas de APIs para coleta de dados será aqui
-  async function getAgendamentos(): Promise<number> {
-    return import("../../data/Variaveis").then(
-      (mod) => mod.estatisticasDashboard.agendamentosHoje
-    );
-  }
-
-  async function getReceita(): Promise<number> {
-    return import("../../data/Variaveis").then(
-      (mod) => mod.estatisticasDashboard.receitaMes
-    );
-  }
-
-  async function getNovosClientes(): Promise<number> {
-    return import("../../data/Variaveis").then(
-      (mod) => mod.estatisticasDashboard.novosClientes
-    );
-  }
-
-  async function getPendentes(): Promise<number> {
-    return import("../../data/Variaveis").then(
-      (mod) => mod.estatisticasDashboard.pagamentosPendentes
-    );
-  }
 
   const estatisticas = [
     {
