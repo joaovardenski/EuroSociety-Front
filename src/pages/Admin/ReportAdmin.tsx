@@ -29,19 +29,20 @@ type Ocupacao = {
 
 export default function ReportAdmin() {
   const [tipoRelatorio, setTipoRelatorio] = useState("financeiro");
-  const [tipoQuadra, setTipoQuadra] = useState("todas");
   const [dataInicio, setDataInicio] = useState("2025-01-01");
   const [dataFim, setDataFim] = useState("2025-12-31");
   const [loading, setLoading] = useState(false);
+
+  const [anoReceita, setAnoReceita] = useState(new Date().getFullYear());
+  const [mesOcupacao, setMesOcupacao] = useState(new Date().getMonth() + 1);
 
   const [receitaDados, setReceitaDados] = useState<Receita[]>([]);
   const [ocupacaoQuadras, setOcupacaoQuadras] = useState<Ocupacao[]>([]);
 
   async function getReceitaMensal(): Promise<Receita[]> {
-    const year = new Date().getFullYear();
     try {
       const response = await axiosPrivate.get(
-        `/admin/report/receitaMensal?year=${year}`
+        `/admin/report/receitaMensal?year=${anoReceita}`
       );
       return response.data.report as Receita[];
     } catch (error) {
@@ -52,7 +53,10 @@ export default function ReportAdmin() {
 
   async function getOcupacao(): Promise<Ocupacao[]> {
     try {
-      const response = await axiosPrivate.get("/admin/report/ocupacaoQuadras");
+      console.log(`Requisição: /admin/report/ocupacaoQuadras?year=${new Date().getFullYear()}&month=${mesOcupacao}`);
+      const response = await axiosPrivate.get(
+        `/admin/report/ocupacaoQuadras?year=${new Date().getFullYear()}&month=${mesOcupacao}`
+      );
       return response.data.report as Ocupacao[];
     } catch (error) {
       console.error("Erro ao buscar ocupação por quadra:", error);
@@ -66,7 +70,6 @@ export default function ReportAdmin() {
     try {
       const params = {
         tipo_relatorio: tipoRelatorio,
-        tipo_quadra: tipoQuadra,
         data_inicio: dataInicio,
         data_fim: dataFim,
       };
@@ -108,7 +111,7 @@ export default function ReportAdmin() {
     }
 
     carregarDadosRelatorios();
-  }, []);
+  }, [anoReceita, mesOcupacao]);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#e6f4ff]">
@@ -135,21 +138,6 @@ export default function ReportAdmin() {
               >
                 <option value="financeiro">Financeiro</option>
                 <option value="ocupacao">Ocupação</option>
-              </select>
-            </div>
-
-            <div className="flex flex-col">
-              <label className="text-gray-700 font-medium mb-1">
-                Tipo de quadra
-              </label>
-              <select
-                className="border border-gray-300 rounded-md px-4 py-2"
-                onChange={(e) => setTipoQuadra(e.target.value)}
-                value={tipoQuadra}
-              >
-                <option value="todas">Todas</option>
-                <option value="society">Society</option>
-                <option value="areia">Areia</option>
               </select>
             </div>
 
@@ -189,9 +177,27 @@ export default function ReportAdmin() {
           {/* Gráficos */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-2">
             <div className="bg-white p-6 rounded-xl shadow-md">
-              <h2 className="text-lg font-semibold text-azulBase mb-4">
-                Receita por período
-              </h2>
+              <div className="flex justify-between">
+                <h2 className="text-lg font-semibold text-azulBase mb-4">
+                  Receita por período
+                </h2>
+                <div className="mb-4">
+                  <label className="text-gray-700 font-medium mr-2">
+                    Ano da Receita:
+                  </label>
+                  <select
+                    value={anoReceita}
+                    onChange={(e) => setAnoReceita(Number(e.target.value))}
+                    className="border px-2 py-1 rounded-md"
+                  >
+                    {[2023, 2024, 2025].map((year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
               <ResponsiveContainer width="100%" height={250}>
                 <LineChart data={receitaDados}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -212,9 +218,29 @@ export default function ReportAdmin() {
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-md">
-              <h2 className="text-lg font-semibold text-azulBase mb-4">
-                Ocupação por quadra (mensal)
-              </h2>
+              <div className="flex justify-between">
+                <h2 className="text-lg font-semibold text-azulBase mb-4">
+                  Ocupação por quadra
+                </h2>
+                <div className="mb-4">
+                  <label className="text-gray-700 font-medium mr-2">
+                    Mês da Ocupação:
+                  </label>
+                  <select
+                    value={mesOcupacao}
+                    onChange={(e) => setMesOcupacao(Number(e.target.value))}
+                    className="border px-2 py-1 rounded-md"
+                  >
+                    {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                      <option key={m} value={m}>
+                        {new Date(0, m - 1).toLocaleString("pt-BR", {
+                          month: "long",
+                        })}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
               <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={ocupacaoQuadras}>
                   <CartesianGrid strokeDasharray="3 3" />
