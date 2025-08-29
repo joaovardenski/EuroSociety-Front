@@ -317,6 +317,38 @@ export default function AdminBooking() {
     }
   }
 
+  async function handleAgendarAdmin({
+    nome,
+    valor,
+  }: {
+    nome: string;
+    valor: number;
+  }) {
+    try {
+      const quadra = quadras.find((q) => q.nome === horarioSelecionado.quadra);
+      if (!quadra) return;
+
+      await axiosPrivate.post("/reservas/agendar-admin", {
+        quadra_id: quadra.id,
+        data: horarioSelecionado.data,
+        slot: horarioSelecionado.horario.split(" - ")[0],
+        nome_cliente: nome,
+        valor_pago: valor,
+        valor_total: horarioSelecionado.valor,
+      });
+
+      alert("Reserva agendada com sucesso!");
+      setModalAgendarAberto(false);
+
+      // Atualiza lista de indisponibilidades
+      const indisponiveisData = await getIndisponibilidades();
+      setIndisponibilidades(indisponiveisData);
+    } catch (error) {
+      console.error(error);
+      alert("Erro ao agendar reserva");
+    }
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-[#e6f4ff]">
       <HeaderEuro />
@@ -397,7 +429,7 @@ export default function AdminBooking() {
           isOpen={modalAgendarAberto}
           onClose={() => setModalAgendarAberto(false)}
           dados={horarioSelecionado}
-          onConfirmar={() => setModalAgendarAberto(false)}
+          onConfirmar={handleAgendarAdmin}
         />
       )}
 

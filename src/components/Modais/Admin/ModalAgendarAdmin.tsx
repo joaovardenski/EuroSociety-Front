@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { User, DollarSign, CalendarCheck, ArrowLeftIcon, Mail } from "lucide-react";
+import { User, DollarSign, CalendarCheck, ArrowLeftIcon, Loader2 } from "lucide-react";
 import Modal from "../Modal";
 import InputFieldAuth from "../../Auth/InputFieldAuth";
 import { formatarDataBrasileira } from "../../../utils/DateUtils";
@@ -13,7 +13,7 @@ interface ModalConfirmarAdminProps {
     horario: string;
     valor: number;
   };
-  onConfirmar: (info: { nome: string; email: string; valor: number}) => void;
+  onConfirmar: (info: { nome: string; valor: number }) => Promise<void>;
 }
 
 export default function ModalAgendarAdmin({
@@ -23,11 +23,16 @@ export default function ModalAgendarAdmin({
   onConfirmar,
 }: ModalConfirmarAdminProps) {
   const [nome, setNome] = useState("");
-  const [email, setEmail] = useState("");
   const [valor, setValor] = useState(dados.valor);
+  const [isLoading, setIsLoading] = useState(false);
 
-  function handleConfirm() {
-    onConfirmar({ nome, email, valor});
+  async function handleConfirm() {
+    setIsLoading(true);
+    try {
+      await onConfirmar({ nome, valor });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -47,18 +52,10 @@ export default function ModalAgendarAdmin({
 
       {/* Dados da reserva */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm mb-6 shadow-inner">
-        <p>
-          <strong>Quadra:</strong> {dados.quadra}
-        </p>
-        <p>
-          <strong>Data:</strong> {formatarDataBrasileira(dados.data)}
-        </p>
-        <p>
-          <strong>Horário:</strong> {dados.horario}
-        </p>
-        <p>
-          <strong>Valor base:</strong> R$ {dados.valor.toFixed(2)}
-        </p>
+        <p><strong>Quadra:</strong> {dados.quadra}</p>
+        <p><strong>Data:</strong> {formatarDataBrasileira(dados.data)}</p>
+        <p><strong>Horário:</strong> {dados.horario}</p>
+        <p><strong>Valor base:</strong> R$ {dados.valor.toFixed(2)}</p>
       </div>
 
       {/* Campos de input */}
@@ -72,17 +69,6 @@ export default function ModalAgendarAdmin({
             placeholder="Nome"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
-          />
-        </div>
-        <div className="flex items-center gap-2">
-          <Mail className="text-blue-600" size={18} />
-          <InputFieldAuth
-            id="iemail"
-            label="Email:"
-            type="text"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
           />
         </div>
         <div className="flex items-center gap-2">
@@ -102,16 +88,18 @@ export default function ModalAgendarAdmin({
       <div className="flex justify-between gap-4 mt-8">
         <button
           onClick={onClose}
-          className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition flex items-center justify-center gap-2"
+          disabled={isLoading}
+          className={`w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition flex items-center justify-center gap-2 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
-          <ArrowLeftIcon size={18}/> Voltar
+          <ArrowLeftIcon size={18} /> Voltar
         </button>
         <button
           onClick={handleConfirm}
-          className="w-full py-2 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700 transition flex items-center justify-center gap-2"
+          disabled={isLoading}
+          className={`w-full py-2 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700 transition flex items-center justify-center gap-2 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
-          <CalendarCheck size={18} />
-          Agendar
+          {isLoading ? <Loader2 className="animate-spin" size={18} /> : <CalendarCheck size={18} />}
+          {isLoading ? "Agendando..." : "Agendar"}
         </button>
       </div>
     </Modal>
