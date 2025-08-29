@@ -1,18 +1,12 @@
-import { formatarDataBrasileira } from "../../../utils/DateUtils";
+import type { Reserva } from "../../../types/interfaces";
+import { formatarDataIso } from "../../../utils/DateUtils";
 import Modal from "../Modal";
 import { Wallet, Info, ArrowLeftIcon, DollarSignIcon } from "lucide-react";
 
 interface ModalRecebimentoAdminProps {
   isOpen: boolean;
   onClose: () => void;
-  dados: {
-    cliente: string;
-    quadra: string;
-    data: string;
-    horario: string;
-    pagamentoFaltante: number;
-    valorTotal: number;
-  };
+  dados: Reserva;
   onConfirmar: () => void;
 }
 
@@ -22,7 +16,13 @@ export default function ModalRecebimentoAdmin({
   dados,
   onConfirmar,
 }: ModalRecebimentoAdminProps) {
-  const valorPago = dados.valorTotal - dados.pagamentoFaltante;
+  // Garantindo valores válidos
+  const clienteNome = dados.clienteNome ?? dados.user?.nome ?? "Cliente não informado";
+  const quadraNome = dados.quadra?.nome ?? "Quadra não informada";
+  const slot = dados.slot ?? "-";
+  const dataFormatada = dados.data ? formatarDataIso(dados.data) : "-";
+
+  const restante = dados.pagamentoFaltante ?? 0;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -37,10 +37,8 @@ export default function ModalRecebimentoAdmin({
           Receber pagamento restante
         </h2>
         <p className="text-sm text-gray-700 mb-4 px-4">
-          O cliente pagou{" "}
-          <span className="text-green-600 font-semibold">R${valorPago} </span>
-          antecipadamente. Restam{" "}
-          <span className="text-red-500 font-semibold">R${dados.pagamentoFaltante} </span>
+          O cliente pagou antecipadamente. Restam{" "}
+          <span className="text-red-500 font-semibold">R$ {restante} </span>
           a serem pagos no balcão.
         </p>
 
@@ -48,22 +46,17 @@ export default function ModalRecebimentoAdmin({
         <div className="bg-gray-50 border border-gray-200 text-sm rounded-lg px-4 py-3 w-full mb-5 shadow-inner text-left">
           <p>
             <span className="font-medium">Cliente:</span>{" "}
-            <span className="text-azulBase">{dados.cliente}</span>
+            <span className="text-azulBase">{clienteNome}</span>
           </p>
           <p>
             <span className="font-medium">Quadra:</span>{" "}
-            <span className="text-azulBase">{dados.quadra}</span>
+            <span className="text-azulBase">{quadraNome}</span>
           </p>
           <p>
-            <span className="font-medium">Data:</span>{" "}
-            {`${formatarDataBrasileira(dados.data)}`}
+            <span className="font-medium">Data:</span> {dataFormatada}
           </p>
           <p>
-            <span className="font-medium">Horário:</span> {dados.horario}
-          </p>
-          <p>
-            <span className="font-medium">Valor total:</span>{" "}
-            <span className="text-azulBase">R$ {dados.valorTotal.toFixed(2)}</span>
+            <span className="font-medium">Horário:</span> {slot}
           </p>
         </div>
 
@@ -71,8 +64,7 @@ export default function ModalRecebimentoAdmin({
         <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
           <Info size={14} className="text-green-600" />
           <span>
-            Confirme o recebimento para atualizar o status do pagamento no
-            sistema.
+            Confirme o recebimento para atualizar o status do pagamento no sistema.
           </span>
         </div>
 
@@ -88,8 +80,8 @@ export default function ModalRecebimentoAdmin({
             onClick={onConfirmar}
             className="w-full py-2 rounded-md bg-green-600 text-white font-semibold hover:bg-green-700 transition flex items-center justify-center gap-2"
           >
-            <DollarSignIcon size={18 }/>
-            Receber R$ {dados.pagamentoFaltante}
+            <DollarSignIcon size={18}/>
+            Receber R$ {restante}
           </button>
         </div>
       </div>

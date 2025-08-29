@@ -1,18 +1,12 @@
-import { formatarDataBrasileira } from "../../../utils/DateUtils";
+import type { Reserva } from "../../../types/interfaces";
+import { formatarDataIso } from "../../../utils/DateUtils";
 import Modal from "../Modal";
 import { AlertTriangle, ArrowLeftIcon, CircleX } from "lucide-react";
 
 interface ModalCancelarAdminProps {
   isOpen: boolean;
   onClose: () => void;
-  dados: {
-    cliente: string;
-    quadra: string;
-    data: string;
-    horario: string;
-    pagamentoFaltante: number;
-    valorTotal: number;
-  };
+  dados: Reserva;
   onConfirmar: () => void;
 }
 
@@ -22,7 +16,7 @@ export default function ModalCancelarAdmin({
   dados,
   onConfirmar,
 }: ModalCancelarAdminProps) {
-  const valorPago = dados.valorTotal - dados.pagamentoFaltante;
+  const nomeCliente = dados.clienteNome ?? dados.user?.nome ?? "Cliente não informado";
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -38,7 +32,9 @@ export default function ModalCancelarAdmin({
         </h2>
         <p className="text-sm text-gray-600 mb-5 px-4">
           Ao cancelar este horário, o cliente{" "}
-          <span className="font-semibold text-gray-800">{dados.cliente}</span>{" "}
+          <span className="font-semibold text-gray-800">
+            {nomeCliente}
+          </span>{" "}
           será notificado imediatamente.
         </p>
 
@@ -46,24 +42,20 @@ export default function ModalCancelarAdmin({
         <div className="bg-gray-50 border border-gray-200 text-sm rounded-lg px-4 py-3 w-full mb-5 shadow-inner text-left space-y-1">
           <p>
             <span className="font-medium">Cliente:</span>{" "}
-            <span className="text-azulBase">{dados.cliente}</span>
+            <span className="text-azulBase">
+              {nomeCliente}
+            </span>
           </p>
           <p>
             <span className="font-medium">Quadra:</span>{" "}
-            <span className="text-azulBase">{dados.quadra}</span>
+            <span className="text-azulBase">{dados.quadra?.nome}</span>
           </p>
           <p>
             <span className="font-medium">Data:</span>{" "}
-            {`${formatarDataBrasileira(dados.data)}`}
+            {`${formatarDataIso(dados.data)}`}
           </p>
           <p>
-            <span className="font-medium">Horário:</span> {dados.horario}
-          </p>
-          <p>
-            <span className="font-medium">Valor pago:</span>{" "}
-            <span className="text-green-600 font-semibold">
-              R$ {valorPago.toFixed(2)}
-            </span>
+            <span className="font-medium">Horário:</span> {dados.slot}
           </p>
         </div>
 

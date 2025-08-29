@@ -243,11 +243,18 @@ export default function NewBooking() {
         ? reservaCriada[0].id
         : reservaCriada.id;
 
+      const nomeCompleto = user?.nome ?? "";
+      const nomes = nomeCompleto.trim().split(" "); // Divide por espaço
+      const firstName = nomes[0] || ""; // Primeiro nome
+      const lastName = nomes.slice(1).join(" ") || ""; // Sobrenome(s)
+
       const pagamentoResponse = await axiosPrivate.post<PreferenceResponse>(
         "/mercado-pago/pagar",
         {
           reserva_id: reservaId,
-          quantidade_pagamento: 0.01, // Teste de pagamento
+          quantidade_pagamento: 0.01,
+          user_first_name: firstName,
+          user_last_name: lastName,
         }
       );
 

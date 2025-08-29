@@ -1,6 +1,7 @@
 // src/components/Tabelas/TabelaAgendamentos.tsx
 import type { Reserva } from "../../types/interfaces";
-import { formatarDataBrasileira } from "../../utils/DateUtils";
+import { formatarDataIso } from "../../utils/DateUtils";
+import { getNomeCondensado } from "../../utils/NameUtils";
 
 interface Props {
   reservas: Reserva[];
@@ -26,30 +27,28 @@ export default function TableActiveBookings({
           </tr>
         </thead>
         <tbody>
-          {reservas.map((r, index) => (
-            <tr key={index} className="border-t border-gray-200">
-              <td className="px-4 py-2">{r.usuario.nome}</td>
-              <td className="px-4 py-2">{r.quadra.nome}</td>
-              <td className="px-4 py-2">{`${formatarDataBrasileira(r.data)} às ${r.slot}`}</td>
+          {reservas.map((r) => (
+            <tr key={r.id} className="border-t border-gray-200">
+              <td className="px-4 py-2">{r.user ? getNomeCondensado(r.user.nome)  : getNomeCondensado(r.clienteNome)}</td>
+              <td className="px-4 py-2">{r.quadra?.nome}</td>
+              <td className="px-4 py-2">{`${formatarDataIso(r.data)} às ${r.slot}`}</td>
               <td className="px-4 py-2">
                 <span
-                  className={`text-sm font-medium px-3 py-1 rounded-full
-                    ${
-                      r.statusPagamento === "Completo"
-                        ? "bg-green-500 text-white"
-                        : r.statusPagamento === "Parcial"
-                        ? "bg-yellow-400 text-white"
-                        : "bg-gray-300 text-black"
-                    }`}
+                  className={`text-sm font-medium px-3 py-1 rounded-full ${
+                    r.pagamentoFaltante === 0
+                      ? "bg-green-500 text-white"
+                      : "bg-yellow-400 text-white"
+                  }`}
                 >
-                  {r.statusPagamento}
+                  {r.pagamentoFaltante === 0 ? "Completo" : "Parcial"}
                 </span>
               </td>
               <td className="px-4 py-2 space-x-3">
                 <button
-                  onClick={() => r.pagamentoFaltante && onReceberClick(r)}
+                  onClick={() => onReceberClick(r)}
+                  disabled={r.pagamentoFaltante === 0}
                   className={`bg-green-200 text-green-800 font-medium px-3 py-1 rounded-lg ${
-                    !r.pagamentoFaltante
+                    r.pagamentoFaltante === 0
                       ? "opacity-50 cursor-not-allowed"
                       : "hover:bg-green-300"
                   }`}
