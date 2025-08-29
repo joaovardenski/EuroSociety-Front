@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Calendar, UserPlus, ShieldBan, ArrowLeftIcon } from "lucide-react";
+import { Calendar, UserPlus, ShieldBan, ArrowLeftIcon, Loader2 } from "lucide-react";
 import Modal from "../Modal";
 import { formatarDataBrasileira } from "../../../utils/DateUtils";
 
@@ -12,8 +12,8 @@ interface ModalConfirmarAdminProps {
     horario: string;
     valor: number;
   };
-  onBloquear: () => void;
-  onConfirmar: () => void;
+  onBloquear: () => Promise<void> | void; // <- pode ser assíncrono
+  onConfirmar: () => Promise<void> | void;
 }
 
 export default function ModalConfirmarAdmin({
@@ -24,10 +24,24 @@ export default function ModalConfirmarAdmin({
   onConfirmar,
 }: ModalConfirmarAdminProps) {
   const [onlyCancel, setOnlyCancel] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function handleAction() {
+    setIsLoading(true);
+    try {
+      if (onlyCancel) {
+        await onBloquear();
+      } else {
+        await onConfirmar();
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      {/* Header com ícone */}
+      {/* Header */}
       <div className="flex flex-col items-center text-center mb-4">
         <div className="bg-blue-100 text-blue-600 rounded-full p-3 mb-3">
           <Calendar size={32} />
@@ -42,7 +56,7 @@ export default function ModalConfirmarAdmin({
         </p>
       </div>
 
-      {/* Dados da reserva */}
+      {/* Dados */}
       <div className="space-y-1 text-md text-gray-700 mb-6 border-2 border-blue-300 rounded-lg p-4 bg-blue-50 shadow-inner">
         <p>
           <strong>Quadra:</strong>{" "}
@@ -68,7 +82,7 @@ export default function ModalConfirmarAdmin({
         )}
       </div>
 
-      {/* Switch para bloqueio */}
+      {/* Switch */}
       <div className="flex items-center gap-3 p-3 bg-gray-100 rounded-lg mb-5">
         <input
           type="checkbox"
@@ -92,20 +106,31 @@ export default function ModalConfirmarAdmin({
       <div className="flex justify-between gap-4">
         <button
           onClick={onClose}
-          className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition flex items-center justify-center gap-2"
+          disabled={isLoading}
+          className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition flex items-center justify-center gap-2 disabled:opacity-60"
         >
           <ArrowLeftIcon size={18}/> Voltar
         </button>
         <button
-          onClick={onlyCancel ? onBloquear : onConfirmar}
-          className={`w-full py-2 rounded-md font-semibold transition flex items-center justify-center gap-2 ${
+          onClick={handleAction}
+          disabled={isLoading}
+          className={`w-full py-2 rounded-md font-semibold transition flex items-center justify-center gap-2 disabled:opacity-60 ${
             onlyCancel
               ? "bg-red-600 text-white hover:bg-red-700"
               : "bg-blue-600 text-white hover:bg-blue-700"
           }`}
         >
-          {onlyCancel ? <ShieldBan size={18} /> : <UserPlus size={18} />}
-          {onlyCancel ? "Bloquear" : "Agendar"}
+          {isLoading ? (
+            <>
+              <Loader2 size={18} className="animate-spin" />
+              {onlyCancel ? "Bloqueando..." : "Agendando..."}
+            </>
+          ) : (
+            <>
+              {onlyCancel ? <ShieldBan size={18} /> : <UserPlus size={18} />}
+              {onlyCancel ? "Bloquear" : "Agendar"}
+            </>
+          )}
         </button>
       </div>
     </Modal>

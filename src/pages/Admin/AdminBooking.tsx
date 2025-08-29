@@ -219,6 +219,104 @@ export default function AdminBooking() {
     setDataSelecionada(novaData);
   }
 
+  async function bloquearHorario() {
+    const token = localStorage.getItem("access_token");
+    try {
+      console.log(
+        "Dados para bloqueio:",
+        quadras.find((q) => q.nome === horarioSelecionado.quadra)?.id,
+        horarioSelecionado.data,
+        horarioSelecionado.horario.split(" - ")[0]
+      );
+      await axiosPrivate.post(
+        "/agenda-bloqueios",
+        {
+          quadra_id: quadras.find((q) => q.nome === horarioSelecionado.quadra)
+            ?.id,
+          data: horarioSelecionado.data,
+          slot: horarioSelecionado.horario.split(" - ")[0], // pega só o início
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      alert("Horário bloqueado com sucesso!");
+      setModalConfirmarAberto(false);
+      // Atualiza lista de bloqueios
+      const bloqueiosData = await getBloqueios();
+      setBloqueios(bloqueiosData);
+    } catch (error) {
+      console.error("Erro ao bloquear horário:", error);
+      alert("Erro ao bloquear horário");
+    }
+  }
+
+  async function desbloquearHorario() {
+    const token = localStorage.getItem("access_token");
+    try {
+      await axiosPrivate.delete("/agenda-bloqueios/desbloquear", {
+        headers: { Authorization: `Bearer ${token}` },
+        data: {
+          quadra_id: quadras.find((q) => q.nome === horarioSelecionado.quadra)
+            ?.id,
+          data: horarioSelecionado.data,
+          slot: horarioSelecionado.horario.split(" - ")[0], // pega só o início
+        },
+      });
+      alert("Horário desbloqueado com sucesso!");
+      setModalDesbloquearAberto(false);
+      // Atualiza lista de bloqueios
+      const bloqueiosData = await getBloqueios();
+      setBloqueios(bloqueiosData);
+    } catch (error) {
+      console.error("Erro ao desbloquear horário:", error);
+      alert("Erro ao desbloquear horário");
+    }
+  }
+
+  async function cancelarReserva() {
+    const token = localStorage.getItem("access_token");
+    try {
+      const quadraId = quadras.find(
+        (q) => q.nome === horarioSelecionado.quadra
+      )?.id;
+
+      const response = await axiosPrivate.get("/reservas/por-horario", {
+        headers: { Authorization: `Bearer ${token}` },
+        params: {
+          quadra_id: quadraId,
+          data: horarioSelecionado.data,
+          slot: horarioSelecionado.horario.split(" - ")[0],
+        },
+      });
+
+      console.log("Resposta getReservaPorHorario:", response.data);
+      const reservaId = response.data.id;
+
+      const cancelResponse = await axiosPrivate.delete(
+        `/reservas/${reservaId}/cancelar`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { reembolso: false },
+        }
+      );
+
+      console.log("Resposta cancelarReserva:", cancelResponse.data);
+
+      alert("Reserva cancelada com sucesso!");
+      setModalAgendarOcupadoAberto(false);
+
+      const indisponiveisData = await getIndisponibilidades();
+      setIndisponibilidades(indisponiveisData);
+    } catch (error: any) {
+      console.error(
+        "Erro ao cancelar reserva:",
+        error.response?.data || error.message
+      );
+      alert("Erro ao cancelar reserva");
+    }
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-[#e6f4ff]">
       <HeaderEuro />
@@ -286,7 +384,7 @@ export default function AdminBooking() {
           isOpen={modalConfirmarAberto}
           onClose={() => setModalConfirmarAberto(false)}
           dados={horarioSelecionado}
-          onBloquear={() => setModalConfirmarAberto(false)}
+          onBloquear={bloquearHorario}
           onConfirmar={() => {
             setModalConfirmarAberto(false);
             setModalAgendarAberto(true);
@@ -308,7 +406,7 @@ export default function AdminBooking() {
           isOpen={modalAgendarOcupadoAberto}
           onClose={() => setModalAgendarOcupadoAberto(false)}
           dados={horarioSelecionado}
-          onConfirmar={() => setModalAgendarOcupadoAberto(false)}
+          onConfirmar={cancelarReserva}
         />
       )}
 
@@ -317,7 +415,7 @@ export default function AdminBooking() {
           isOpen={modalDesbloquearAberto}
           onClose={() => setModalDesbloquearAberto(false)}
           dados={horarioSelecionado}
-          onConfirmar={() => setModalDesbloquearAberto(false)}
+          onConfirmar={desbloquearHorario}
         />
       )}
 
