@@ -367,6 +367,38 @@ export default function NewBooking() {
     }
   }
 
+  async function handleEntrarFila() {
+    if (!user || !horarioSelecionado.quadra) {
+      alert("Usuário ou quadra não encontrados.");
+      return;
+    }
+
+    console.log("Dados:")
+    console.log(user.id)
+    console.log(horarioSelecionado.quadra.id)
+    console.log(horarioSelecionado.data)
+    console.log(horarioSelecionado.horario.split(" - ")[0])
+
+    try {
+      const response = await axiosPrivate.post("/fila-espera", {
+        user_id: user.id,
+        quadra_id: horarioSelecionado.quadra.id,
+        data: horarioSelecionado.data,
+        slot: horarioSelecionado.horario.split(" - ")[0], // só hora de início
+      });
+
+      console.log("Entrou na fila de espera:", response.data);
+
+      alert("Você entrou na fila de espera com sucesso!");
+      setModalFilaAberto(false); // fecha o modal
+    } catch (error) {
+      console.error("Erro ao entrar na fila de espera:", error);
+      alert(
+        "Ocorreu um erro ao tentar entrar na fila. Por favor, tente novamente."
+      );
+    }
+  }
+
   function handleSetDataSelecionada(novaData: string) {
     if (novaData < getCurrentDate()) {
       alert("Não é possível selecionar uma data passada.");
@@ -479,7 +511,7 @@ export default function NewBooking() {
           isOpen={modalFilaAberto}
           onClose={() => setModalFilaAberto(false)}
           dados={horarioSelecionado}
-          onEntrarFila={() => setModalFilaAberto(false)}
+          onEntrarFila={handleEntrarFila}
         />
       )}
 
