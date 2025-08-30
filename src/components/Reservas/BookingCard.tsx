@@ -1,23 +1,77 @@
 import { Calendar, Clock, DollarSign, Eye, CircleX } from "lucide-react";
-import { quadras } from "../../data/Variaveis";
-import type { Reserva } from "../../types/interfaces";
+import type { Quadra, Reserva } from "../../types/interfaces";
 import { formatarDataIso } from "../../utils/DateUtils";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
+import { useEffect, useState } from "react";
+import axiosPrivate from "../../api/axiosPrivate";
+
 interface BookingCardProps {
   reserva: Reserva;
   onCancel?: (reserva: Reserva) => void;
 }
 
 export default function BookingCard({ reserva, onCancel }: BookingCardProps) {
-  const quadraInfo = quadras.find((q) => q.nome === reserva.quadra.nome);
+  const [quadrasState, setQuadrasState] = useState<Quadra[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  async function getQuadras(): Promise<Quadra[]> {
+    const token = localStorage.getItem("access_token");
+
+    const response = await axiosPrivate.get("/quadras", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    console.log("Resposta da API /quadras:", response.data);
+
+    return response.data.data.map((q: any) => ({
+      id: q.id,
+      nome: q.nome,
+      tipo: q.tipo || "",
+      status: q.status || "ativa",
+      horaAbertura: q.hora_abertura,
+      horaFechamento: q.hora_fechamento,
+      precoNormal: Number(q.preco_normal),
+      precoNoturno: Number(q.preco_noturno),
+      precoMensalNormal: Number(q.preco_normal_mensal),
+      precoMensalNoturno: Number(q.preco_noturno_mensal),
+    }));
+  }
+
+  useEffect(() => {
+    const fetchQuadras = async () => {
+      try {
+        const quadrasData = await getQuadras();
+        setQuadrasState(quadrasData);
+      } catch (error) {
+        console.error("Erro ao buscar quadras: ", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQuadras();
+  }, []);
+
+  const quadraInfo = quadrasState.find((q) => q.nome === reserva.quadra?.nome);
 
   function calcularValorReserva(slot: string): string {
-    //Pega o valor da reserva baseado no horário
     if (!quadraInfo) return "N/A";
 
     const [horaInicio] = slot.split(" - "); // "18:00"
     const hora = parseInt(horaInicio.split(":")[0], 10);
-    const preco = hora >= 18 ? quadraInfo.precoNoturno : quadraInfo.precoNormal;
+
+    let preco = 0;
+
+    if (reserva.mensalidade) {
+      // Se for mensalidade, usar preços mensais
+      preco =
+        hora >= 18
+          ? quadraInfo.precoMensalNoturno
+          : quadraInfo.precoMensalNormal;
+    } else {
+      // Se não for mensalidade, usar preços normais
+      preco = hora >= 18 ? quadraInfo.precoNoturno : quadraInfo.precoNormal;
+    }
 
     return `R$ ${preco.toFixed(2)}`;
   }
@@ -33,8 +87,19 @@ export default function BookingCard({ reserva, onCancel }: BookingCardProps) {
   }
 
   function cancelamentoDisponivel(): boolean {
-    // Verifica se a reserva já passou ou está cancelada
-    return !(reservaJaPassou() || reserva.status.toLowerCase() === "cancelada" || reserva.status.toLowerCase() === "pendente");
+    return !(
+      reservaJaPassou() ||
+      reserva.status.toLowerCase() === "cancelada" ||
+      reserva.status.toLowerCase() === "pendente"
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-4 bg-white shadow-md rounded-xl">
+        Carregando informações da quadra...
+      </div>
+    );
   }
 
   return (

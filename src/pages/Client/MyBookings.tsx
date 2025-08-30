@@ -201,7 +201,7 @@ function MyBookings() {
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
         {reservaSelecionada && (
           <ModalCancelarReserva
-            quadra={reservaSelecionada.quadra.nome}
+            quadra={reservaSelecionada.quadra?.nome}
             data={reservaSelecionada.data}
             horario={reservaSelecionada.slot}
             podeReembolso={reservaSelecionada.podeReembolso}

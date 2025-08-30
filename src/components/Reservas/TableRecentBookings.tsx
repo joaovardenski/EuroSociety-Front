@@ -26,9 +26,9 @@ export default function TableRecentBookings({ recentBookings }: TableRecentBooki
             {recentBookings.map((agendamento, index) => (
               <tr key={index} className="border-t">
                 <td className="px-2 py-4 font-medium">
-                  {agendamento.usuario.nome}
+                  {agendamento.user?.nome}
                 </td>
-                <td className="px-2 py-4">{agendamento.quadra.nome}</td>
+                <td className="px-2 py-4">{agendamento.quadra?.nome}</td>
                 <td className="px-2 py-4">{`${formatarDataIso(agendamento.data)} às ${agendamento.slot}`}</td>
                 <td className="px-2 py-4">
                   <span

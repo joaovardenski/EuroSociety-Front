@@ -21,7 +21,7 @@ export default function ProximaReservaCard({ reserva }: Props) {
         {reserva ? (
           <>
             <p className="text-sm font-semibold text-gray-700">
-              Quadra: <span className="font-medium">{reserva.quadra.nome}</span>
+              Quadra: <span className="font-medium">{reserva.quadra?.nome}</span>
             </p>
             <p className="text-sm font-semibold text-gray-700">
               Data:{" "}

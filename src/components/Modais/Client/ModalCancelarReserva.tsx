@@ -2,7 +2,7 @@ import { Calendar, Clock, XCircle, ArrowLeft } from "lucide-react";
 import { formatarDataIso } from "../../../utils/DateUtils";
 
 interface ModalCancelarReservaProps {
-  quadra: string;
+  quadra: string | undefined;
   data: string;
   horario: string;
   podeReembolso: boolean;
