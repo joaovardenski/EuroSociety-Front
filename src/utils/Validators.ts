@@ -22,7 +22,7 @@ export function getEmailError(email: string): string {
 // Verifica se a senha bate com todos os critérios de validação, retornando o erro específico ou uma string vazia se não houver erro
 export function getSenhaError(senha: string): string {
   if (!senha) return "Senha é obrigatória";
-  if (senha.length < 6) return "Senha deve ter pelo menos 6 caracteres";
+  if (senha.length < 8) return "Senha deve ter pelo menos 8 caracteres";
   if (senha.length > 64) return "Senha muito longa";
 
   const hasLetter = /[a-zA-Z]/.test(senha);
@@ -78,7 +78,7 @@ export function isValidInterval(start: string, end: string): boolean {
 
 export function getSenhaRedefinicaoError(senha: string, confirmacaoSenha: string): string {
   if (!senha) return "Senha é obrigatória";
-  if (senha.length < 6) return "Senha deve ter pelo menos 6 caracteres";
+  if (senha.length < 8) return "Senha deve ter pelo menos 8 caracteres";
   if (senha.length > 64) return "Senha muito longa";
   const hasLetter = /[a-zA-Z]/.test(senha);
   const hasNumber = /\d/.test(senha);
