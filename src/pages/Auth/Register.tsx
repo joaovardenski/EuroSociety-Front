@@ -172,7 +172,7 @@ export default function Register() {
 
   // --- Limpar timer do alert ---
   useEffect(() => {
-    let timer: NodeJS.Timeout;
+    let timer: ReturnType<typeof setTimeout>;
     if (verificarEmail) {
       timer = setTimeout(() => setVerificarEmail(false), 10000);
     }
