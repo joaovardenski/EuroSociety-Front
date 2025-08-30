@@ -1,9 +1,12 @@
-// Hooks
-import { useEffect, useState } from "react";
+// src/pages/Client/NewBooking.tsx
+
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 // Utils
 import { getCurrentDate, gerarHorarioFim } from "../../utils/DateUtils";
+import { calcularValor } from "../../utils/Calculate";
 
 // Components
 import HeaderEuro from "../../components/Layout/HeaderEuro";
@@ -20,14 +23,27 @@ import ModalConfirmarAgendamento from "../../components/Modais/Client/ModalConfi
 import ModalDetalhesPagamento from "../../components/Modais/Client/ModalDetalhesPagamento";
 import ModalFilaDeEspera from "../../components/Modais/Client/ModalFilaDeEspera";
 
-// Icons
-import { ArrowLeft } from "lucide-react";
-
-import axiosPrivate from "../../api/axiosPrivate";
+// Hooks
 import { useAuth } from "../../hooks/useAuth";
-import { calcularValor } from "../../utils/Calculate";
 
-// Types locais
+// API
+import axiosPrivate from "../../api/axiosPrivate";
+import { AxiosError } from "axios";
+
+// Types
+interface QuadraAPI {
+  id: number;
+  nome: string;
+  tipo?: string;
+  status?: string;
+  hora_abertura: string;
+  hora_fechamento: string;
+  preco_normal: string | number;
+  preco_noturno: string | number;
+  preco_normal_mensal: string | number;
+  preco_noturno_mensal: string | number;
+}
+
 type Quadra = {
   id: number;
   nome: string;
@@ -59,6 +75,8 @@ interface PreferenceResponse {
   init_point: string;
 }
 
+type ModalType = "confirmar" | "pagamento" | "fila" | null;
+
 export default function NewBooking() {
   // ----------------- Estados -----------------
   const [tipoSelecionado, setTipoSelecionado] = useState("Todas");
@@ -70,14 +88,11 @@ export default function NewBooking() {
   >([]);
   const [bloqueios, setBloqueios] = useState<Bloqueio[]>([]);
 
-  const [isLoading, setIsLoading] = useState(true);
-
-  const [modalConfirmarAberto, setModalConfirmarAberto] = useState(false);
-  const [modalPagamentoAberto, setModalPagamentoAberto] = useState(false);
-  const [modalFilaAberto, setModalFilaAberto] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [modalAtivo, setModalAtivo] = useState<ModalType>(null);
 
   const [horarioSelecionado, setHorarioSelecionado] = useState<{
-    quadra: Quadra | null; // <-- agora guarda a quadra inteira
+    quadra: Quadra | null;
     horario: string;
     data: string;
     valor: number;
@@ -92,321 +107,254 @@ export default function NewBooking() {
 
   const { user, isLoading: isLoadingAuth } = useAuth();
 
-  // ----------------- “APIs” locais (substitua por fetch/axios depois) -----------------
-  async function getQuadras(): Promise<Quadra[]> {
-    const token = localStorage.getItem("access_token");
+  const cacheIndisponibilidades = useMemo(
+    () => new Map<string, Indisponibilidade[]>(),
+    []
+  );
+  const cacheBloqueios = useMemo(() => new Map<string, Bloqueio[]>(), []);
 
-    const response = await axiosPrivate.get("/quadras", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  // ----------------- Funções API -----------------
+  const carregarDados = useCallback(
+    async (data: string) => {
+      setLoading(true);
 
-    console.log("Resposta da API /quadras:", response.data);
-
-    // Adapta os nomes para o front
-    return response.data.data.map((q: any) => ({
-      id: q.id,
-      nome: q.nome,
-      tipo: q.tipo || "",
-      status: q.status || "ativa",
-      horaAbertura: q.hora_abertura,
-      horaFechamento: q.hora_fechamento,
-      precoNormal: Number(q.preco_normal),
-      precoNoturno: Number(q.preco_noturno),
-      precoMensalNormal: Number(q.preco_normal_mensal),
-      precoMensalNoturno: Number(q.preco_noturno_mensal),
-    }));
-  }
-
-  async function getIndisponibilidades(): Promise<Indisponibilidade[]> {
-    const token = localStorage.getItem("access_token");
-    const response = await axiosPrivate.get("/reservas/indisponiveis", {
-      headers: { Authorization: `Bearer ${token}` },
-      params: { data: dataSelecionada },
-    });
-    console.log("Resposta da API /reservas/indisponiveis:", response.data);
-
-    return response.data as Indisponibilidade[];
-  }
-
-  async function getBloqueios(): Promise<Bloqueio[]> {
-    const token = localStorage.getItem("access_token");
-    const response = await axiosPrivate.get(
-      "/agenda-bloqueios/bloqueados-por-data",
-      {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { data: dataSelecionada }, // Passa a data selecionada como parâmetro
-      }
-    );
-    console.log(
-      "Resposta da API /agenda-bloqueios/bloqueados-por-data:",
-      response.data
-    );
-
-    return response.data as Bloqueio[];
-  }
-
-  // ----------------- Efeito de entrada ----------------- (Pega os dados iniciais e coloca no estado)
-  // ----------------- Efeito para carregar quadras apenas uma vez -----------------
-  useEffect(() => {
-    async function carregarQuadras() {
-      setIsLoading(true);
       try {
-        const quadrasData = await getQuadras();
-        setQuadras(quadrasData);
-        const indisponiveisData = await getIndisponibilidades();
-        setIndisponibilidades(indisponiveisData);
-        const bloqueiosData = await getBloqueios();
-        setBloqueios(bloqueiosData);
-      } catch (error) {
-        console.error("Erro ao carregar quadras:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    carregarQuadras();
-  }, []);
-
-  // Novo useEffect para carregar indisponibilidades E bloqueios quando a data muda.
-  useEffect(() => {
-    // Define the functions *inside* the useEffect
-    async function getBloqueios() {
-      const response = await axiosPrivate.get(
-        "/agenda-bloqueios/bloqueados-por-data",
-        {
-          params: { data: dataSelecionada },
+        // Carrega quadras apenas uma vez
+        if (quadras.length === 0) {
+          const responseQuadras = await axiosPrivate.get("/quadras");
+          const quadrasFormatadas: Quadra[] = responseQuadras.data.data.map(
+            (q: QuadraAPI) => ({
+              id: q.id,
+              nome: q.nome,
+              tipo: q.tipo || "",
+              status: q.status || "ativa",
+              horaAbertura: q.hora_abertura,
+              horaFechamento: q.hora_fechamento,
+              precoNormal: Number(q.preco_normal),
+              precoNoturno: Number(q.preco_noturno),
+              precoMensalNormal: Number(q.preco_normal_mensal),
+              precoMensalNoturno: Number(q.preco_noturno_mensal),
+            })
+          );
+          setQuadras(quadrasFormatadas);
         }
-      );
-      return response.data as Bloqueio[];
-    }
 
-    async function getIndisponibilidades() {
-      const response = await axiosPrivate.get("/reservas/indisponiveis", {
-        params: { data: dataSelecionada },
-      });
-      return response.data as Indisponibilidade[];
-    }
+        // ---------------- Cache para Indisponibilidades ----------------
+        let indisponiveisData: Indisponibilidade[];
+        if (cacheIndisponibilidades.has(data)) {
+          indisponiveisData = cacheIndisponibilidades.get(data)!;
+        } else {
+          const indisponiveisRes = await axiosPrivate.get(
+            "/reservas/indisponiveis",
+            { params: { data } }
+          );
+          indisponiveisData = indisponiveisRes.data ?? [];
+          cacheIndisponibilidades.set(data, indisponiveisData);
+        }
 
-    async function carregarHorarios() {
-      setIsLoading(true);
-      try {
-        const indisponiveisData = await getIndisponibilidades();
+        // ---------------- Cache para Bloqueios ----------------
+        let bloqueiosData: Bloqueio[];
+        if (cacheBloqueios.has(data)) {
+          bloqueiosData = cacheBloqueios.get(data)!;
+        } else {
+          const bloqueiosRes = await axiosPrivate.get(
+            "/agenda-bloqueios/bloqueados-por-data",
+            { params: { data } }
+          );
+          bloqueiosData = bloqueiosRes.data ?? [];
+          cacheBloqueios.set(data, bloqueiosData);
+        }
+
+        // Atualiza os estados
         setIndisponibilidades(indisponiveisData);
-
-        const bloqueiosData = await getBloqueios();
         setBloqueios(bloqueiosData);
       } catch (error) {
-        console.error("Erro ao carregar horários:", error);
+        console.error("Erro ao carregar dados de quadras:", error);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
-    }
+    },
+    [quadras, cacheIndisponibilidades, cacheBloqueios]
+  );
 
-    carregarHorarios();
-  }, [dataSelecionada]);
+  useEffect(() => {
+    carregarDados(dataSelecionada);
+  }, [dataSelecionada, carregarDados]);
 
   // ----------------- Helpers -----------------
-  const getIndisponiveis = (nome: string) =>
-    indisponibilidades.find((q) => q.nome === nome)?.indisponiveis || [];
+  const getIndisponiveis = useCallback(
+    (nome: string) =>
+      indisponibilidades.find((q) => q.nome === nome)?.indisponiveis || [],
+    [indisponibilidades]
+  );
 
-  const getBloqueadas = (nome: string) =>
-    bloqueios.find((q) => q.nome === nome)?.bloqueados || [];
+  const getBloqueadas = useCallback(
+    (nome: string) => bloqueios.find((q) => q.nome === nome)?.bloqueados || [],
+    [bloqueios]
+  );
 
-  async function handlePagamento(
-    usuarioId: number,
-    quadraId: number,
-    data: string,
-    slot: string,
-    valor: number,
-    quantidade_pagamento: number,
-    mensalista: boolean
-  ) {
-    console.log(
-      `2) Entrou no HandlePagamento com os dados: ${usuarioId}, ${quadraId}, ${data}, ${slot}, ${valor}, ${quantidade_pagamento}, ${mensalista}`
+  const quadrasFiltradas = useMemo(() => {
+    return quadras.filter(
+      (q) =>
+        tipoSelecionado === "Todas" ||
+        q.tipo.toLowerCase() === tipoSelecionado.toLowerCase()
     );
-    try {
-      const reservaResponse = await axiosPrivate.post<
-        ReservaPendente | ReservaPendente[]
-      >("/reservas", {
-        user_id: usuarioId,
-        quadra_id: quadraId,
-        data: data,
-        slot: slot,
-        valor: valor,
-        tipo_reserva: mensalista ? "mensal" : "unica",
+  }, [quadras, tipoSelecionado]);
+
+  // ----------------- Handlers -----------------
+  const handleSetDataSelecionada = (novaData: string) => {
+    if (novaData < getCurrentDate()) {
+      alert("Não é possível selecionar uma data passada.");
+      return;
+    }
+    setDataSelecionada(novaData);
+  };
+
+  const handleHorarioClick = useCallback(
+    async (
+      quadraId: number,
+      horario: string,
+      indisponivel: boolean,
+      bloqueado: boolean
+    ) => {
+      const quadra = quadras.find((q) => q.id === quadraId);
+      if (!quadra) return;
+
+      const valor = calcularValor(quadra, horario, false);
+
+      setHorarioSelecionado({
+        quadra,
+        horario: `${horario} - ${gerarHorarioFim(horario)}`,
+        data: dataSelecionada,
+        valor,
+        mensalistaDisponivel: false,
       });
 
-      const reservaCriada = reservaResponse.data;
+      if (bloqueado) return;
+      if (indisponivel) {
+        setModalAtivo("fila");
+        return;
+      }
 
-      console.log("3) Reserva criada:", reservaCriada);
+      try {
+        const response = await axiosPrivate.post(
+          "/mensalidades/check-disponibilidade",
+          {
+            quadra_id: quadraId,
+            data_inicio: dataSelecionada,
+            horario,
+          }
+        );
 
-      const reservaId = Array.isArray(reservaCriada)
-        ? reservaCriada[0].id
-        : reservaCriada.id;
+        const mensalistaDisponivel = response.data.disponivel;
 
-      const nomeCompleto = user?.nome ?? "";
-      const nomes = nomeCompleto.trim().split(" "); // Divide por espaço
-      const firstName = nomes[0] || ""; // Primeiro nome
-      const lastName = nomes.slice(1).join(" ") || ""; // Sobrenome(s)
+        setHorarioSelecionado((prev) => ({ ...prev, mensalistaDisponivel }));
+        setModalAtivo("confirmar");
+      } catch (error: unknown) {
+        const axiosError = error as AxiosError;
 
-      const pagamentoResponse = await axiosPrivate.post<PreferenceResponse>(
-        "/mercado-pago/pagar",
-        {
-          reserva_id: reservaId,
-          quantidade_pagamento: 0.01,
-          user_first_name: firstName,
-          user_last_name: lastName,
+        if (axiosError.response?.status === 409) {
+          setHorarioSelecionado((prev) => ({
+            ...prev,
+            mensalistaDisponivel: false,
+          }));
+          setModalAtivo("confirmar");
+        } else if (axiosError instanceof Error) {
+          console.error(
+            "Erro ao verificar disponibilidade mensalista:",
+            axiosError.message
+          );
+          alert(
+            "Ocorreu um erro ao verificar a disponibilidade. Por favor, tente novamente."
+          );
+        } else {
+          console.error(
+            "Erro desconhecido ao verificar disponibilidade:",
+            error
+          );
+          alert("Ocorreu um erro desconhecido. Por favor, tente novamente.");
         }
-      );
+      }
+    },
+    [quadras, dataSelecionada]
+  );
 
-      console.log("4) Resposta do pagamento:", pagamentoResponse.data);
-
-      const { init_point } = pagamentoResponse.data;
-      window.location.href = init_point;
-    } catch (error) {
-      console.error("Erro ao processar o pagamento:", error);
-      alert("Ocorreu um erro ao tentar agendar. Por favor, tente novamente.");
-    }
-  }
-
-  function handleConfirmarPagamento(
+  const handleConfirmarPagamento = async (
     quadra: Quadra | null,
     horario: string,
     data: string,
     valor: number,
     quantidade_pagamento: number,
     mensalista: boolean
-  ) {
+  ) => {
     if (!user || !quadra) {
       alert(
         "Dados de usuário ou quadra não encontrados. Por favor, recarregue a página."
       );
       return;
     }
-    console.log(
-      `1) Entrou no HandleConfirmarPagamento com os dados: ${quadra.nome}, ${horario}, ${data}, ${valor}, ${quantidade_pagamento}, ${mensalista} e o user id: ${user.id}`
-    );
-
-    // Chame a função de pagamento com os dados necessários
-    handlePagamento(
-      user.id,
-      quadra.id,
-      data,
-      horario.split(" - ")[0], // Pega apenas a hora de início
-      valor,
-      quantidade_pagamento,
-      mensalista
-    );
-    setModalPagamentoAberto(false);
-  }
-
-  // ----------------- Handlers -----------------
-  async function handleHorarioClick(
-    quadraId: number,
-    horario: string,
-    indisponivel: boolean,
-    bloqueado: boolean
-  ) {
-    const quadraConfig = quadras.find((q) => q.id === quadraId);
-    if (!quadraConfig) return;
-
-    const valor = calcularValor(quadraConfig, horario, false);
-
-    // Inicializa mensalistaDisponivel como false
-    setHorarioSelecionado({
-      quadra: quadraConfig,
-      horario: `${horario} - ${gerarHorarioFim(horario)}`,
-      data: dataSelecionada,
-      valor,
-      mensalistaDisponivel: false,
-    });
-
-    if (bloqueado) return;
-    if (indisponivel) {
-      setModalFilaAberto(true);
-      return;
-    }
 
     try {
-      console.log("Verificando disponibilidade de mensalista...");
-      const response = await axiosPrivate.post(
-        "/mensalidades/check-disponibilidade",
+      const reservaResponse = await axiosPrivate.post<ReservaPendente>(
+        "/reservas",
         {
-          quadra_id: quadraId,
-          data_inicio: dataSelecionada,
-          horario: horario,
+          user_id: user.id,
+          quadra_id: quadra.id,
+          data,
+          slot: horario.split(" - ")[0],
+          valor,
+          tipo_reserva: mensalista ? "mensal" : "unica",
         }
       );
 
-      const mensalistaDisponivel = response.data.disponivel;
+      const reservaId = reservaResponse.data.id;
 
-      // Atualiza apenas o campo mensalistaDisponivel
-      setHorarioSelecionado((prev) => ({
-        ...prev,
-        mensalistaDisponivel,
-      }));
+      const nomes = (user.nome ?? "").trim().split(" ");
+      const firstName = nomes[0] || "";
+      const lastName = nomes.slice(1).join(" ") || "";
 
-      setModalConfirmarAberto(true);
-      setModalPagamentoAberto(false);
-    } catch (error: any) {
-      console.error("Erro ao verificar disponibilidade mensalista:", error);
+      const pagamentoResponse = await axiosPrivate.post<PreferenceResponse>(
+        "/mercado-pago/pagar",
+        {
+          reserva_id: reservaId,
+          quantidade_pagamento,
+          user_first_name: firstName,
+          user_last_name: lastName,
+        }
+      );
 
-      // Se for conflito de horário/mensalidade (status 409), apenas mantém mensalistaDisponivel como false
-      if (error.response?.status === 409) {
-        setHorarioSelecionado((prev) => ({
-          ...prev,
-          mensalistaDisponivel: false,
-        }));
-        setModalConfirmarAberto(true);
-      } else {
-        // Para outros erros de servidor, ainda dá o alert
-        alert(
-          "Ocorreu um erro ao verificar a disponibilidade. Por favor, tente novamente."
-        );
-        setModalConfirmarAberto(true);
-      }
+      window.location.href = pagamentoResponse.data.init_point;
+    } catch (error) {
+      console.error("Erro ao processar o pagamento:", error);
+      alert("Ocorreu um erro ao tentar agendar. Por favor, tente novamente.");
     }
-  }
+  };
 
-  async function handleEntrarFila() {
+  const handleEntrarFila = async () => {
     if (!user || !horarioSelecionado.quadra) {
       alert("Usuário ou quadra não encontrados.");
       return;
     }
 
-    console.log("Dados:")
-    console.log(user.id)
-    console.log(horarioSelecionado.quadra.id)
-    console.log(horarioSelecionado.data)
-    console.log(horarioSelecionado.horario.split(" - ")[0])
-
     try {
-      const response = await axiosPrivate.post("/fila-espera", {
+      await axiosPrivate.post("/fila-espera", {
         user_id: user.id,
         quadra_id: horarioSelecionado.quadra.id,
         data: horarioSelecionado.data,
-        slot: horarioSelecionado.horario.split(" - ")[0], // só hora de início
+        slot: horarioSelecionado.horario.split(" - ")[0],
       });
 
-      console.log("Entrou na fila de espera:", response.data);
-
       alert("Você entrou na fila de espera com sucesso!");
-      setModalFilaAberto(false); // fecha o modal
+      setModalAtivo(null);
     } catch (error) {
       console.error("Erro ao entrar na fila de espera:", error);
       alert(
         "Ocorreu um erro ao tentar entrar na fila. Por favor, tente novamente."
       );
     }
-  }
+  };
 
-  function handleSetDataSelecionada(novaData: string) {
-    if (novaData < getCurrentDate()) {
-      alert("Não é possível selecionar uma data passada.");
-      return;
-    }
-    setDataSelecionada(novaData);
-  }
-
+  // ----------------- JSX -----------------
   return (
     <div className="min-h-screen flex flex-col bg-[#f3f7ff]">
       <HeaderEuro />
@@ -440,59 +388,49 @@ export default function NewBooking() {
         <LegendaReservas />
 
         {/* Conteúdo */}
-        {isLoading || isLoadingAuth ? (
+        {loading || isLoadingAuth ? (
           <LoadingMessage message="Carregando quadras disponíveis..." />
         ) : (
           <div className="space-y-6">
-            {quadras
-              .filter(
-                (quadra) =>
-                  tipoSelecionado === "Todas" ||
-                  quadra.tipo.toLowerCase() === tipoSelecionado.toLowerCase()
-              )
-              .map((quadra) => (
-                <AvailableCourts
-                  key={quadra.id}
-                  nome={quadra.nome}
-                  horaAbertura={quadra.horaAbertura}
-                  horaFechamento={quadra.horaFechamento}
-                  indisponiveis={getIndisponiveis(quadra.nome)}
-                  bloqueados={getBloqueadas(quadra.nome)}
-                  onHorarioClick={(horario, indisponivel, bloqueado) =>
-                    handleHorarioClick(
-                      quadra.id,
-                      horario,
-                      indisponivel,
-                      bloqueado
-                    )
-                  }
-                  isAdmin={false}
-                />
-              ))}
+            {quadrasFiltradas.map((quadra) => (
+              <AvailableCourts
+                key={quadra.id}
+                nome={quadra.nome}
+                horaAbertura={quadra.horaAbertura}
+                horaFechamento={quadra.horaFechamento}
+                indisponiveis={getIndisponiveis(quadra.nome)}
+                bloqueados={getBloqueadas(quadra.nome)}
+                onHorarioClick={(horario, indisponivel, bloqueado) =>
+                  handleHorarioClick(
+                    quadra.id,
+                    horario,
+                    indisponivel,
+                    bloqueado
+                  )
+                }
+                isAdmin={false}
+              />
+            ))}
           </div>
         )}
       </main>
 
       {/* Modais */}
-      {modalConfirmarAberto && (
+      {modalAtivo === "confirmar" && (
         <ModalConfirmarAgendamento
-          isOpen={modalConfirmarAberto}
-          onClose={() => setModalConfirmarAberto(false)}
+          isOpen
+          onClose={() => setModalAtivo(null)}
           dados={horarioSelecionado}
-          onConfirmar={() => {
-            setModalConfirmarAberto(false);
-            setModalPagamentoAberto(true);
-          }}
+          onConfirmar={() => setModalAtivo("pagamento")}
         />
       )}
 
-      {modalPagamentoAberto && (
+      {modalAtivo === "pagamento" && (
         <ModalDetalhesPagamento
-          isOpen={modalPagamentoAberto}
-          onClose={() => setModalPagamentoAberto(false)}
+          isOpen
+          onClose={() => setModalAtivo(null)}
           dados={horarioSelecionado}
           mensalistaDisponivel={horarioSelecionado.mensalistaDisponivel}
-          // Chame a função auxiliar para confirmar o pagamento
           onConfirmarPagamento={(valorPago, mensalista) => {
             handleConfirmarPagamento(
               horarioSelecionado.quadra,
@@ -506,10 +444,10 @@ export default function NewBooking() {
         />
       )}
 
-      {modalFilaAberto && (
+      {modalAtivo === "fila" && (
         <ModalFilaDeEspera
-          isOpen={modalFilaAberto}
-          onClose={() => setModalFilaAberto(false)}
+          isOpen
+          onClose={() => setModalAtivo(null)}
           dados={horarioSelecionado}
           onEntrarFila={handleEntrarFila}
         />

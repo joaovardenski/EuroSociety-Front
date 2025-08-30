@@ -1,3 +1,4 @@
+import { useMemo, useCallback } from "react";
 import { gerarHorarios } from "../../utils/Horarios";
 
 interface AvailableCourtsProps {
@@ -8,6 +9,33 @@ interface AvailableCourtsProps {
   bloqueados: string[];
   onHorarioClick: (horario: string, indisponivel: boolean, bloqueado: boolean) => void;
   isAdmin: boolean;
+}
+
+interface HorarioButtonProps {
+  hora: string;
+  isIndisponivel: boolean;
+  isBloqueado: boolean;
+  isAdmin: boolean;
+  onClick: () => void;
+}
+
+const HorarioButton = ({ hora, isIndisponivel, isBloqueado, isAdmin, onClick }: HorarioButtonProps) => {
+  const getButtonClasses = () => {
+    if (isIndisponivel) return "bg-yellow-200 text-gray-600 hover:bg-yellow-300/80";
+    if (isBloqueado) return "bg-gray-300 text-gray-600 cursor-not-allowed";
+    return "bg-white text-azulBase border-azulBase hover:bg-azulBase hover:text-white";
+  };
+
+  return (
+    <button
+      key={hora}
+      className={`flex items-center justify-center px-5 py-2.5 w-18 rounded-lg border text-[14px] md:text-base font-semibold transition-all md:w-22 ${getButtonClasses()}`}
+      onClick={onClick}
+      disabled={!isAdmin && isBloqueado}
+    >
+      {hora}
+    </button>
+  );
 };
 
 export default function AvailableCourts({
@@ -19,7 +47,16 @@ export default function AvailableCourts({
   onHorarioClick,
   isAdmin,
 }: AvailableCourtsProps) {
-  const horarios = gerarHorarios(horaAbertura, horaFechamento);
+  const horarios = useMemo(() => gerarHorarios(horaAbertura, horaFechamento), [horaAbertura, horaFechamento]);
+
+  const handleClick = useCallback(
+    (hora: string) => {
+      const isIndisponivel = indisponiveis.includes(hora);
+      const isBloqueado = bloqueados.includes(hora);
+      onHorarioClick(hora, isIndisponivel, isBloqueado);
+    },
+    [indisponiveis, bloqueados, onHorarioClick]
+  );
 
   return (
     <div>
@@ -30,27 +67,16 @@ export default function AvailableCourts({
       <hr className="border opacity-60 mb-5" />
 
       <div className="flex flex-wrap gap-3">
-        {horarios.map((hora) => {
-          const isIndisponivel = indisponiveis.includes(hora);
-          const isBloqueado = bloqueados.includes(hora);
-
-          return (
-            <button
-              key={hora}
-              className={`flex items-center justify-center px-5 py-2.5 w-18 rounded-lg border text-[14px] md:text-base font-semibold transition-all md:w-22 ${
-                isIndisponivel
-                  ? "bg-yellow-200 text-gray-600 hover:bg-yellow-300/80"
-                  : isBloqueado
-                  ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                  : "bg-white text-azulBase border-azulBase hover:bg-azulBase hover:text-white"
-              }`}
-              onClick={() => onHorarioClick(hora, isIndisponivel, isBloqueado)}
-              disabled={!isAdmin && isBloqueado}
-            >
-              {hora}
-            </button>
-          );
-        })}
+        {horarios.map((hora) => (
+          <HorarioButton
+            key={hora}
+            hora={hora}
+            isIndisponivel={indisponiveis.includes(hora)}
+            isBloqueado={bloqueados.includes(hora)}
+            isAdmin={isAdmin}
+            onClick={() => handleClick(hora)}
+          />
+        ))}
       </div>
     </div>
   );
