@@ -2,82 +2,42 @@ import { Calendar, Clock, DollarSign, Eye, CircleX } from "lucide-react";
 import type { Quadra, Reserva } from "../../types/interfaces";
 import { formatarDataIso } from "../../utils/DateUtils";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
-import { useEffect, useState } from "react";
-import axiosPrivate from "../../api/axiosPrivate";
 
 interface BookingCardProps {
   reserva: Reserva;
+  quadras: Quadra[];
+  loading: boolean;
   onCancel?: (reserva: Reserva) => void;
 }
 
-export default function BookingCard({ reserva, onCancel }: BookingCardProps) {
-  const [quadrasState, setQuadrasState] = useState<Quadra[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function BookingCard({
+  reserva,
+  quadras,
+  loading,
+  onCancel,
+}: BookingCardProps) {
 
-  async function getQuadras(): Promise<Quadra[]> {
-    const token = localStorage.getItem("access_token");
-
-    const response = await axiosPrivate.get("/quadras", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    console.log("Resposta da API /quadras:", response.data);
-
-    return response.data.data.map((q: any) => ({
-      id: q.id,
-      nome: q.nome,
-      tipo: q.tipo || "",
-      status: q.status || "ativa",
-      horaAbertura: q.hora_abertura,
-      horaFechamento: q.hora_fechamento,
-      precoNormal: Number(q.preco_normal),
-      precoNoturno: Number(q.preco_noturno),
-      precoMensalNormal: Number(q.preco_normal_mensal),
-      precoMensalNoturno: Number(q.preco_noturno_mensal),
-    }));
-  }
-
-  useEffect(() => {
-    const fetchQuadras = async () => {
-      try {
-        const quadrasData = await getQuadras();
-        setQuadrasState(quadrasData);
-      } catch (error) {
-        console.error("Erro ao buscar quadras: ", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchQuadras();
-  }, []);
-
-  const quadraInfo = quadrasState.find((q) => q.nome === reserva.quadra?.nome);
+  const quadraInfo = quadras.find((q) => q.nome === reserva.quadra?.nome);
 
   function calcularValorReserva(slot: string): string {
     if (!quadraInfo) return "N/A";
 
-    const [horaInicio] = slot.split(" - "); // "18:00"
+    const [horaInicio] = slot.split(" - ");
     const hora = parseInt(horaInicio.split(":")[0], 10);
 
-    let preco = 0;
-
-    if (reserva.mensalidade) {
-      // Se for mensalidade, usar preços mensais
-      preco =
-        hora >= 18
-          ? quadraInfo.precoMensalNoturno
-          : quadraInfo.precoMensalNormal;
-    } else {
-      // Se não for mensalidade, usar preços normais
-      preco = hora >= 18 ? quadraInfo.precoNoturno : quadraInfo.precoNormal;
-    }
+    const preco = reserva.mensalidade
+      ? hora >= 18
+        ? quadraInfo.precoMensalNoturno
+        : quadraInfo.precoMensalNormal
+      : hora >= 18
+      ? quadraInfo.precoNoturno
+      : quadraInfo.precoNormal;
 
     return `R$ ${preco.toFixed(2)}`;
   }
 
   function reservaJaPassou(): boolean {
-    const [horaInicio] = reserva.slot.split(" - "); // "18:00"
+    const [horaInicio] = reserva.slot.split(" - ");
     const [hora, minuto] = horaInicio.split(":").map(Number);
 
     const [ano, mes, dia] = reserva.data.split("T")[0].split("-").map(Number);
@@ -104,7 +64,7 @@ export default function BookingCard({ reserva, onCancel }: BookingCardProps) {
 
   return (
     <div className="flex items-start bg-white shadow-md rounded-xl p-4 justify-between flex-col md:flex-row md:items-center">
-      {/* Ícone */}
+      {/* Ícone da reserva */}
       <div className="hidden md:flex items-center justify-center w-12 h-12 bg-azulBase text-white rounded-full mb-3 md:mb-0 md:mr-6">
         <Calendar size={24} />
       </div>
@@ -115,8 +75,7 @@ export default function BookingCard({ reserva, onCancel }: BookingCardProps) {
           {reserva.quadra?.nome ?? "Quadra Desconhecida"}
         </h2>
         <p className="flex items-center gap-2">
-          <Calendar size={16} /> Data:{" "}
-          <strong>{formatarDataIso(reserva.data)}</strong>
+          <Calendar size={16} /> Data: <strong>{formatarDataIso(reserva.data)}</strong>
         </p>
         <p className="flex items-center gap-2">
           <Clock size={16} /> Horário: <strong>{reserva.slot}</strong>
@@ -140,7 +99,7 @@ export default function BookingCard({ reserva, onCancel }: BookingCardProps) {
         </p>
       </div>
 
-      {/* Botões de ações */}
+      {/* Botões de ação */}
       <div className="flex md:flex-col items-stretch gap-2 mt-4 md:mt-0 md:ml-6 w-full md:w-auto">
         <button className="flex items-center gap-2 bg-azulBase text-white px-4 py-1 rounded text-sm hover:bg-azulEscuro w-full md:w-[130px]">
           <Eye size={16} /> Detalhes

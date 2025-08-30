@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
+
 import HeaderEuro from "../../components/Layout/HeaderEuro";
 import SearchOptionButton from "../../components/SearchOptionButton";
 import BookingCard from "../../components/Reservas/BookingCard";
@@ -8,108 +10,107 @@ import BottomNav from "../../components/Navigation/BottomNav";
 import Modal from "../../components/Modais/Modal";
 import ModalCancelarReserva from "../../components/Modais/Client/ModalCancelarReserva";
 import LoadingMessage from "../../components/LoadingMessage";
-import { Link } from "react-router-dom";
+
 import type { Reserva } from "../../types/interfaces";
-import axios from "axios";
-import axiosPrivate from "../../api/axiosPrivate";
+import {
+  getMinhasReservas,
+  cancelarMinhaReserva,
+} from "../../services/reservaService";
+import useQuadras from "../../hooks/useQuadras";
+import type { FiltroReservas } from "../../services/reservaService";
 
-type FiltroReservas = "Todas" | "Próximas" | "Anteriores";
-// Add this new type definition near the top of MyBookings.tsx
-type ReservaComReembolso = Reserva & {
-  podeReembolso: boolean;
-};
+type ReservaComReembolso = Reserva & { podeReembolso: boolean };
 
-function MyBookings() {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [reservaSelecionada, setReservaSelecionada] = useState<ReservaComReembolso | null>(null);
+export default function MyBookings() {
+  // -----------------------
+  // Estados
+  // -----------------------
   const [reservas, setReservas] = useState<Reserva[]>([]);
   const [searchOption, setSearchOption] = useState<FiltroReservas>("Próximas");
   const [isLoading, setIsLoading] = useState(true);
 
-  // Pega reservas da API
-  async function getMinhasReservas(filtro: FiltroReservas): Promise<Reserva[]> {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [reservaSelecionada, setReservaSelecionada] =
+    useState<ReservaComReembolso | null>(null);
+
+  const { quadras, loading: quadrasLoading } = useQuadras();
+
+  // -----------------------
+  // Funções auxiliares
+  // -----------------------
+
+  // Carrega reservas do usuário com base no filtro
+  async function carregarReservas(filtro: FiltroReservas) {
+    setIsLoading(true);
     try {
-      const token = localStorage.getItem("token"); // ou onde você salva o token no login
+      const reservasAPI = await getMinhasReservas(filtro);
 
-      // Mapear filtro do frontend → filtro da API
-      let filtroAPI = "ativas";
-      if (filtro === "Próximas") filtroAPI = "ativas";
-      if (filtro === "Anteriores") filtroAPI = "passadas";
-      if (filtro === "Todas") filtroAPI = "todas";
+      // Mapeia cada reserva para data + horário em Date
+      const reservasComData = reservasAPI.map((reserva) => {
+        const [horaInicio] = reserva.slot.split(" - ");
+        const [hora, minuto] = horaInicio.split(":").map(Number);
+        const [ano, mes, dia] = reserva.data
+          .split("T")[0]
+          .split("-")
+          .map(Number);
+        return {
+          ...reserva,
+          dataHora: new Date(ano, mes - 1, dia, hora, minuto),
+        };
+      });
 
-      const response = await axiosPrivate.get(
-        `/user/bookings?filter=${filtroAPI}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const agora = new Date();
+      const ativas = reservasComData
+        .filter(
+          (r) => r.dataHora >= agora && r.status.toLowerCase() === "confirmada"
+        )
+        .sort((a, b) => a.dataHora.getTime() - b.dataHora.getTime());
 
-      return response.data.data;
+      const passadas = reservasComData
+        .filter(
+          (r) => r.dataHora < agora || r.status.toLowerCase() !== "confirmada"
+        )
+        .sort((a, b) => b.dataHora.getTime() - a.dataHora.getTime());
+
+      setReservas([...ativas, ...passadas]);
     } catch (error) {
-      console.error("Erro ao buscar reservas:", error);
-      return [];
-    }
-  }
-
-  async function cancelarReservaAPI(reservaId: number) {
-    try {
-      console.log("Tentando cancelar reserva com ID:", reservaId);
-      const token = localStorage.getItem("token");
-      const response = await axiosPrivate.post(
-        `/reservas/${reservaId}`,
-        {}, // corpo vazio
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { reembolso: true },
-        }
-      );
-
-      console.log("Resposta do cancelamento:", response.data);
-
-      setReservas((prev) => prev.filter((r) => r.id !== reservaId));
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        console.error(
-          "Erro ao cancelar reserva:",
-          error.response?.data || error.message
-        );
-      } else if (error instanceof Error) {
-        console.error("Erro ao cancelar reserva:", error.message);
-      } else {
-        console.error("Erro ao cancelar reserva:", error);
-      }
-
-      alert("Não foi possível cancelar a reserva. Tente novamente.");
-    }
-  }
-
-  useEffect(() => {
-    async function carregarReservas() {
-      setIsLoading(true);
-      const reservasAPI = await getMinhasReservas(searchOption);
-      setReservas(reservasAPI);
+      console.error("Erro ao carregar reservas:", error);
+      setReservas([]);
+    } finally {
       setIsLoading(false);
     }
+  }
 
-    carregarReservas();
-  }, [searchOption]);
-
+  // Abrir modal de cancelamento
   function abrirModal(reserva: Reserva) {
-    const podeReembolso = podeTerReembolso(reserva);
-    setReservaSelecionada({ ...reserva, podeReembolso });
+    setReservaSelecionada({
+      ...reserva,
+      podeReembolso: podeTerReembolso(reserva),
+    });
     setModalOpen(true);
   }
 
-  function confirmarCancelamento() {
-    if (reservaSelecionada) {
-      cancelarReservaAPI(reservaSelecionada.id);
+  // Confirmar cancelamento de reserva
+  async function confirmarCancelamento() {
+    if (!reservaSelecionada) return;
+
+    try {
+      await cancelarMinhaReserva(
+        reservaSelecionada.id,
+        false // Alterar
+      );
+      setReservas((prev) => prev.filter((r) => r.id !== reservaSelecionada.id));
+    } catch (error) {
+      console.error("Erro ao cancelar reserva:", error);
+      alert("Não foi possível cancelar a reserva. Tente novamente.");
+    } finally {
+      setModalOpen(false);
+      setReservaSelecionada(null);
     }
-    setModalOpen(false);
-    setReservaSelecionada(null);
   }
 
+  // Determina se a reserva ainda pode ter reembolso
   function podeTerReembolso(reserva: Reserva): boolean {
-    // A sua lógica aqui está correta. Mantenha-a como está.
     const [horaInicio] = reserva.slot.split(" - ");
     const [hora, minuto] = horaInicio.split(":").map(Number);
     const [ano, mes, dia] = reserva.data.split("T")[0].split("-").map(Number);
@@ -124,6 +125,16 @@ function MyBookings() {
     );
   }
 
+  // -----------------------
+  // Hooks
+  // -----------------------
+  useEffect(() => {
+    carregarReservas(searchOption);
+  }, [searchOption]);
+
+  // -----------------------
+  // JSX
+  // -----------------------
   return (
     <div className="flex flex-col min-h-screen bg-[#f3f7ff]">
       <HeaderEuro />
@@ -137,7 +148,7 @@ function MyBookings() {
             <div className="flex flex-col items-center justify-center gap-5 md:justify-between md:flex-row mb-3">
               <div className="flex items-center gap-4">
                 <Link
-                  to={"/home"}
+                  to="/home"
                   className="text-azulBase hover:text-azulEscuro transition"
                 >
                   <ArrowLeft size={23} />
@@ -148,26 +159,21 @@ function MyBookings() {
               </div>
 
               <div className="flex gap-3">
-                <SearchOptionButton
-                  label="Próximas"
-                  isActive={searchOption === "Próximas"}
-                  onClick={() => setSearchOption("Próximas")}
-                />
-                <SearchOptionButton
-                  label="Anteriores"
-                  isActive={searchOption === "Anteriores"}
-                  onClick={() => setSearchOption("Anteriores")}
-                />
-                <SearchOptionButton
-                  label="Todas"
-                  isActive={searchOption === "Todas"}
-                  onClick={() => setSearchOption("Todas")}
-                />
+                {(["Próximas", "Anteriores", "Todas"] as FiltroReservas[]).map(
+                  (filtro) => (
+                    <SearchOptionButton
+                      key={filtro}
+                      label={filtro}
+                      isActive={searchOption === filtro}
+                      onClick={() => setSearchOption(filtro)}
+                    />
+                  )
+                )}
               </div>
             </div>
             <hr className="hidden md:block mb-6 border-t-2 rounded-2xl border-azulBase opacity-70" />
 
-            {/* Cards de reservas filtradas */}
+            {/* Lista de reservas */}
             <div className="space-y-4">
               {reservas.length === 0 ? (
                 <div className="flex flex-col bg-white items-center justify-center text-center text-gray-600 py-16">
@@ -175,7 +181,7 @@ function MyBookings() {
                     Nenhuma reserva encontrada para este filtro.
                   </p>
                   <Link
-                    to={"/agendamento"}
+                    to="/agendamento"
                     className="text-azulBase hover:text-azulEscuro transition"
                   >
                     Clique aqui para agendar uma nova reserva
@@ -187,6 +193,8 @@ function MyBookings() {
                     key={reserva.id}
                     reserva={reserva}
                     onCancel={abrirModal}
+                    quadras={quadras}
+                    loading={quadrasLoading}
                   />
                 ))
               )}
@@ -198,6 +206,7 @@ function MyBookings() {
       <BottomNav />
       <FooterEuro />
 
+      {/* Modal de cancelamento */}
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
         {reservaSelecionada && (
           <ModalCancelarReserva
@@ -213,5 +222,3 @@ function MyBookings() {
     </div>
   );
 }
-
-export default MyBookings;
