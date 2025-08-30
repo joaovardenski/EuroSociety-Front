@@ -13,7 +13,7 @@ import type { JwtPayload } from "jwt-decode";
 import axiosPublic from "../../api/axiosPublic";
 import { AxiosError } from "axios";
 // Icons
-import { XCircle } from "lucide-react";
+import { XCircle, Mail } from "lucide-react";
 
 interface GoogleJwtPayload extends JwtPayload {
   name: string;
@@ -29,6 +29,7 @@ export default function Register() {
   const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [senhaError, setSenhaError] = useState("");
+  const [verificarEmail, setVerificarEmail] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function handleRegisterEmail(nome: string, email: string, senha: string) {
@@ -45,10 +46,8 @@ export default function Register() {
       });
 
       console.log("Registro bem-sucedido:", response.data);
+      setVerificarEmail(true)
 
-      //const data = response.data as { access_token: string };
-      //localStorage.setItem("access_token", data.access_token);
-      navigate("/"); // redireciona após registro para a pagina de login
     } catch (error) {
       const axiosError = error as AxiosError<{ errors?: { email?: string[] } }>;
       if (
@@ -134,6 +133,13 @@ export default function Register() {
             <div className="flex items-center justify-center gap-2 text-red-700 bg-red-100 border border-red-300 rounded-md p-2 text-center w-full transition-opacity duration-500 opacity-100">
               <XCircle size={20} />
               <span>{emailError}</span>
+            </div>
+          )}
+
+          {verificarEmail && (
+            <div className="flex items-center justify-center gap-2 text-green-700 bg-green-100 border border-green-300 rounded-md p-2 text-center w-full transition-opacity duration-500 opacity-100">
+              <Mail size={20} />
+              <span>Uma mensagem de verificação de email foi enviado, verifique sua caixa postal!</span>
             </div>
           )}
 

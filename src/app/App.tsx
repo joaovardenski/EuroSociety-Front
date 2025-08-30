@@ -20,6 +20,7 @@ import NotAuthenticated from "../pages/Error/NotAuthenticated";
 import NotFound from "../pages/Error/NotFound";
 import ChangePassword from "../pages/Auth/ChangePassword";
 import ResultadoPagamento from "../pages/Payment/ResultadoPagamento";
+import EmailVerificado from "../pages/Auth/VerifiedEmail";
 
 const router = createBrowserRouter([
   {
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
   {
     path: "/redefinir-senha/:token",
     element: <ChangePassword />,
+  },
+  {
+    path: "/email-verificado",
+    element: <EmailVerificado />,
   },
   {
     path: "/home",
