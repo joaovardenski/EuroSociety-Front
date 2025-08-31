@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useMemo } from "react";
 // Components
 import HeaderEuro from "../../components/Layout/HeaderEuro";
 import AdminSidebar from "../../components/Navigation/AdminSidebar";
@@ -11,76 +11,40 @@ import ModalRecebimentoAdmin from "../../components/Modais/Admin/ModalRecebiment
 import ModalCancelarAdmin from "../../components/Modais/Admin/ModalCancelarAdmin";
 // Utils
 import { getCurrentDate } from "../../utils/DateUtils";
-import type { Reserva, Usuario, Quadra } from "../../types/interfaces";
+import type { Reserva } from "../../types/interfaces";
+import { useAgendamentosAtivos } from "../../hooks/useAgendamentosAtivos";
 import axiosPrivate from "../../api/axiosPrivate";
 
-// Interface para os dados crus do backend, usando snake_case
-interface ReservaBackend {
-  id: number;
-  user?: Usuario | null;
-  user_id?: number | null;
-  quadra?: Quadra;
-  quadra_id: number;
-  tipo_reserva: string;
-  mensalidade_id?: number | null;
-  pagamento_id?: number | null;
-  pagamento_faltante: string;
-  data: string;
-  slot: string;
-  status: string;
-  cliente_nome?: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-// Função de mapeamento que transforma os dados do backend para a nossa interface
-const mapReservasFromBackend = (data: ReservaBackend[]): Reserva[] => {
-  return data.map((reserva) => ({
-    id: reserva.id,
-    user: reserva.user,
-    userId: reserva.user_id,
-    quadra: reserva.quadra,
-    quadraId: reserva.quadra_id,
-    tipoReserva: reserva.tipo_reserva,
-    mensalidadeId: reserva.mensalidade_id,
-    pagamentoId: reserva.pagamento_id,
-    // Converte a string do backend para um número
-    pagamentoFaltante: parseFloat(reserva.pagamento_faltante),
-    data: reserva.data,
-    slot: reserva.slot,
-    status: reserva.status,
-    clienteNome: reserva.cliente_nome,
-    createdAt: reserva.created_at,
-    updatedAt: reserva.updated_at,
-    // Adiciona a propriedade de status de pagamento com base na lógica do frontend
-    statusPagamento: parseFloat(reserva.pagamento_faltante) === 0 ? "Completo" : "Parcial",
-  }));
-};
-
 export default function ActiveBookingsAdmin() {
-  const [dataSelecionada, setDataSelecionada] = useState(getCurrentDate);
-  const [agendamentos, setAgendamentos] = useState<Reserva[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [dataSelecionada, setDataSelecionada] = useState(getCurrentDate());
+  const [searchQuery, setSearchQuery] = useState("");
   const [modalRecebimentoOpen, setModalRecebimentoOpen] = useState(false);
   const [modalCancelarOpen, setModalCancelarOpen] = useState(false);
   const [agendamentoSelecionado, setAgendamentoSelecionado] = useState<Reserva | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
 
-  const agendamentosFiltrados = agendamentos.filter((reserva) =>
-    reserva.cliente_nome?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false
-  );
+  const { agendamentos, setAgendamentos, loading: isLoading } = useAgendamentosAtivos(dataSelecionada);
 
-  function handleSetDataSelecionada(novaData: string) {
+  // Filtra os agendamentos com useMemo para melhor desempenho
+  const agendamentosFiltrados = useMemo(() => {
+    const query = searchQuery.toLowerCase();
+    return agendamentos.filter(
+      (r) =>
+        r.cliente_nome?.toLowerCase().includes(query) ||
+        r.user?.nome.toLowerCase().includes(query)
+    );
+  }, [agendamentos, searchQuery]);
+
+  // Valida e altera a data selecionada
+  const handleSetDataSelecionada = (novaData: string) => {
     if (novaData < getCurrentDate()) {
       alert("Não é possível selecionar uma data passada.");
       return;
     }
     setDataSelecionada(novaData);
-  }
+  };
 
-  // A função de cálculo foi movida para o componente da tabela para maior clareza
+  // Confirma pagamento restante
   const confirmarPagamentoRestante = async (reservaId: number) => {
-    console.log(reservaId)
     try {
       await axiosPrivate.post(`/reservas/${reservaId}/confirmar-pagamento-restante`);
       setAgendamentos((prev) =>
@@ -96,35 +60,16 @@ export default function ActiveBookingsAdmin() {
     }
   };
 
+  // Cancela a reserva
   const cancelarReserva = async (reservaId: number) => {
     try {
-      await axiosPrivate.delete(`/reservas/${reservaId}/cancelar?reembolso=false`);
+      await axiosPrivate.post(`/reservas/${reservaId}/cancelar?reembolso=false`);
       setAgendamentos((prev) => prev.filter((r) => r.id !== reservaId));
       setModalCancelarOpen(false);
     } catch (err) {
       console.error("Erro ao cancelar reserva:", err);
     }
   };
-
-  useEffect(() => {
-    async function carregarAgendamentos() {
-      setIsLoading(true);
-      try {
-        const response = await axiosPrivate.get("/reservas/por-data", {
-          params: { data: dataSelecionada },
-        });
-        // Mapeia os dados do backend para a interface do frontend
-        const agendamentosFormatados = mapReservasFromBackend(response.data);
-        console.log("Agendamentos formatados:", agendamentosFormatados)
-        setAgendamentos(agendamentosFormatados);
-      } catch (error) {
-        console.error("Erro ao carregar agendamentos:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    carregarAgendamentos();
-  }, [dataSelecionada]);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#e6f4ff]">
@@ -135,6 +80,7 @@ export default function ActiveBookingsAdmin() {
           <h1 className="text-xl font-semibold text-azulBase mb-4">
             Agendamentos ativos
           </h1>
+
           {/* Filtros */}
           <div className="bg-gray-100/50 border border-black rounded-xl mb-6 py-4 flex items-center justify-between gap-6">
             <div className="flex items-center gap-4 pl-4">
@@ -157,19 +103,18 @@ export default function ActiveBookingsAdmin() {
               />
             </div>
           </div>
+
           {isLoading ? (
-            <p className="text-center text-gray-500">
-              Carregando agendamentos...
-            </p>
+            <p className="text-center text-gray-500">Carregando agendamentos...</p>
           ) : (
             <TableActiveBookings
               reservas={agendamentosFiltrados}
-              onReceberClick={(agendamento) => {
-                setAgendamentoSelecionado(agendamento);
+              onReceberClick={(reserva) => {
+                setAgendamentoSelecionado(reserva);
                 setModalRecebimentoOpen(true);
               }}
-              onCancelarClick={(agendamento) => {
-                setAgendamentoSelecionado(agendamento);
+              onCancelarClick={(reserva) => {
+                setAgendamentoSelecionado(reserva);
                 setModalCancelarOpen(true);
               }}
             />
@@ -177,6 +122,7 @@ export default function ActiveBookingsAdmin() {
         </main>
       </div>
       <FooterEuro />
+
       {/* Modais */}
       {agendamentoSelecionado && (
         <>
@@ -184,17 +130,13 @@ export default function ActiveBookingsAdmin() {
             isOpen={modalRecebimentoOpen}
             onClose={() => setModalRecebimentoOpen(false)}
             dados={agendamentoSelecionado}
-            onConfirmar={() => {
-              confirmarPagamentoRestante(agendamentoSelecionado.id);
-            }}
+            onConfirmar={() => confirmarPagamentoRestante(agendamentoSelecionado.id)}
           />
           <ModalCancelarAdmin
             isOpen={modalCancelarOpen}
             onClose={() => setModalCancelarOpen(false)}
             dados={agendamentoSelecionado}
-            onConfirmar={() => {
-              cancelarReserva(agendamentoSelecionado.id);
-            }}
+            onConfirmar={() => cancelarReserva(agendamentoSelecionado.id)}
           />
         </>
       )}

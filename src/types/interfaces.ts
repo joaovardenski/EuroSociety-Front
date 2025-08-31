@@ -95,3 +95,21 @@ export interface AgendaBloqueio {
   updatedAt: string;
   quadra?: Quadra;
 }
+
+export interface ReservaBackend {
+  id: number;
+  user?: Usuario | null;
+  user_id?: number | null;
+  quadra?: Quadra;
+  quadra_id: number;
+  tipo_reserva: string;
+  mensalidade_id?: number | null;
+  pagamento_id?: number | null;
+  pagamento_faltante: string;
+  data: string;
+  slot: string;
+  status: string;
+  cliente_nome?: string | null;
+  created_at: string;
+  updated_at: string;
+}
