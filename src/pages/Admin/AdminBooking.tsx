@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 
 // Utils
 import { getCurrentDate, gerarHorarioFim } from "../../utils/DateUtils";
@@ -18,7 +18,23 @@ import ModalConfirmarAdmin from "../../components/Modais/Admin/ModalConfirmarAdm
 import ModalAgendarAdmin from "../../components/Modais/Admin/ModalAgendarAdmin";
 import ModalAgendarOcupadoAdmin from "../../components/Modais/Admin/ModalAgendarOcupadoAdmin";
 import ModalDesbloquearAdmin from "../../components/Modais/Admin/ModalDesbloquearAdmin";
+
+// API
 import axiosPrivate from "../../api/axiosPrivate";
+
+// Types
+interface QuadraAPI {
+  id: number;
+  nome: string;
+  tipo?: string;
+  status?: string;
+  hora_abertura: string;
+  hora_fechamento: string;
+  preco_normal: string | number;
+  preco_noturno: string | number;
+  preco_normal_mensal: string | number;
+  preco_noturno_mensal: string | number;
+}
 
 type Quadra = {
   id: number;
@@ -37,15 +53,13 @@ type Indisponibilidade = { nome: string; indisponiveis: string[] };
 type Bloqueio = { nome: string; bloqueados: string[] };
 
 export default function AdminBooking() {
+  // ----------------- Estados -----------------
   const [tipoSelecionado, setTipoSelecionado] = useState("Todas");
   const [dataSelecionada, setDataSelecionada] = useState(getCurrentDate());
 
   const [quadras, setQuadras] = useState<Quadra[]>([]);
-  const [indisponibilidades, setIndisponibilidades] = useState<
-    Indisponibilidade[]
-  >([]);
+  const [indisponibilidades, setIndisponibilidades] = useState<Indisponibilidade[]>([]);
   const [bloqueios, setBloqueios] = useState<Bloqueio[]>([]);
-
   const [isLoading, setIsLoading] = useState(true);
 
   const [horarioSelecionado, setHorarioSelecionado] = useState({
@@ -55,17 +69,15 @@ export default function AdminBooking() {
     valor: 0,
   });
 
-  async function getQuadras(): Promise<Quadra[]> {
-    const token = localStorage.getItem("access_token");
+  const [modalConfirmarAberto, setModalConfirmarAberto] = useState(false);
+  const [modalAgendarAberto, setModalAgendarAberto] = useState(false);
+  const [modalAgendarOcupadoAberto, setModalAgendarOcupadoAberto] = useState(false);
+  const [modalDesbloquearAberto, setModalDesbloquearAberto] = useState(false);
 
-    const response = await axiosPrivate.get("/quadras", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    console.log("Resposta da API /quadras:", response.data);
-
-    // Adapta os nomes para o front
-    return response.data.data.map((q: any) => ({
+  // ----------------- API Helpers -----------------
+  const getQuadras = useCallback(async (): Promise<Quadra[]> => {
+    const response = await axiosPrivate.get("/quadras");
+    return response.data.data.map((q: QuadraAPI) => ({
       id: q.id,
       nome: q.nome,
       tipo: q.tipo || "",
@@ -77,253 +89,168 @@ export default function AdminBooking() {
       precoMensalNormal: Number(q.preco_normal_mensal),
       precoMensalNoturno: Number(q.preco_noturno_mensal),
     }));
-  }
-
-  async function getIndisponibilidades(): Promise<Indisponibilidade[]> {
-    const token = localStorage.getItem("access_token");
-    const response = await axiosPrivate.get("/reservas/indisponiveis", {
-      headers: { Authorization: `Bearer ${token}` },
-      params: { data: dataSelecionada },
-    });
-    console.log("Resposta da API /reservas/indisponiveis:", response.data);
-
-    return response.data as Indisponibilidade[];
-  }
-
-  async function getBloqueios(): Promise<Bloqueio[]> {
-    const token = localStorage.getItem("access_token");
-    const response = await axiosPrivate.get(
-      "/agenda-bloqueios/bloqueados-por-data",
-      {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { data: dataSelecionada }, // Passa a data selecionada como parâmetro
-      }
-    );
-    console.log(
-      "Resposta da API /agenda-bloqueios/bloqueados-por-data:",
-      response.data
-    );
-
-    return response.data as Bloqueio[];
-  }
-
-  // ----------------- Efeito de entrada ----------------- (Pega os dados iniciais e coloca no estado)
-  // ----------------- Efeito para carregar quadras apenas uma vez -----------------
-  useEffect(() => {
-    async function carregarQuadras() {
-      setIsLoading(true);
-      try {
-        const quadrasData = await getQuadras();
-        setQuadras(quadrasData);
-        const indisponiveisData = await getIndisponibilidades();
-        setIndisponibilidades(indisponiveisData);
-        const bloqueiosData = await getBloqueios();
-        setBloqueios(bloqueiosData);
-      } catch (error) {
-        console.error("Erro ao carregar quadras:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    carregarQuadras();
   }, []);
 
-  // Novo useEffect para carregar indisponibilidades E bloqueios quando a data muda.
-  useEffect(() => {
-    // Define the functions *inside* the useEffect
-    async function getBloqueios() {
-      const response = await axiosPrivate.get(
-        "/agenda-bloqueios/bloqueados-por-data",
-        {
-          params: { data: dataSelecionada },
-        }
-      );
-      return response.data as Bloqueio[];
-    }
-
-    async function getIndisponibilidades() {
-      const response = await axiosPrivate.get("/reservas/indisponiveis", {
-        params: { data: dataSelecionada },
-      });
-      return response.data as Indisponibilidade[];
-    }
-
-    async function carregarHorarios() {
-      setIsLoading(true);
-      try {
-        const indisponiveisData = await getIndisponibilidades();
-        setIndisponibilidades(indisponiveisData);
-
-        const bloqueiosData = await getBloqueios();
-        setBloqueios(bloqueiosData);
-      } catch (error) {
-        console.error("Erro ao carregar horários:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    carregarHorarios();
+  const getIndisponibilidades = useCallback(async (): Promise<Indisponibilidade[]> => {
+    const response = await axiosPrivate.get("/reservas/indisponiveis", {
+      params: { data: dataSelecionada },
+    });
+    return response.data ?? [];
   }, [dataSelecionada]);
 
+  const getBloqueios = useCallback(async (): Promise<Bloqueio[]> => {
+    const response = await axiosPrivate.get("/agenda-bloqueios/bloqueados-por-data", {
+      params: { data: dataSelecionada },
+    });
+    return response.data ?? [];
+  }, [dataSelecionada]);
+
+  // ----------------- Carregamento de dados -----------------
+  const carregarDados = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      if (!quadras.length) {
+        const quadrasData = await getQuadras();
+        setQuadras(quadrasData);
+      }
+      const [indisponiveisData, bloqueiosData] = await Promise.all([
+        getIndisponibilidades(),
+        getBloqueios(),
+      ]);
+      setIndisponibilidades(indisponiveisData);
+      setBloqueios(bloqueiosData);
+    } catch (error) {
+      console.error("Erro ao carregar dados:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [getQuadras, getIndisponibilidades, getBloqueios, quadras.length]);
+
+  useEffect(() => {
+    carregarDados();
+  }, [carregarDados]);
+
   // ----------------- Helpers -----------------
-  const getIndisponiveis = (nome: string) =>
-    indisponibilidades.find((q) => q.nome === nome)?.indisponiveis || [];
+  const getIndisponiveis = useCallback(
+    (nome: string) => indisponibilidades.find((q) => q.nome === nome)?.indisponiveis || [],
+    [indisponibilidades]
+  );
 
-  const getBloqueadas = (nome: string) =>
-    bloqueios.find((q) => q.nome === nome)?.bloqueados || [];
+  const getBloqueadas = useCallback(
+    (nome: string) => bloqueios.find((q) => q.nome === nome)?.bloqueados || [],
+    [bloqueios]
+  );
 
-  const calcularValor = (quadra: Quadra, horario: string) => {
+  const calcularValor = useCallback((quadra: Quadra, horario: string) => {
     const horaInt = parseInt(horario.split(":")[0], 10);
     return horaInt >= 18 ? quadra.precoNoturno : quadra.precoNormal;
-  };
+  }, []);
 
-  const [modalConfirmarAberto, setModalConfirmarAberto] = useState(false);
-  const [modalAgendarAberto, setModalAgendarAberto] = useState(false);
-  const [modalAgendarOcupadoAberto, setModalAgendarOcupadoAberto] =
-    useState(false);
-  const [modalDesbloquearAberto, setModalDesbloquearAberto] = useState(false);
+  const quadrasFiltradas = useMemo(
+    () =>
+      quadras.filter(
+        (quadra) =>
+          tipoSelecionado === "Todas" ||
+          quadra.tipo.toLowerCase() === tipoSelecionado.toLowerCase()
+      ),
+    [quadras, tipoSelecionado]
+  );
 
-  const handleHorarioClick = (
-    quadraId: number,
-    horario: string,
-    indisponivel: boolean,
-    bloqueado: boolean
-  ) => {
-    const quadraConfig = quadras.find((q) => q.id === quadraId);
-    if (!quadraConfig) return;
-
-    const valor = calcularValor(quadraConfig, horario);
-
-    setHorarioSelecionado({
-      quadra: quadraConfig.nome,
-      horario: `${horario} - ${gerarHorarioFim(horario)}`,
-      data: dataSelecionada,
-      valor,
-    });
-
-    if (indisponivel) {
-      setModalAgendarOcupadoAberto(true);
-    } else if (bloqueado) {
-      setModalDesbloquearAberto(true);
-    } else {
-      setModalConfirmarAberto(true);
-    }
-  };
-
-  function handleSetDataSelecionada(novaData: string) {
+  // ----------------- Handlers -----------------
+  const handleSetDataSelecionada = (novaData: string) => {
     if (novaData < getCurrentDate()) {
       alert("Não é possível selecionar uma data passada.");
       return;
     }
     setDataSelecionada(novaData);
-  }
+  };
 
-  async function bloquearHorario() {
-    const token = localStorage.getItem("access_token");
+  const handleHorarioClick = (quadraId: number, horario: string, indisponivel: boolean, bloqueado: boolean) => {
+    const quadra = quadras.find((q) => q.id === quadraId);
+    if (!quadra) return;
+
+    const valor = calcularValor(quadra, horario);
+
+    setHorarioSelecionado({
+      quadra: quadra.nome,
+      horario: `${horario} - ${gerarHorarioFim(horario)}`,
+      data: dataSelecionada,
+      valor,
+    });
+
+    if (indisponivel) setModalAgendarOcupadoAberto(true);
+    else if (bloqueado) setModalDesbloquearAberto(true);
+    else setModalConfirmarAberto(true);
+  };
+
+  const bloquearHorario = async () => {
     try {
-      console.log(
-        "Dados para bloqueio:",
-        quadras.find((q) => q.nome === horarioSelecionado.quadra)?.id,
-        horarioSelecionado.data,
-        horarioSelecionado.horario.split(" - ")[0]
-      );
-      await axiosPrivate.post(
-        "/agenda-bloqueios",
-        {
-          quadra_id: quadras.find((q) => q.nome === horarioSelecionado.quadra)
-            ?.id,
-          data: horarioSelecionado.data,
-          slot: horarioSelecionado.horario.split(" - ")[0], // pega só o início
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const quadraId = quadras.find((q) => q.nome === horarioSelecionado.quadra)?.id;
+      if (!quadraId) return;
+
+      await axiosPrivate.post("/agenda-bloqueios", {
+        quadra_id: quadraId,
+        data: horarioSelecionado.data,
+        slot: horarioSelecionado.horario.split(" - ")[0],
+      });
+
       alert("Horário bloqueado com sucesso!");
       setModalConfirmarAberto(false);
-      // Atualiza lista de bloqueios
       const bloqueiosData = await getBloqueios();
       setBloqueios(bloqueiosData);
     } catch (error) {
       console.error("Erro ao bloquear horário:", error);
       alert("Erro ao bloquear horário");
     }
-  }
+  };
 
-  async function desbloquearHorario() {
-    const token = localStorage.getItem("access_token");
+  const desbloquearHorario = async () => {
     try {
-      await axiosPrivate.delete("/agenda-bloqueios/desbloquear", {
-        headers: { Authorization: `Bearer ${token}` },
-        data: {
-          quadra_id: quadras.find((q) => q.nome === horarioSelecionado.quadra)
-            ?.id,
+      const quadraId = quadras.find((q) => q.nome === horarioSelecionado.quadra)?.id;
+      if (!quadraId) return;
+      console.log(quadraId);
+      console.log(horarioSelecionado.data)
+      console.log(horarioSelecionado.horario.split(" - ")[0])
+
+      await axiosPrivate.post("/agenda-bloqueios/desbloquear", {
+          quadra_id: quadraId,
           data: horarioSelecionado.data,
-          slot: horarioSelecionado.horario.split(" - ")[0], // pega só o início
-        },
+          slot: horarioSelecionado.horario.split(" - ")[0],
       });
+
       alert("Horário desbloqueado com sucesso!");
       setModalDesbloquearAberto(false);
-      // Atualiza lista de bloqueios
       const bloqueiosData = await getBloqueios();
       setBloqueios(bloqueiosData);
     } catch (error) {
       console.error("Erro ao desbloquear horário:", error);
       alert("Erro ao desbloquear horário");
     }
-  }
+  };
 
-  async function cancelarReserva() {
-    const token = localStorage.getItem("access_token");
+  const cancelarReserva = async () => {
     try {
-      const quadraId = quadras.find(
-        (q) => q.nome === horarioSelecionado.quadra
-      )?.id;
+      const quadraId = quadras.find((q) => q.nome === horarioSelecionado.quadra)?.id;
+      if (!quadraId) return;
 
       const response = await axiosPrivate.get("/reservas/por-horario", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
-          quadra_id: quadraId,
-          data: horarioSelecionado.data,
-          slot: horarioSelecionado.horario.split(" - ")[0],
-        },
+        params: { quadra_id: quadraId, data: horarioSelecionado.data, slot: horarioSelecionado.horario.split(" - ")[0] },
       });
 
-      console.log("Resposta getReservaPorHorario:", response.data);
       const reservaId = response.data.id;
-
-      const cancelResponse = await axiosPrivate.delete(
-        `/reservas/${reservaId}/cancelar`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { reembolso: false },
-        }
-      );
-
-      console.log("Resposta cancelarReserva:", cancelResponse.data);
+      await axiosPrivate.post(`/reservas/${reservaId}/cancelar`, { params: { reembolso: false } });
 
       alert("Reserva cancelada com sucesso!");
       setModalAgendarOcupadoAberto(false);
-
       const indisponiveisData = await getIndisponibilidades();
       setIndisponibilidades(indisponiveisData);
-    } catch (error: any) {
-      console.error(
-        "Erro ao cancelar reserva:",
-        error.response?.data || error.message
-      );
+    } catch (error) {
+      console.error("Erro ao cancelar reserva:", error);
       alert("Erro ao cancelar reserva");
     }
-  }
+  };
 
-  async function handleAgendarAdmin({
-    nome,
-    valor,
-  }: {
-    nome: string;
-    valor: number;
-  }) {
+  const handleAgendarAdmin = async ({ nome, valor }: { nome: string; valor: number }) => {
     try {
       const quadra = quadras.find((q) => q.nome === horarioSelecionado.quadra);
       if (!quadra) return;
@@ -339,20 +266,18 @@ export default function AdminBooking() {
 
       alert("Reserva agendada com sucesso!");
       setModalAgendarAberto(false);
-
-      // Atualiza lista de indisponibilidades
       const indisponiveisData = await getIndisponibilidades();
       setIndisponibilidades(indisponiveisData);
     } catch (error) {
       console.error(error);
       alert("Erro ao agendar reserva");
     }
-  }
+  };
 
+  // ----------------- JSX -----------------
   return (
     <div className="min-h-screen flex flex-col bg-[#e6f4ff]">
       <HeaderEuro />
-
       <div className="flex flex-1">
         <AdminSidebar />
 
@@ -364,46 +289,31 @@ export default function AdminBooking() {
               <h1 className="text-xl font-semibold text-azulBase mb-4">
                 Disponibilidade de quadras
               </h1>
+
               {/* Filtros */}
               <div className="bg-blue-100/50 border border-blue-400 rounded-xl p-4 mb-6 space-y-4 md:space-y-0 md:flex md:items-center md:justify-between md:gap-6">
-                <FiltroTipo
-                  tipoSelecionado={tipoSelecionado}
-                  setTipoSelecionado={setTipoSelecionado}
-                />
-                <FiltroData
-                  dataSelecionada={dataSelecionada}
-                  setDataSelecionada={handleSetDataSelecionada}
-                />
+                <FiltroTipo tipoSelecionado={tipoSelecionado} setTipoSelecionado={setTipoSelecionado} />
+                <FiltroData dataSelecionada={dataSelecionada} setDataSelecionada={handleSetDataSelecionada} />
               </div>
+
               <LegendaReservas />
+
               {/* Lista de quadras */}
               <div className="space-y-6">
-                {quadras
-                  .filter(
-                    (quadra) =>
-                      tipoSelecionado === "Todas" ||
-                      quadra.tipo.toLowerCase() ===
-                        tipoSelecionado.toLowerCase()
-                  )
-                  .map((quadra) => (
-                    <AvailableCourts
-                      key={quadra.id}
-                      nome={quadra.nome}
-                      horaAbertura={quadra.horaAbertura}
-                      horaFechamento={quadra.horaFechamento}
-                      indisponiveis={getIndisponiveis(quadra.nome)}
-                      bloqueados={getBloqueadas(quadra.nome)}
-                      onHorarioClick={(horario, indisponivel, bloqueado) =>
-                        handleHorarioClick(
-                          quadra.id,
-                          horario,
-                          indisponivel,
-                          bloqueado
-                        )
-                      }
-                      isAdmin={true}
-                    />
-                  ))}
+                {quadrasFiltradas.map((quadra) => (
+                  <AvailableCourts
+                    key={quadra.id}
+                    nome={quadra.nome}
+                    horaAbertura={quadra.horaAbertura}
+                    horaFechamento={quadra.horaFechamento}
+                    indisponiveis={getIndisponiveis(quadra.nome)}
+                    bloqueados={getBloqueadas(quadra.nome)}
+                    onHorarioClick={(horario, indisponivel, bloqueado) =>
+                      handleHorarioClick(quadra.id, horario, indisponivel, bloqueado)
+                    }
+                    isAdmin={true}
+                  />
+                ))}
               </div>
             </>
           )}
