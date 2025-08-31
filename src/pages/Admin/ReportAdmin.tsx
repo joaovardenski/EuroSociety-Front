@@ -1,117 +1,88 @@
-import { useEffect, useState } from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
-  LineChart,
-  Line,
-  Legend,
-} from "recharts";
-
+import { useEffect, useState, useCallback } from "react";
 import HeaderEuro from "../../components/Layout/HeaderEuro";
 import FooterEuro from "../../components/Layout/FooterEuro";
 import AdminSidebar from "../../components/Navigation/AdminSidebar";
 import axiosPrivate from "../../api/axiosPrivate";
+import RelatorioFiltros from "../../components/Report/RelatorioFiltro";
+import ReceitaGrafico from "../../components/Report/ReceitaGrafico";
+import OcupacaoGrafico from "../../components/Report/OcupacaoGrafico";
 
-type Receita = {
-  mes: string;
-  valor: number;
-};
-
-type Ocupacao = {
-  quadra: string;
-  usos: number;
-};
+export type Receita = { mes: string; valor: number };
+export type Ocupacao = { quadra: string; usos: number };
 
 export default function ReportAdmin() {
+  // ------------------ ESTADOS ------------------
   const [tipoRelatorio, setTipoRelatorio] = useState("financeiro");
   const [dataInicio, setDataInicio] = useState("2025-01-01");
   const [dataFim, setDataFim] = useState("2025-12-31");
-  const [loading, setLoading] = useState(false);
-
   const [anoReceita, setAnoReceita] = useState(new Date().getFullYear());
   const [mesOcupacao, setMesOcupacao] = useState(new Date().getMonth() + 1);
 
+  const [loadingPDF, setLoadingPDF] = useState(false);
   const [receitaDados, setReceitaDados] = useState<Receita[]>([]);
-  const [ocupacaoQuadras, setOcupacaoQuadras] = useState<Ocupacao[]>([]);
+  const [ocupacaoDados, setOcupacaoDados] = useState<Ocupacao[]>([]);
 
-  async function getReceitaMensal(): Promise<Receita[]> {
+  // ------------------ FUNÇÕES DE FETCH ------------------
+  const fetchReceita = useCallback(async (ano: number) => {
     try {
-      const response = await axiosPrivate.get(
-        `/admin/report/receitaMensal?year=${anoReceita}`
+      const res = await axiosPrivate.get(
+        `/admin/report/receitaMensal?year=${ano}`
       );
-      return response.data.report as Receita[];
-    } catch (error) {
-      console.error("Erro ao buscar receita mensal:", error);
-      return [];
+      setReceitaDados(res.data.report);
+    } catch (err) {
+      console.error("Erro ao buscar receita mensal:", err);
+      setReceitaDados([]);
     }
-  }
+  }, []);
 
-  async function getOcupacao(): Promise<Ocupacao[]> {
+  const fetchOcupacao = useCallback(async (ano: number, mes: number) => {
     try {
-      console.log(`Requisição: /admin/report/ocupacaoQuadras?year=${new Date().getFullYear()}&month=${mesOcupacao}`);
-      const response = await axiosPrivate.get(
-        `/admin/report/ocupacaoQuadras?year=${new Date().getFullYear()}&month=${mesOcupacao}`
+      const res = await axiosPrivate.get(
+        `/admin/report/ocupacaoQuadras?year=${ano}&month=${mes}`
       );
-      return response.data.report as Ocupacao[];
-    } catch (error) {
-      console.error("Erro ao buscar ocupação por quadra:", error);
-      return [];
+      setOcupacaoDados(res.data.report);
+    } catch (err) {
+      console.error("Erro ao buscar ocupação por quadra:", err);
+      setOcupacaoDados([]);
     }
-  }
+  }, []);
 
-  async function gerarRelatorio() {
-    setLoading(true);
+  // ------------------ EFEITOS ------------------
+  useEffect(() => {
+    fetchReceita(anoReceita);
+  }, [anoReceita, fetchReceita]);
 
+  useEffect(() => {
+    fetchOcupacao(new Date().getFullYear(), mesOcupacao);
+  }, [mesOcupacao, fetchOcupacao]);
+
+  // ------------------ GERAÇÃO DE PDF ------------------
+  const gerarRelatorio = async () => {
+    setLoadingPDF(true);
     try {
-      const params = {
-        tipo_relatorio: tipoRelatorio,
-        data_inicio: dataInicio,
-        data_fim: dataFim,
-      };
-
-      const response = await axiosPrivate.get("/admin/report/generate", {
-        params,
+      const res = await axiosPrivate.get("/admin/report/generate", {
+        params: {
+          tipo_relatorio: tipoRelatorio,
+          data_inicio: dataInicio,
+          data_fim: dataFim,
+        },
         responseType: "blob",
       });
 
-      const blob = new Blob([response.data], { type: "application/pdf" });
-      const url = window.URL.createObjectURL(blob);
-
+      const url = window.URL.createObjectURL(
+        new Blob([res.data], { type: "application/pdf" })
+      );
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", `relatorio_${tipoRelatorio}.pdf`);
-      document.body.appendChild(link);
+      link.download = `relatorio_${tipoRelatorio}.pdf`;
       link.click();
-
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url); // libera memória
-    } catch (error) {
-      console.error("Erro ao gerar relatório:", error);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Erro ao gerar relatório:", err);
     } finally {
-      setLoading(false);
+      setLoadingPDF(false);
     }
-  }
-
-  useEffect(() => {
-    async function carregarDadosRelatorios() {
-      try {
-        const receitaApi = await getReceitaMensal();
-        const ocupacaoApi = await getOcupacao();
-
-        setReceitaDados(receitaApi);
-        setOcupacaoQuadras(ocupacaoApi);
-      } catch (error) {
-        console.error("Erro ao carregar dados:", error);
-      }
-    }
-
-    carregarDadosRelatorios();
-  }, [anoReceita, mesOcupacao]);
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-[#e6f4ff]">
@@ -119,143 +90,44 @@ export default function ReportAdmin() {
 
       <div className="flex flex-1">
         <AdminSidebar />
-
-        <main className="flex-1 p-8 overflow-y-auto max-h-130">
+        <main className="flex-1 p-8 overflow-y-auto">
           <h1 className="text-2xl font-semibold text-azulBase mb-8">
             Relatórios e Métricas
           </h1>
 
-          {/* Card de filtros */}
-          <div className="bg-white p-6 rounded-xl shadow-md mb-8 flex flex-col md:flex-row md:items-center gap-6">
-            <div className="flex flex-col">
-              <label className="text-gray-700 font-medium mb-1">
-                Tipo de relatório
-              </label>
-              <select
-                className="border border-gray-300 rounded-md px-4 py-2"
-                onChange={(e) => setTipoRelatorio(e.target.value)}
-                value={tipoRelatorio}
-              >
-                <option value="financeiro">Financeiro</option>
-                <option value="ocupacao">Ocupação</option>
-              </select>
-            </div>
+          {/* ---------------- FILTROS ---------------- */}
+          <RelatorioFiltros
+            filtros={{
+              tipoRelatorio: tipoRelatorio,
+              dataInicio: dataInicio,
+              dataFim: dataFim,
+            }}
+            setFiltros={(novos) => {
+              if (novos.tipoRelatorio !== undefined)
+                setTipoRelatorio(novos.tipoRelatorio);
+              if (novos.dataInicio !== undefined)
+                setDataInicio(novos.dataInicio);
+              if (novos.dataFim !== undefined) setDataFim(novos.dataFim);
+            }}
+            onGerar={gerarRelatorio}
+            loading={loadingPDF}
+          />
 
-            <div className="flex flex-col">
-              <label className="text-gray-700 font-medium mb-1">
-                Data início
-              </label>
-              <input
-                type="date"
-                className="border border-gray-300 rounded-md px-4 py-2"
-                value={dataInicio}
-                onChange={(e) => setDataInicio(e.target.value)}
-              />
-            </div>
-
-            <div className="flex flex-col">
-              <label className="text-gray-700 font-medium mb-1">Data fim</label>
-              <input
-                type="date"
-                className="border border-gray-300 rounded-md px-4 py-2"
-                value={dataFim}
-                onChange={(e) => setDataFim(e.target.value)}
-              />
-            </div>
-
-            <div className="mt-4 md:mt-6">
-              <button
-                onClick={gerarRelatorio}
-                disabled={loading}
-                className="bg-[#2b4363] text-white px-6 py-2 rounded-md font-medium hover:bg-[#1f324b] transition"
-              >
-                {loading ? "Gerando..." : "Gerar"}
-              </button>
-            </div>
-          </div>
-
-          {/* Gráficos */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-2">
-            <div className="bg-white p-6 rounded-xl shadow-md">
-              <div className="flex justify-between">
-                <h2 className="text-lg font-semibold text-azulBase mb-4">
-                  Receita por período
-                </h2>
-                <div className="mb-4">
-                  <label className="text-gray-700 font-medium mr-2">
-                    Ano da Receita:
-                  </label>
-                  <select
-                    value={anoReceita}
-                    onChange={(e) => setAnoReceita(Number(e.target.value))}
-                    className="border px-2 py-1 rounded-md"
-                  >
-                    {[2023, 2024, 2025].map((year) => (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <ResponsiveContainer width="100%" height={250}>
-                <LineChart data={receitaDados}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="mes" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="valor"
-                    stroke="#2b4363"
-                    name="Receita (R$)"
-                    strokeWidth={3}
-                    activeDot={{ r: 6 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-md">
-              <div className="flex justify-between">
-                <h2 className="text-lg font-semibold text-azulBase mb-4">
-                  Ocupação por quadra
-                </h2>
-                <div className="mb-4">
-                  <label className="text-gray-700 font-medium mr-2">
-                    Mês da Ocupação:
-                  </label>
-                  <select
-                    value={mesOcupacao}
-                    onChange={(e) => setMesOcupacao(Number(e.target.value))}
-                    className="border px-2 py-1 rounded-md"
-                  >
-                    {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                      <option key={m} value={m}>
-                        {new Date(0, m - 1).toLocaleString("pt-BR", {
-                          month: "long",
-                        })}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={ocupacaoQuadras}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="quadra" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="usos" fill="#3182ce" name="Agendamentos" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+          {/* ---------------- GRÁFICOS ---------------- */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <ReceitaGrafico
+              dados={receitaDados}
+              ano={anoReceita}
+              setAno={setAnoReceita}
+            />
+            <OcupacaoGrafico
+              dados={ocupacaoDados}
+              mes={mesOcupacao}
+              setMes={setMesOcupacao}
+            />
           </div>
         </main>
       </div>
-
       <FooterEuro />
     </div>
   );

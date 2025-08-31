@@ -17,7 +17,7 @@ export default function ModalRecebimentoAdmin({
   onConfirmar,
 }: ModalRecebimentoAdminProps) {
   // Garantindo valores válidos
-  const clienteNome = dados.clienteNome ?? dados.user?.nome ?? "Cliente não informado";
+  const clienteNome = dados.cliente_nome ?? dados.user?.nome ?? "Cliente não informado";
   const quadraNome = dados.quadra?.nome ?? "Quadra não informada";
   const slot = dados.slot ?? "-";
   const dataFormatada = dados.data ? formatarDataIso(dados.data) : "-";

@@ -16,7 +16,7 @@ export default function ModalCancelarAdmin({
   dados,
   onConfirmar,
 }: ModalCancelarAdminProps) {
-  const nomeCliente = dados.clienteNome ?? dados.user?.nome ?? "Cliente não informado";
+  const nomeCliente = dados.cliente_nome ?? dados.user?.nome ?? "Cliente não informado";
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>

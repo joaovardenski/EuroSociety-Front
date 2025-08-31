@@ -29,7 +29,7 @@ export default function TableActiveBookings({
         <tbody>
           {reservas.map((r) => (
             <tr key={r.id} className="border-t border-gray-200">
-              <td className="px-4 py-2">{r.user ? getNomeCondensado(r.user.nome)  : getNomeCondensado(r.clienteNome)}</td>
+              <td className="px-4 py-2">{r.user ? getNomeCondensado(r.user.nome)  : getNomeCondensado(r.cliente_nome)}</td>
               <td className="px-4 py-2">{r.quadra?.nome}</td>
               <td className="px-4 py-2">{`${formatarDataIso(r.data)} às ${r.slot}`}</td>
               <td className="px-4 py-2">

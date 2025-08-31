@@ -67,7 +67,7 @@ export default function ActiveBookingsAdmin() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const agendamentosFiltrados = agendamentos.filter((reserva) =>
-    reserva.clienteNome?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false
+    reserva.cliente_nome?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false
   );
 
   function handleSetDataSelecionada(novaData: string) {
