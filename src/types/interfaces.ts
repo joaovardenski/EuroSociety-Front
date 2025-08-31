@@ -61,7 +61,7 @@ export interface Reserva {
   data: string;
   slot: string;
   status: string;
-  clienteNome?: string | null;   // 'cliente_nome'
+  cliente_nome?: string | null;   // 'cliente_nome'
   createdAt: string;
   updatedAt: string;
   // Relacionamentos opcionais
