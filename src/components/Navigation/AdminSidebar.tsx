@@ -1,4 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
+import axiosPrivate from "../../api/axiosPrivate";
+import { AxiosError } from "axios";
 
 import {
   LayoutDashboard,
@@ -11,13 +13,23 @@ import {
 
 export default function AdminSidebar() {
   const location = useLocation();
-  const isActive = (path: string) => location.pathname === path;
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    // Implement logout logic here
-    console.log("Logout clicked");
-    navigate("/");
+  const isActive = (path: string) => location.pathname === path;
+
+  const handleLogout = async () => {
+    try {
+      await axiosPrivate.post("/logout");
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("user_nome");
+      navigate("/");
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      console.error(
+        "Erro ao fazer logout:",
+        err.response?.data?.message || err.message
+      );
+    }
   };
 
   return (
@@ -80,8 +92,10 @@ export default function AdminSidebar() {
           </a>
         </nav>
       </div>
+
       <button
-        onClick={handleLogout} className="flex gap-2 justify-center hover:text-red-500 px-4 py-4 border-t border-white"
+        onClick={handleLogout}
+        className="flex gap-2 justify-center hover:text-red-500 px-4 py-4 border-t border-white"
       >
         <LogOut /> Sair
       </button>

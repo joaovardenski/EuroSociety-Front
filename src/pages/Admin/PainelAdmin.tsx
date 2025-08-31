@@ -6,9 +6,17 @@ import AdminSidebar from "../../components/Navigation/AdminSidebar";
 import TableRecentBookings from "../../components/Reservas/TableRecentBookings";
 import StatisticCard from "../../components/StatisticCard";
 import LoadingMessage from "../../components/LoadingMessage";
+import { useEffect } from "react";
 import { useDashboardAdminData } from "../../hooks/useDashboardAdminData";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function PainelAdmin() {
+  const auth = useAuth();
+    useEffect(() => {
+      if (auth.user?.nome) {
+        localStorage.setItem("user_nome", auth.user.nome);
+      }
+    }, [auth.user?.nome]);
   const { data, loading } = useDashboardAdminData();
 
   const estatisticas = [

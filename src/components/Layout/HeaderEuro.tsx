@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { UserCircle, LogOut } from "lucide-react";
 import euroLogoWhite from "../../assets/euroSocietyWhite.png";
 import { getNomeCondensado } from "../../utils/NameUtils";
+import axiosPrivate from "../../api/axiosPrivate";
+import { AxiosError } from "axios";
 
 export default function HeaderEuro() {
   const navigate = useNavigate();
@@ -13,11 +15,20 @@ export default function HeaderEuro() {
     setMenuOpen(!menuOpen);
   }
 
-  function handleLogout() {
-    navigate("/");
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("user_nome");
-  }
+  const handleLogout = async () => {
+    try {
+      await axiosPrivate.post("/logout");
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("user_nome");
+      navigate("/");
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      console.error(
+        "Erro ao fazer logout:",
+        err.response?.data?.message || err.message
+      );
+    }
+  };
 
   return (
     <header className="bg-azulBase text-white flex items-center justify-center  px-6 py-2 shadow-md md:justify-between">
