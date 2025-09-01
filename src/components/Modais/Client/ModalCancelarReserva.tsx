@@ -1,5 +1,6 @@
-import { Calendar, Clock, XCircle, ArrowLeft } from "lucide-react";
+import { Calendar, Clock, XCircle, ArrowLeft, Loader2 } from "lucide-react";
 import { formatarDataIso } from "../../../utils/DateUtils";
+import { useState } from "react";
 
 interface ModalCancelarReservaProps {
   quadra: string | undefined;
@@ -7,7 +8,7 @@ interface ModalCancelarReservaProps {
   horario: string;
   podeReembolso: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: () => Promise<void>; // agora espera Promise
 }
 
 export default function ModalCancelarReserva({
@@ -18,6 +19,19 @@ export default function ModalCancelarReserva({
   onClose,
   onConfirm,
 }: ModalCancelarReservaProps) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleConfirm = async () => {
+    setIsLoading(true);
+    try {
+      await onConfirm();
+    } catch (error) {
+      console.error("Erro ao cancelar a reserva:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="text-center space-y-5 p-4">
       {/* Ícone de destaque */}
@@ -63,14 +77,28 @@ export default function ModalCancelarReserva({
         <button
           className="text-sm min-w-[175px] bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 flex items-center justify-center gap-2 font-medium shadow-md transition"
           onClick={onClose}
+          disabled={isLoading}
         >
           <ArrowLeft size={18} /> Voltar
         </button>
         <button
-          className="text-sm min-w-[175px] bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center justify-center gap-2 font-medium shadow-md transition"
-          onClick={onConfirm}
+          className={`text-sm min-w-[175px] px-4 py-2 rounded-lg flex items-center justify-center gap-2 font-medium shadow-md transition ${
+            isLoading
+              ? "bg-gray-400 cursor-not-allowed text-white"
+              : "bg-red-600 hover:bg-red-700 text-white"
+          }`}
+          onClick={handleConfirm}
+          disabled={isLoading}
         >
-          <XCircle size={18} /> Confirmar
+          {isLoading ? (
+            <>
+              <Loader2 size={18} className="animate-spin" /> Cancelando...
+            </>
+          ) : (
+            <>
+              <XCircle size={18} /> Confirmar
+            </>
+          )}
         </button>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import axiosPrivate from "../../api/axiosPrivate";
 import { AxiosError } from "axios";
+import { useState } from "react";
 
 import {
   LayoutDashboard,
@@ -9,15 +10,18 @@ import {
   ChartNoAxesCombined,
   Waypoints,
   LogOut,
+  Loader2,
 } from "lucide-react";
 
 export default function AdminSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [isLogout, setIsLogout] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
 
   const handleLogout = async () => {
+    setIsLogout(true);
     try {
       await axiosPrivate.post("/logout");
       localStorage.removeItem("access_token");
@@ -29,6 +33,8 @@ export default function AdminSidebar() {
         "Erro ao fazer logout:",
         err.response?.data?.message || err.message
       );
+    } finally {
+      setIsLogout(false);
     }
   };
 
@@ -95,9 +101,20 @@ export default function AdminSidebar() {
 
       <button
         onClick={handleLogout}
-        className="flex gap-2 justify-center hover:text-red-500 px-4 py-4 border-t border-white"
+        disabled={isLogout}
+        className="flex gap-2 justify-center hover:text-red-500 px-4 py-4 border-t border-white disabled:opacity-60"
       >
-        <LogOut /> Sair
+        {isLogout ? (
+          <>
+            <Loader2 size={20} className="animate-spin" />
+            Saindo...
+          </>
+        ) : (
+          <>
+            <LogOut />
+            Sair
+          </>
+        )}
       </button>
     </aside>
   );

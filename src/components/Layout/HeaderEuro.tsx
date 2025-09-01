@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { UserCircle, LogOut } from "lucide-react";
+import { UserCircle, LogOut, Loader2 } from "lucide-react";
 import euroLogoWhite from "../../assets/euroSocietyWhite.png";
 import { getNomeCondensado } from "../../utils/NameUtils";
 import axiosPrivate from "../../api/axiosPrivate";
@@ -10,12 +10,14 @@ export default function HeaderEuro() {
   const navigate = useNavigate();
   const user = localStorage.getItem("user_nome");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isLogout, setIsLogout] = useState(false);
 
   function toggleMenu() {
     setMenuOpen(!menuOpen);
   }
 
   const handleLogout = async () => {
+    setIsLogout(true); // ativa o loading
     try {
       await axiosPrivate.post("/logout");
       localStorage.removeItem("access_token");
@@ -27,6 +29,8 @@ export default function HeaderEuro() {
         "Erro ao fazer logout:",
         err.response?.data?.message || err.message
       );
+    } finally {
+      setIsLogout(false); // desativa o loading se algo falhar
     }
   };
 
@@ -48,10 +52,15 @@ export default function HeaderEuro() {
           <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-md z-10 text-black">
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 w-full px-4 py-2 hover:bg-gray-100"
+              disabled={isLogout}
+              className="flex items-center gap-2 w-full px-4 py-2 hover:bg-gray-100 disabled:opacity-60"
             >
-              <LogOut size={18} />
-              Sair
+              {isLogout ? (
+                <Loader2 size={18} className="animate-spin" />
+              ) : (
+                <LogOut size={18} />
+              )}
+              {isLogout ? "Saindo..." : "Sair"}
             </button>
           </div>
         )}

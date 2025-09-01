@@ -1,15 +1,18 @@
 import { useNavigate, useLocation } from "react-router-dom";
-
-import { Home, Calendar, ClipboardList, LogOut } from "lucide-react";
+import { useState } from "react";
+import { Home, Calendar, ClipboardList, LogOut, Loader2 } from "lucide-react";
 import axiosPrivate from "../../api/axiosPrivate";
 import { AxiosError } from "axios";
 
 export default function BottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isLogout, setIsLogout] = useState(false);
+
   const isActive = (path: string) => location.pathname === path;
 
   const handleLogout = async () => {
+    setIsLogout(true);
     try {
       await axiosPrivate.post("/logout");
       localStorage.removeItem("access_token");
@@ -21,6 +24,8 @@ export default function BottomNav() {
         "Erro ao fazer logout:",
         err.response?.data?.message || err.message
       );
+    } finally {
+      setIsLogout(false);
     }
   };
 
@@ -57,11 +62,21 @@ export default function BottomNav() {
       </button>
 
       <button
-        onClick={() => handleLogout()}
-        className={`flex flex-col items-center text-red-500/90`}
+        onClick={handleLogout}
+        disabled={isLogout}
+        className="flex flex-col items-center text-red-500/90 disabled:opacity-60"
       >
-        <LogOut size={22} />
-        <span className="text-xs">Sair</span>
+        {isLogout ? (
+          <>
+            <Loader2 size={22} className="animate-spin" />
+            <span className="text-xs">Saindo...</span>
+          </>
+        ) : (
+          <>
+            <LogOut size={22} />
+            <span className="text-xs">Sair</span>
+          </>
+        )}
       </button>
     </nav>
   );

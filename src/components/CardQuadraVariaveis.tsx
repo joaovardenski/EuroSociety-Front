@@ -117,8 +117,8 @@ export default function CardQuadra({
         <button
           onClick={handleSave}
           disabled={isLoading} // Desabilita o botão durante o carregamento
-          className={`mt-4 w-full text-white px-4 py-2 rounded-md transition ${
-            isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-[#2b4363] hover:bg-[#1f324b]"
+          className={`mt-4 w-full text-white px-4 py-2 rounded-lg transition ${
+            isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-azulBase hover:bg-[#0f3c76]"
           }`}
         >
           {isLoading ? (
