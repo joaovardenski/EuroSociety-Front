@@ -1,13 +1,32 @@
 // src/pages/ResultadoPagamento.tsx
 import { useSearchParams } from "react-router-dom";
 import { CheckCircle, XCircle, Clock } from "lucide-react";
+import { useEffect, useState } from "react";
+import axiosPrivate from "../../api/axiosPrivate";
 
 export default function ResultadoPagamento() {
   const [searchParams] = useSearchParams();
-
-  const status = searchParams.get("status"); // approved, pending, rejected
+  const paymentId = searchParams.get("payment_id");
   const externalReference = searchParams.get("external_reference");
   const preferenceId = searchParams.get("preference_id");
+
+  const [status, setStatus] = useState<string | null>(
+    searchParams.get("status")
+  );
+
+  useEffect(() => {
+    if (paymentId) {
+      axiosPrivate.get(`/mercado-pago/${paymentId}/getPayment`)
+        .then((res) => {
+          if (res.data.success) {
+            setStatus(res.data.payment.status);
+          }
+        })
+        .catch((err) => {
+          console.error("Erro ao buscar pagamento:", err);
+        });
+    }
+  }, [paymentId]);
 
   // Define mensagem, cor e ícone baseado no status
   let mensagem = "";
@@ -26,7 +45,6 @@ export default function ResultadoPagamento() {
       color = "text-yellow-500";
       break;
     case "rejected":
-    case "null":
       mensagem = "Pagamento rejeitado. Tente novamente.";
       Icon = XCircle;
       color = "text-red-500";
@@ -58,6 +76,11 @@ export default function ResultadoPagamento() {
             <p>
               <span className="font-semibold">Preference ID:</span>{" "}
               {preferenceId}
+            </p>
+          )}
+          {paymentId && (
+            <p>
+              <span className="font-semibold">Payment ID:</span> {paymentId}
             </p>
           )}
         </div>
