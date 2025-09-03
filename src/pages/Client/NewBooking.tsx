@@ -309,17 +309,11 @@ export default function NewBooking() {
 
       const reservaId = reservaResponse.data.id;
 
-      const nomes = (user.nome ?? "").trim().split(" ");
-      const firstName = nomes[0] || "";
-      const lastName = nomes.slice(1).join(" ") || "";
-
       const pagamentoResponse = await axiosPrivate.post<PreferenceResponse>(
         "/mercado-pago/pagar",
         {
           reserva_id: reservaId,
           quantidade_pagamento,
-          user_first_name: firstName,
-          user_last_name: lastName,
         }
       );
 
