@@ -97,7 +97,7 @@ export default function MyBookings() {
     try {
       await cancelarMinhaReserva(
         reservaSelecionada.id,
-        false // Alterar reembolso
+        reservaSelecionada.podeReembolso,
       );
       setReservas((prev) => prev.filter((r) => r.id !== reservaSelecionada.id));
     } catch (error) {
