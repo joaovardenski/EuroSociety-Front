@@ -20,7 +20,7 @@ interface ModalDetalhesPagamentoProps {
     valor: number;
   };
   mensalistaDisponivel: boolean;
-  onConfirmarPagamento: (valorPago: number, mensalista: boolean) => void;
+  onConfirmarPagamento: (valorPago: number, mensalista: boolean) => Promise<void>;
 }
 
 export default function ModalDetalhesPagamento({
@@ -33,6 +33,7 @@ export default function ModalDetalhesPagamento({
   const [mensalista, setMensalista] = useState(false);
   const [percentual, setPercentual] = useState(50);
   const [valorPago, setValorPago] = useState(dados.valor * (percentual / 100));
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (mensalista && dados.quadra) {
@@ -41,6 +42,15 @@ export default function ModalDetalhesPagamento({
       setValorPago((dados.valor * percentual) / 100);
     }
   }, [mensalista, percentual, dados]);
+
+  const handlePagamento = async () => {
+    setLoading(true);
+    try {
+      await onConfirmarPagamento(valorPago, mensalista);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -144,11 +154,39 @@ export default function ModalDetalhesPagamento({
 
       {/* Botão de pagar */}
       <button
-        onClick={() => onConfirmarPagamento(valorPago, mensalista)}
-        className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-md font-semibold transition flex items-center justify-center gap-1"
+        onClick={handlePagamento}
+        disabled={loading}
+        className={`w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-md font-semibold transition flex items-center justify-center gap-2 ${
+          loading ? "opacity-50 cursor-not-allowed" : ""
+        }`}
       >
-        <DollarSign size={18} />
-        Pagar R$ {valorPago.toFixed(2)}
+        {loading ? (
+          <svg
+            className="animate-spin h-5 w-5 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v8H4z"
+            ></path>
+          </svg>
+        ) : (
+          <>
+            <DollarSign size={18} />
+            Pagar R$ {valorPago.toFixed(2)}
+          </>
+        )}
       </button>
     </Modal>
   );

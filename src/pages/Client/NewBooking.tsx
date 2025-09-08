@@ -295,29 +295,28 @@ export default function NewBooking() {
     }
 
     try {
-      const reservaResponse = await axiosPrivate.post<ReservaPendente | ReservaPendente[]>(
-        "/reservas",
-        {
-          user_id: user.id,
-          quadra_id: quadra.id,
-          data,
-          slot: horario.split(" - ")[0],
-          valor: mensalista? quantidade_pagamento : valor,
-          tipo_reserva: mensalista ? "mensal" : "unica",
-        }
-      );
+      const reservaResponse = await axiosPrivate.post<
+        ReservaPendente | ReservaPendente[]
+      >("/reservas", {
+        user_id: user.id,
+        quadra_id: quadra.id,
+        data,
+        slot: horario.split(" - ")[0],
+        valor: mensalista ? quantidade_pagamento : valor,
+        tipo_reserva: mensalista ? "mensal" : "unica",
+      });
 
       const reservaId = mensalista
-      ? (reservaResponse.data as ReservaPendente[])[0].id
-      : (reservaResponse.data as ReservaPendente).id;
+        ? (reservaResponse.data as ReservaPendente[])[0].id
+        : (reservaResponse.data as ReservaPendente).id;
 
-    const pagamentoResponse = await axiosPrivate.post<PreferenceResponse>(
-      "/mercado-pago/pagar",
-      {
-        reserva_id: reservaId,
-        quantidade_pagamento,
-      }
-    );
+      const pagamentoResponse = await axiosPrivate.post<PreferenceResponse>(
+        "/mercado-pago/pagar",
+        {
+          reserva_id: reservaId,
+          quantidade_pagamento,
+        }
+      );
 
       window.location.href = pagamentoResponse.data.init_point;
     } catch (error) {
@@ -427,8 +426,8 @@ export default function NewBooking() {
           onClose={() => setModalAtivo(null)}
           dados={horarioSelecionado}
           mensalistaDisponivel={horarioSelecionado.mensalistaDisponivel}
-          onConfirmarPagamento={(valorPago, mensalista) => {
-            handleConfirmarPagamento(
+          onConfirmarPagamento={async (valorPago, mensalista) => {
+            await handleConfirmarPagamento(
               horarioSelecionado.quadra,
               horarioSelecionado.horario,
               horarioSelecionado.data,
