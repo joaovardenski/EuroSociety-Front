@@ -111,19 +111,21 @@ export default function MyBookings() {
 
   // Determina se a reserva ainda pode ter reembolso
   function podeTerReembolso(reserva: Reserva): boolean {
-    const [horaInicio] = reserva.slot.split(" - ");
-    const [hora, minuto] = horaInicio.split(":").map(Number);
-    const [ano, mes, dia] = reserva.data.split("T")[0].split("-").map(Number);
-    const dataHoraReserva = new Date(ano, mes - 1, dia, hora, minuto);
-
-    const diffMilissegundos = dataHoraReserva.getTime() - Date.now();
-    const seteHorasMilissegundos = 7 * 60 * 60 * 1000;
-
-    return (
-      diffMilissegundos > seteHorasMilissegundos &&
-      reserva.status.toLowerCase() === "confirmada"
-    );
+  // Apenas reservas confirmadas e do tipo "unica" podem ter reembolso
+  if (reserva.status.toLowerCase() !== "confirmada" || reserva.tipoReserva !== "unica") {
+    return false;
   }
+
+  const [horaInicio] = reserva.slot.split(" - ");
+  const [hora, minuto] = horaInicio.split(":").map(Number);
+  const [ano, mes, dia] = reserva.data.split("T")[0].split("-").map(Number);
+  const dataHoraReserva = new Date(ano, mes - 1, dia, hora, minuto);
+
+  const diffMilissegundos = dataHoraReserva.getTime() - Date.now();
+  const seteHorasMilissegundos = 7 * 60 * 60 * 1000;
+
+  return diffMilissegundos > seteHorasMilissegundos;
+}
 
   // -----------------------
   // Hooks
