@@ -21,7 +21,7 @@ import LoadingMessage from "../../components/LoadingMessage";
 // Modals
 import ModalConfirmarAgendamento from "../../components/Modais/Client/ModalConfirmarAgendamento";
 import ModalDetalhesPagamento from "../../components/Modais/Client/ModalDetalhesPagamento";
-import ModalFilaDeEspera from "../../components/Modais/Client/ModalFilaDeEspera";
+import ModalListaDeEspera from "../../components/Modais/Client/ModalListaDeEspera";
 
 // Hooks
 import { useAuth } from "../../hooks/useAuth";
@@ -325,26 +325,26 @@ export default function NewBooking() {
     }
   };
 
-  const handleEntrarFila = async () => {
+  const handleEntrarLista = async () => {
     if (!user || !horarioSelecionado.quadra) {
       alert("Usuário ou quadra não encontrados.");
       return;
     }
 
     try {
-      await axiosPrivate.post("/fila-espera", {
+      await axiosPrivate.post("/lista-espera", {
         user_id: user.id,
         quadra_id: horarioSelecionado.quadra.id,
         data: horarioSelecionado.data,
         slot: horarioSelecionado.horario.split(" - ")[0],
       });
 
-      alert("Você entrou na fila de espera com sucesso!");
+      alert("Você entrou na lista de espera com sucesso!");
       setModalAtivo(null);
     } catch (error) {
-      console.error("Erro ao entrar na fila de espera:", error);
+      console.error("Erro ao entrar na lista de espera:", error);
       alert(
-        "Ocorreu um erro ao tentar entrar na fila. Por favor, tente novamente."
+        "Ocorreu um erro ao tentar entrar na lista. Por favor, tente novamente."
       );
     }
   };
@@ -440,11 +440,11 @@ export default function NewBooking() {
       )}
 
       {modalAtivo === "fila" && (
-        <ModalFilaDeEspera
+        <ModalListaDeEspera
           isOpen
           onClose={() => setModalAtivo(null)}
           dados={horarioSelecionado}
-          onEntrarFila={handleEntrarFila}
+          onEntrarLista={handleEntrarLista}
         />
       )}
 

@@ -3,7 +3,7 @@ import { formatarDataBrasileira } from "../../../utils/DateUtils";
 import { Hourglass, BellRing, ArrowLeft, AlarmClockCheckIcon } from "lucide-react";
 import type { Quadra } from "../../../types/interfaces";
 
-interface ModalFilaDeEsperaProps {
+interface ModalListaDeEsperaProps {
   isOpen: boolean;
   onClose: () => void;
   dados: {
@@ -12,15 +12,15 @@ interface ModalFilaDeEsperaProps {
     horario: string;
     valor: number;
   };
-  onEntrarFila: () => void;
+  onEntrarLista: () => void;
 }
 
-export default function ModalFilaDeEspera({
+export default function ModalListaDeEspera({
   isOpen,
   onClose,
   dados,
-  onEntrarFila,
-}: ModalFilaDeEsperaProps) {
+  onEntrarLista,
+}: ModalListaDeEsperaProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="flex flex-col items-center text-center">
@@ -34,7 +34,7 @@ export default function ModalFilaDeEspera({
           Horário já reservado!
         </h2>
         <p className="text-sm text-gray-700 mb-4 max-w-sm">
-          Mas não desanime! Entre na fila de espera e será avisado assim que{" "}
+          Mas não desanime! Entre na lista de espera e será avisado assim que{" "}
           <span className="font-semibold text-azulBase">este horário</span> ficar
           disponível.
         </p>
@@ -62,7 +62,7 @@ export default function ModalFilaDeEspera({
         <div className="flex items-center gap-2 bg-yellow-50 border border-yellow-200 text-yellow-700 text-xs px-3 py-2 rounded-md mb-4">
           <BellRing size={16} />
           <span>
-            Chamaremos em ordem de inscrição. Mantenha as notificações ativas.
+            Chamaremos assim que o horário estiver disponível. Mantenha as notificações ativas.
           </span>
         </div>
 
@@ -75,10 +75,10 @@ export default function ModalFilaDeEspera({
             <ArrowLeft size={18} /> Voltar
           </button>
           <button
-            onClick={onEntrarFila}
+            onClick={onEntrarLista}
             className="w-full py-2 rounded-md bg-yellow-500 text-white font-semibold hover:bg-yellow-600 transition transform hover:scale-[1.02] flex items-center justify-center gap-2"
           >
-            <AlarmClockCheckIcon size={18} /> Entrar na fila
+            <AlarmClockCheckIcon size={18} /> Entrar na lista
           </button>
         </div>
       </div>
