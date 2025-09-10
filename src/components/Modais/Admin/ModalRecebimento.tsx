@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Reserva } from "../../../types/interfaces";
 import { formatarDataIso } from "../../../utils/DateUtils";
 import Modal from "../Modal";
@@ -7,7 +8,7 @@ interface ModalRecebimentoAdminProps {
   isOpen: boolean;
   onClose: () => void;
   dados: Reserva;
-  onConfirmar: () => void;
+  onConfirmar: () => Promise<void>; // Alterado para suportar async
 }
 
 export default function ModalRecebimentoAdmin({
@@ -16,13 +17,25 @@ export default function ModalRecebimentoAdmin({
   dados,
   onConfirmar,
 }: ModalRecebimentoAdminProps) {
+  const [loading, setLoading] = useState(false); // Estado de loading
+
   // Garantindo valores válidos
   const clienteNome = dados.cliente_nome ?? dados.user?.nome ?? "Cliente não informado";
   const quadraNome = dados.quadra?.nome ?? "Quadra não informada";
   const slot = dados.slot ?? "-";
   const dataFormatada = dados.data ? formatarDataIso(dados.data) : "-";
-
   const restante = dados.pagamentoFaltante ?? 0;
+
+  const handleConfirmar = async () => {
+    setLoading(true);
+    try {
+      await onConfirmar(); // Executa a ação passada pelo pai
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -73,15 +86,25 @@ export default function ModalRecebimentoAdmin({
           <button
             onClick={onClose}
             className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition flex items-center justify-center gap-2"
+            disabled={loading} // Desabilita botão enquanto carrega
           >
             <ArrowLeftIcon size={18} /> Voltar
           </button>
           <button
-            onClick={onConfirmar}
-            className="w-full py-2 rounded-md bg-green-600 text-white font-semibold hover:bg-green-700 transition flex items-center justify-center gap-2"
+            onClick={handleConfirmar}
+            className={`w-full py-2 rounded-md bg-green-600 text-white font-semibold transition flex items-center justify-center gap-2 ${
+              loading ? "opacity-70 cursor-not-allowed" : "hover:bg-green-700"
+            }`}
+            disabled={loading} // Desabilita enquanto carrega
           >
-            <DollarSignIcon size={18}/>
-            Receber R$ {restante}
+            {loading ? (
+              <span>Recebendo...</span>
+            ) : (
+              <>
+                <DollarSignIcon size={18} />
+                Receber R$ {restante}
+              </>
+            )}
           </button>
         </div>
       </div>

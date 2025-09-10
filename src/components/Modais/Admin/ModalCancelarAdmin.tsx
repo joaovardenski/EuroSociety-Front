@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Reserva } from "../../../types/interfaces";
 import { formatarDataIso } from "../../../utils/DateUtils";
 import Modal from "../Modal";
@@ -7,7 +8,7 @@ interface ModalCancelarAdminProps {
   isOpen: boolean;
   onClose: () => void;
   dados: Reserva;
-  onConfirmar: () => void;
+  onConfirmar: () => Promise<void>; // Alterado para async
 }
 
 export default function ModalCancelarAdmin({
@@ -16,7 +17,19 @@ export default function ModalCancelarAdmin({
   dados,
   onConfirmar,
 }: ModalCancelarAdminProps) {
+  const [loading, setLoading] = useState(false); // Estado de loading
   const nomeCliente = dados.cliente_nome ?? dados.user?.nome ?? "Cliente não informado";
+
+  const handleConfirmar = async () => {
+    setLoading(true);
+    try {
+      await onConfirmar();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -42,9 +55,7 @@ export default function ModalCancelarAdmin({
         <div className="bg-gray-50 border border-gray-200 text-sm rounded-lg px-4 py-3 w-full mb-5 shadow-inner text-left space-y-1">
           <p>
             <span className="font-medium">Cliente:</span>{" "}
-            <span className="text-azulBase">
-              {nomeCliente}
-            </span>
+            <span className="text-azulBase">{nomeCliente}</span>
           </p>
           <p>
             <span className="font-medium">Quadra:</span>{" "}
@@ -69,14 +80,24 @@ export default function ModalCancelarAdmin({
           <button
             onClick={onClose}
             className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition flex items-center justify-center gap-2"
+            disabled={loading} // Desabilita enquanto carrega
           >
             <ArrowLeftIcon size={18} /> Voltar
           </button>
           <button
-            onClick={onConfirmar}
-            className="w-full py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700 transition flex items-center justify-center gap-2"
+            onClick={handleConfirmar}
+            className={`w-full py-2 rounded-md bg-red-600 text-white font-semibold transition flex items-center justify-center gap-2 ${
+              loading ? "opacity-70 cursor-not-allowed" : "hover:bg-red-700"
+            }`}
+            disabled={loading} // Desabilita enquanto carrega
           >
-            <CircleX size={18} /> Confirmar
+            {loading ? (
+              <span>Processando...</span>
+            ) : (
+              <>
+                <CircleX size={18} /> Confirmar
+              </>
+            )}
           </button>
         </div>
       </div>

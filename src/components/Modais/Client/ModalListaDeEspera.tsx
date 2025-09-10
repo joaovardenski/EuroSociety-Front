@@ -1,6 +1,13 @@
+import { useState } from "react";
 import Modal from "../Modal";
 import { formatarDataBrasileira } from "../../../utils/DateUtils";
-import { Hourglass, BellRing, ArrowLeft, AlarmClockCheckIcon } from "lucide-react";
+import {
+  Hourglass,
+  BellRing,
+  ArrowLeft,
+  AlarmClockCheckIcon,
+  Loader2,
+} from "lucide-react";
 import type { Quadra } from "../../../types/interfaces";
 
 interface ModalListaDeEsperaProps {
@@ -12,7 +19,7 @@ interface ModalListaDeEsperaProps {
     horario: string;
     valor: number;
   };
-  onEntrarLista: () => void;
+  onEntrarLista: () => Promise<void> | void;
 }
 
 export default function ModalListaDeEspera({
@@ -21,6 +28,17 @@ export default function ModalListaDeEspera({
   dados,
   onEntrarLista,
 }: ModalListaDeEsperaProps) {
+  const [loading, setLoading] = useState(false);
+
+  const handleEntrarLista = async () => {
+    try {
+      setLoading(true);
+      await onEntrarLista();
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="flex flex-col items-center text-center">
@@ -62,7 +80,8 @@ export default function ModalListaDeEspera({
         <div className="flex items-center gap-2 bg-yellow-50 border border-yellow-200 text-yellow-700 text-xs px-3 py-2 rounded-md mb-4">
           <BellRing size={16} />
           <span>
-            Chamaremos assim que o horário estiver disponível. Mantenha as notificações ativas.
+            Chamaremos assim que o horário estiver disponível. Mantenha as
+            notificações ativas.
           </span>
         </div>
 
@@ -70,15 +89,25 @@ export default function ModalListaDeEspera({
         <div className="flex justify-between gap-4 w-full">
           <button
             onClick={onClose}
-            className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition flex items-center justify-center gap-1"
+            disabled={loading}
+            className="w-full py-2 rounded-md bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition flex items-center justify-center gap-1 disabled:opacity-70 disabled:cursor-not-allowed"
           >
             <ArrowLeft size={18} /> Voltar
           </button>
           <button
-            onClick={onEntrarLista}
-            className="w-full py-2 rounded-md bg-yellow-500 text-white font-semibold hover:bg-yellow-600 transition transform hover:scale-[1.02] flex items-center justify-center gap-2"
+            onClick={handleEntrarLista}
+            disabled={loading}
+            className="w-full py-2 rounded-md bg-yellow-500 text-white font-semibold hover:bg-yellow-600 transition transform hover:scale-[1.02] flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            <AlarmClockCheckIcon size={18} /> Entrar na lista
+            {loading ? (
+              <>
+                <Loader2 size={18} className="animate-spin" /> Entrando...
+              </>
+            ) : (
+              <>
+                <AlarmClockCheckIcon size={18} /> Entrar na lista
+              </>
+            )}
           </button>
         </div>
       </div>
