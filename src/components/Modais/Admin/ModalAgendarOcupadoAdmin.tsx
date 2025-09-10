@@ -65,7 +65,7 @@ export default function ModalAgendarOcupadoAdmin({
           </p>
           <p>
             <span className="font-medium">Valor:</span> R${" "}
-            {dados.valor.toFixed(2)}
+            {dados.valor}
           </p>
         </div>
 

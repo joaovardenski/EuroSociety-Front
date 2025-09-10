@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { Reserva } from "../../../types/interfacesFront";
 import { formatarDataIso } from "../../../utils/DateUtils";
 import Modal from "../Modal";
-import { AlertTriangle, ArrowLeftIcon, CircleX } from "lucide-react";
+import { AlertTriangle, ArrowLeftIcon, CircleX, Loader2 } from "lucide-react";
 
 interface ModalCancelarAdminProps {
   isOpen: boolean;
@@ -91,7 +91,9 @@ export default function ModalCancelarAdmin({
             disabled={loading} // Desabilita enquanto carrega
           >
             {loading ? (
-              <span>Processando...</span>
+              <>
+                <Loader2 size={18} className="animate-spin"/> Cancelando...
+              </>
             ) : (
               <>
                 <CircleX size={18} /> Confirmar

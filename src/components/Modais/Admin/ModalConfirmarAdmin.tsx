@@ -76,7 +76,7 @@ export default function ModalConfirmarAdmin({
           <p className="flex gap-1">
             <strong>Valor:</strong>{" "}
             <span className="text-green-600 flex items-center gap-1 font-bold">
-              R$ {dados.valor.toFixed(2)}
+              R$ {dados.valor}
             </span>
           </p>
         )}

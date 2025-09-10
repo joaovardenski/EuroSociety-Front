@@ -21,33 +21,9 @@ import ModalDesbloquearAdmin from "../../components/Modais/Admin/ModalDesbloquea
 
 // API
 import axiosPrivate from "../../api/axiosPrivate";
-
-// Types
-interface QuadraAPI {
-  id: number;
-  nome: string;
-  tipo?: string;
-  status?: string;
-  hora_abertura: string;
-  hora_fechamento: string;
-  preco_normal: string | number;
-  preco_noturno: string | number;
-  preco_normal_mensal: string | number;
-  preco_noturno_mensal: string | number;
-}
-
-type Quadra = {
-  id: number;
-  nome: string;
-  tipo: string;
-  status: string;
-  horaAbertura: string;
-  horaFechamento: string;
-  precoNormal: number;
-  precoNoturno: number;
-  precoMensalNormal: number;
-  precoMensalNoturno: number;
-};
+import type { Quadra } from "../../types/interfacesFront";
+import type { QuadraAPI } from "../../types/interfacesApi";
+import { mapQuadra } from "../../utils/Mappers";
 
 type Indisponibilidade = { nome: string; indisponiveis: string[] };
 type Bloqueio = { nome: string; bloqueados: string[] };
@@ -58,7 +34,9 @@ export default function AdminBooking() {
   const [dataSelecionada, setDataSelecionada] = useState(getCurrentDate());
 
   const [quadras, setQuadras] = useState<Quadra[]>([]);
-  const [indisponibilidades, setIndisponibilidades] = useState<Indisponibilidade[]>([]);
+  const [indisponibilidades, setIndisponibilidades] = useState<
+    Indisponibilidade[]
+  >([]);
   const [bloqueios, setBloqueios] = useState<Bloqueio[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -71,27 +49,27 @@ export default function AdminBooking() {
 
   const [modalConfirmarAberto, setModalConfirmarAberto] = useState(false);
   const [modalAgendarAberto, setModalAgendarAberto] = useState(false);
-  const [modalAgendarOcupadoAberto, setModalAgendarOcupadoAberto] = useState(false);
+  const [modalAgendarOcupadoAberto, setModalAgendarOcupadoAberto] =
+    useState(false);
   const [modalDesbloquearAberto, setModalDesbloquearAberto] = useState(false);
 
   // ----------------- API Helpers -----------------
   const getQuadras = useCallback(async (): Promise<Quadra[]> => {
-    const response = await axiosPrivate.get("/quadras");
-    return response.data.data.map((q: QuadraAPI) => ({
-      id: q.id,
-      nome: q.nome,
-      tipo: q.tipo || "",
-      status: q.status || "ativa",
-      horaAbertura: q.hora_abertura,
-      horaFechamento: q.hora_fechamento,
-      precoNormal: Number(q.preco_normal),
-      precoNoturno: Number(q.preco_noturno),
-      precoMensalNormal: Number(q.preco_normal_mensal),
-      precoMensalNoturno: Number(q.preco_noturno_mensal),
-    }));
+    try {
+      const response = await axiosPrivate.get<{ data: QuadraAPI[] }>(
+        "/quadras"
+      );
+
+      return response.data.data.map(mapQuadra);
+    } catch (error) {
+      console.error("Erro ao buscar quadras:", error);
+      return [];
+    }
   }, []);
 
-  const getIndisponibilidades = useCallback(async (): Promise<Indisponibilidade[]> => {
+  const getIndisponibilidades = useCallback(async (): Promise<
+    Indisponibilidade[]
+  > => {
     const response = await axiosPrivate.get("/reservas/indisponiveis", {
       params: { data: dataSelecionada },
     });
@@ -99,9 +77,12 @@ export default function AdminBooking() {
   }, [dataSelecionada]);
 
   const getBloqueios = useCallback(async (): Promise<Bloqueio[]> => {
-    const response = await axiosPrivate.get("/agenda-bloqueios/bloqueados-por-data", {
-      params: { data: dataSelecionada },
-    });
+    const response = await axiosPrivate.get(
+      "/agenda-bloqueios/bloqueados-por-data",
+      {
+        params: { data: dataSelecionada },
+      }
+    );
     return response.data ?? [];
   }, [dataSelecionada]);
 
@@ -132,7 +113,8 @@ export default function AdminBooking() {
 
   // ----------------- Helpers -----------------
   const getIndisponiveis = useCallback(
-    (nome: string) => indisponibilidades.find((q) => q.nome === nome)?.indisponiveis || [],
+    (nome: string) =>
+      indisponibilidades.find((q) => q.nome === nome)?.indisponiveis || [],
     [indisponibilidades]
   );
 
@@ -165,7 +147,12 @@ export default function AdminBooking() {
     setDataSelecionada(novaData);
   };
 
-  const handleHorarioClick = (quadraId: number, horario: string, indisponivel: boolean, bloqueado: boolean) => {
+  const handleHorarioClick = (
+    quadraId: number,
+    horario: string,
+    indisponivel: boolean,
+    bloqueado: boolean
+  ) => {
     const quadra = quadras.find((q) => q.id === quadraId);
     if (!quadra) return;
 
@@ -185,7 +172,9 @@ export default function AdminBooking() {
 
   const bloquearHorario = async () => {
     try {
-      const quadraId = quadras.find((q) => q.nome === horarioSelecionado.quadra)?.id;
+      const quadraId = quadras.find(
+        (q) => q.nome === horarioSelecionado.quadra
+      )?.id;
       if (!quadraId) return;
 
       await axiosPrivate.post("/agenda-bloqueios", {
@@ -206,16 +195,18 @@ export default function AdminBooking() {
 
   const desbloquearHorario = async () => {
     try {
-      const quadraId = quadras.find((q) => q.nome === horarioSelecionado.quadra)?.id;
+      const quadraId = quadras.find(
+        (q) => q.nome === horarioSelecionado.quadra
+      )?.id;
       if (!quadraId) return;
       console.log(quadraId);
-      console.log(horarioSelecionado.data)
-      console.log(horarioSelecionado.horario.split(" - ")[0])
+      console.log(horarioSelecionado.data);
+      console.log(horarioSelecionado.horario.split(" - ")[0]);
 
       await axiosPrivate.post("/agenda-bloqueios/desbloquear", {
-          quadra_id: quadraId,
-          data: horarioSelecionado.data,
-          slot: horarioSelecionado.horario.split(" - ")[0],
+        quadra_id: quadraId,
+        data: horarioSelecionado.data,
+        slot: horarioSelecionado.horario.split(" - ")[0],
       });
 
       alert("Horário desbloqueado com sucesso!");
@@ -230,15 +221,23 @@ export default function AdminBooking() {
 
   const cancelarReserva = async () => {
     try {
-      const quadraId = quadras.find((q) => q.nome === horarioSelecionado.quadra)?.id;
+      const quadraId = quadras.find(
+        (q) => q.nome === horarioSelecionado.quadra
+      )?.id;
       if (!quadraId) return;
 
       const response = await axiosPrivate.get("/reservas/por-horario", {
-        params: { quadra_id: quadraId, data: horarioSelecionado.data, slot: horarioSelecionado.horario.split(" - ")[0] },
+        params: {
+          quadra_id: quadraId,
+          data: horarioSelecionado.data,
+          slot: horarioSelecionado.horario.split(" - ")[0],
+        },
       });
 
       const reservaId = response.data.id;
-      await axiosPrivate.post(`/reservas/${reservaId}/cancelar`, { params: { reembolso: false } });
+      await axiosPrivate.post(`/reservas/${reservaId}/cancelar`, {
+        params: { reembolso: false },
+      });
 
       alert("Reserva cancelada com sucesso!");
       setModalAgendarOcupadoAberto(false);
@@ -250,7 +249,13 @@ export default function AdminBooking() {
     }
   };
 
-  const handleAgendarAdmin = async ({ nome, valor }: { nome: string; valor: number }) => {
+  const handleAgendarAdmin = async ({
+    nome,
+    valor,
+  }: {
+    nome: string;
+    valor: number;
+  }) => {
     try {
       const quadra = quadras.find((q) => q.nome === horarioSelecionado.quadra);
       if (!quadra) return;
@@ -292,8 +297,14 @@ export default function AdminBooking() {
 
               {/* Filtros */}
               <div className="bg-blue-100/50 border border-blue-400 rounded-xl p-4 mb-6 space-y-4 md:space-y-0 md:flex md:items-center md:justify-between md:gap-6">
-                <FiltroTipo tipoSelecionado={tipoSelecionado} setTipoSelecionado={setTipoSelecionado} />
-                <FiltroData dataSelecionada={dataSelecionada} setDataSelecionada={handleSetDataSelecionada} />
+                <FiltroTipo
+                  tipoSelecionado={tipoSelecionado}
+                  setTipoSelecionado={setTipoSelecionado}
+                />
+                <FiltroData
+                  dataSelecionada={dataSelecionada}
+                  setDataSelecionada={handleSetDataSelecionada}
+                />
               </div>
 
               <LegendaReservas />
@@ -309,7 +320,12 @@ export default function AdminBooking() {
                     indisponiveis={getIndisponiveis(quadra.nome)}
                     bloqueados={getBloqueadas(quadra.nome)}
                     onHorarioClick={(horario, indisponivel, bloqueado) =>
-                      handleHorarioClick(quadra.id, horario, indisponivel, bloqueado)
+                      handleHorarioClick(
+                        quadra.id,
+                        horario,
+                        indisponivel,
+                        bloqueado
+                      )
                     }
                     isAdmin={true}
                   />

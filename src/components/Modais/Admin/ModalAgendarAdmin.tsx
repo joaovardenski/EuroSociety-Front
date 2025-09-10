@@ -55,7 +55,7 @@ export default function ModalAgendarAdmin({
         <p><strong>Quadra:</strong> {dados.quadra}</p>
         <p><strong>Data:</strong> {formatarDataBrasileira(dados.data)}</p>
         <p><strong>Horário:</strong> {dados.horario}</p>
-        <p><strong>Valor base:</strong> R$ {dados.valor.toFixed(2)}</p>
+        <p><strong>Valor base:</strong> R$ {dados.valor}</p>
       </div>
 
       {/* Campos de input */}
