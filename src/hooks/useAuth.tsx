@@ -1,18 +1,13 @@
 import { useEffect, useState } from "react";
 import axiosPrivate from "../api/axiosPrivate";
-
-export interface Usuario {
-  id: number;   // em vez de id_usuario
-  nome: string;
-  email: string;
-  permissao: "admin" | "user";
-  metodo_login: string;
-}
+import type { User } from "../types/interfacesFront";
+import type { UserAPI } from "../types/interfacesApi";
+import { mapUser } from "../utils/Mappers";
 
 export function useAuth() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<Usuario | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     async function checkAuth() {
@@ -25,8 +20,10 @@ export function useAuth() {
       }
 
       try {
-        const response = await axiosPrivate.get("/user");
-        setUser(response.data as Usuario);
+        const response = await axiosPrivate.get<UserAPI>("/user");
+
+        const mappedUser = mapUser(response.data);
+        setUser(mappedUser);
         setIsAuthenticated(true);
       } catch (err) {
         console.error(err);

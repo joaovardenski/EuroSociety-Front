@@ -6,30 +6,21 @@ import CardQuadraVariaveis from "../../components/CardQuadraVariaveis";
 import LoadingMessage from "../../components/LoadingMessage";
 import { isValidInterval, isValidPrice } from "../../utils/Validators";
 import axiosPrivate from "../../api/axiosPrivate";
-
-interface QuadraConfig {
-  id: number;
-  nome: string;
-  tipo: string;
-  status: string;
-  preco_normal: number;
-  preco_noturno: number;
-  preco_normal_mensal: number;
-  preco_noturno_mensal: number;
-  hora_abertura: string;
-  hora_fechamento: string;
-}
+import type { Quadra } from "../../types/interfacesFront";
+import type { QuadraAPI } from "../../types/interfacesApi";
+import { mapQuadra } from "../../utils/Mappers";
 
 export default function VariablesAdmin() {
   const [isLoading, setIsLoading] = useState(true);
-  const [quadras, setQuadras] = useState<QuadraConfig[]>([]);
+  const [quadras, setQuadras] = useState<Quadra[]>([]);
 
   // ----------------- FETCH INITIAL DATA -----------------
-  async function getQuadras(): Promise<QuadraConfig[]> {
+  async function getQuadras(): Promise<Quadra[]> {
     try {
-      const response = await axiosPrivate.get("/quadras");
+      const response = await axiosPrivate.get<{ data: QuadraAPI[] }>("/quadras");
       console.log("Dados das quadras recebidos:", response.data);
-      return response.data.data;
+      // Mapeia cada quadra usando mapQuadra
+      return response.data.data.map(mapQuadra);
     } catch (error) {
       console.error("Erro ao buscar dados das quadras:", error);
       return [];
@@ -51,31 +42,41 @@ export default function VariablesAdmin() {
     carregarDadosQuadras();
   }, []);
 
-  function validarQuadra(quadra: QuadraConfig) {
+  function validarQuadra(quadra: Quadra) {
     const precos = [
-      quadra.preco_normal,
-      quadra.preco_noturno,
-      quadra.preco_normal_mensal,
-      quadra.preco_noturno_mensal,
+      quadra.precoNormal,
+      quadra.precoNoturno,
+      quadra.precoNormalMensal,
+      quadra.precoNoturnoMensal,
     ];
 
     const todosPrecosValidos = precos.every(isValidPrice);
     const intervaloValido = isValidInterval(
-      quadra.hora_abertura,
-      quadra.hora_fechamento
+      quadra.horaAbertura,
+      quadra.horaFechamento
     );
 
     return todosPrecosValidos && intervaloValido;
   }
 
-  async function salvarVariaveis(quadra: QuadraConfig) {
+  async function salvarVariaveis(quadra: Quadra) {
     if (!validarQuadra(quadra)) {
       alert("Dados inválidos. Verifique os preços e horários.");
       return;
     }
 
     try {
-      const response = await axiosPrivate.put(`/quadras/${quadra.id}`, quadra);
+      const response = await axiosPrivate.put(`/quadras/${quadra.id}`, {
+        nome: quadra.nome,
+        tipo: quadra.tipo,
+        status: quadra.status,
+        hora_abertura: quadra.horaAbertura,
+        hora_fechamento: quadra.horaFechamento,
+        preco_normal: quadra.precoNormal,
+        preco_noturno: quadra.precoNoturno,
+        preco_normal_mensal: quadra.precoNormalMensal,
+        preco_noturno_mensal: quadra.precoNoturnoMensal,
+      });
       console.log("Dados salvos com sucesso:", response.data);
       alert("Configurações salvas com sucesso!");
 

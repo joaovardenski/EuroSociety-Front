@@ -16,12 +16,7 @@ export function useAgendamentosAtivos(dataSelecionada: string) {
           params: { data: dataSelecionada },
         });
 
-        // filtra reservas não pendentes antes de mapear
-        const reservasFiltradas = response.data.filter(
-          (reserva) => reserva.status.toLowerCase() !== "pendente"
-        );
-
-        setAgendamentos(reservasFiltradas.map(mapReserva));
+        setAgendamentos(response.data.map(mapReserva));
       } catch (error) {
         console.error("Erro ao carregar agendamentos:", error);
       } finally {

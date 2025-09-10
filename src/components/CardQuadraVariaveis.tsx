@@ -1,25 +1,11 @@
 import { useState } from "react";
 import InputConfig from "./InputConfig";
-
-// Assumindo que você tem um ícone de carregamento, por exemplo, de 'lucide-react'
-import { Loader2 } from "lucide-react"; 
-
-interface QuadraConfig {
-  id: number;
-  nome: string;
-  tipo: string;
-  status: string;
-  preco_normal: number;
-  preco_noturno: number;
-  preco_normal_mensal: number;
-  preco_noturno_mensal: number;
-  hora_abertura: string;
-  hora_fechamento: string;
-}
+import { Loader2 } from "lucide-react";
+import type { Quadra } from "../types/interfacesFront";
 
 // Função de formatação BRL
 function formatCurrency(value: string | number): string {
-  if (!value) return "";
+  if (!value && value !== 0) return "";
   const number = typeof value === "string" ? parseFloat(value.replace(/\D/g, "")) / 100 : value;
   if (isNaN(number)) return "";
   return number.toLocaleString("pt-BR", {
@@ -41,14 +27,14 @@ export default function CardQuadra({
   onSave,
 }: {
   titulo: string;
-  config: QuadraConfig;
-  setConfig: (value: QuadraConfig) => void;
-  onSave: () => Promise<void>; // Altere o tipo de onSave para Promise
+  config: Quadra;
+  setConfig: (value: Quadra) => void;
+  onSave: () => Promise<void>;
 }) {
   const [isLoading, setIsLoading] = useState(false);
 
   // Handler genérico para inputs monetários
-  const handleCurrencyChange = (field: keyof QuadraConfig, val: string) => {
+  const handleCurrencyChange = (field: keyof Pick<Quadra, 'precoNormal' | 'precoNoturno' | 'precoNormalMensal' | 'precoNoturnoMensal'>, val: string) => {
     setConfig({
       ...config,
       [field]: parseCurrency(val),
@@ -61,7 +47,6 @@ export default function CardQuadra({
       await onSave();
     } catch (error) {
       console.error("Falha ao salvar as configurações:", error);
-      // Você pode adicionar um feedback visual de erro aqui
     } finally {
       setIsLoading(false);
     }
@@ -75,48 +60,49 @@ export default function CardQuadra({
           <div className="space-y-3 flex-1">
             <InputConfig
               label="Preço normal (R$/h)"
-              value={formatCurrency(config.preco_normal)}
-              onChange={(val) => handleCurrencyChange("preco_normal", val)}
+              value={formatCurrency(config.precoNormal)}
+              onChange={(val) => handleCurrencyChange("precoNormal", val)}
               type="text"
             />
             <InputConfig
               label="Preço após 18h (R$/h)"
-              value={formatCurrency(config.preco_noturno)}
-              onChange={(val) => handleCurrencyChange("preco_noturno", val)}
+              value={formatCurrency(config.precoNoturno)}
+              onChange={(val) => handleCurrencyChange("precoNoturno", val)}
               type="text"
             />
           </div>
           <div className="space-y-3 flex-1">
             <InputConfig
               label="Preço mensal normal (R$/h)"
-              value={formatCurrency(config.preco_normal_mensal)}
-              onChange={(val) => handleCurrencyChange("preco_normal_mensal", val)}
+              value={formatCurrency(config.precoNormalMensal)}
+              onChange={(val) => handleCurrencyChange("precoNormalMensal", val)}
               type="text"
             />
             <InputConfig
               label="Preço mensal após 18h (R$/h)"
-              value={formatCurrency(config.preco_noturno_mensal)}
-              onChange={(val) => handleCurrencyChange("preco_noturno_mensal", val)}
+              value={formatCurrency(config.precoNoturnoMensal)}
+              onChange={(val) => handleCurrencyChange("precoNoturnoMensal", val)}
               type="text"
             />
           </div>
         </div>
+
         <InputConfig
           label="Horário de abertura"
-          value={config.hora_abertura}
-          onChange={(val) => setConfig({ ...config, hora_abertura: val })}
+          value={config.horaAbertura}
+          onChange={(val) => setConfig({ ...config, horaAbertura: val })}
           type="time"
         />
         <InputConfig
           label="Horário de fechamento"
-          value={config.hora_fechamento}
-          onChange={(val) => setConfig({ ...config, hora_fechamento: val })}
+          value={config.horaFechamento}
+          onChange={(val) => setConfig({ ...config, horaFechamento: val })}
           type="time"
         />
 
         <button
           onClick={handleSave}
-          disabled={isLoading} // Desabilita o botão durante o carregamento
+          disabled={isLoading}
           className={`mt-4 w-full text-white px-4 py-2 rounded-lg transition ${
             isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-azulBase hover:bg-[#0f3c76]"
           }`}
