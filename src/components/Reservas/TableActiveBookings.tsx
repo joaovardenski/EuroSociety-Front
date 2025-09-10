@@ -47,7 +47,7 @@ export default function TableActiveBookings({
               <td className="px-6 py-3 text-sm text-gray-800">
                 {r.user
                   ? getNomeCondensado(r.user.nome)
-                  : getNomeCondensado(r.cliente_nome)}
+                  : getNomeCondensado(r.clienteNome)}
               </td>
               <td className="px-6 py-3 text-sm text-gray-800">
                 {r.quadra?.nome}

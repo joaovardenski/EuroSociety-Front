@@ -1,19 +1,8 @@
 import { useEffect, useState } from "react";
 import axiosPrivate from "../api/axiosPrivate";
 import type { Quadra } from "../types/interfacesFront";
-
-interface QuadraAPI {
-  id: number;
-  nome: string;
-  tipo?: string;
-  status?: string;
-  hora_abertura: string;
-  hora_fechamento: string;
-  preco_normal: string | number;
-  preco_noturno: string | number;
-  preco_normal_mensal: string | number;
-  preco_noturno_mensal: string | number;
-}
+import type { QuadraAPI } from "../types/interfacesApi";
+import { mapQuadra } from "../utils/Mappers";
 
 export default function useQuadras() {
   const [quadras, setQuadras] = useState<Quadra[]>([]);
@@ -21,24 +10,12 @@ export default function useQuadras() {
 
   useEffect(() => {
     const fetchQuadras = async () => {
+      setLoading(true);
       try {
-        const response = await axiosPrivate.get<{ data: QuadraAPI[] }>(
-          "/quadras"
-        );
-        setQuadras(
-          response.data.data.map((q) => ({
-            id: q.id,
-            nome: q.nome,
-            tipo: q.tipo || "",
-            status: q.status || "ativa",
-            horaAbertura: q.hora_abertura,
-            horaFechamento: q.hora_fechamento,
-            precoNormal: Number(q.preco_normal),
-            precoNoturno: Number(q.preco_noturno),
-            precoMensalNormal: Number(q.preco_normal_mensal),
-            precoMensalNoturno: Number(q.preco_noturno_mensal),
-          }))
-        );
+        const response = await axiosPrivate.get<QuadraAPI[]>("/quadras");
+
+        // Mapeia cada quadra usando o mapQuadra
+        setQuadras(response.data.map(mapQuadra));
       } catch (error) {
         console.error("Erro ao buscar quadras:", error);
       } finally {

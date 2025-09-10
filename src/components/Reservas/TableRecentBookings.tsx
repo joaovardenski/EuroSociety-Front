@@ -37,7 +37,7 @@ export default function TableRecentBookings({
                 >
                   <td className="px-3 py-3 font-medium">
                     {agendamento.user?.nome ||
-                      agendamento.cliente_nome ||
+                      agendamento.clienteNome ||
                       "Anônimo"}
                   </td>
                   <td className="px-3 py-3">{agendamento.quadra?.nome}</td>

@@ -34,7 +34,7 @@ export default function ActiveBookingsAdmin() {
     const query = searchQuery.toLowerCase();
     return agendamentos.filter(
       (r) =>
-        r.cliente_nome?.toLowerCase().includes(query) ||
+        r.clienteNome?.toLowerCase().includes(query) ||
         r.user?.nome.toLowerCase().includes(query)
     );
   }, [agendamentos, searchQuery]);

@@ -19,7 +19,7 @@ export default function ModalCancelarAdmin({
 }: ModalCancelarAdminProps) {
   const [loading, setLoading] = useState(false); // Estado de loading
   const nomeCliente =
-    dados.cliente_nome ?? dados.user?.nome ?? "Cliente não informado";
+    dados.clienteNome ?? dados.user?.nome ?? "Cliente não informado";
 
   const handleConfirmar = async () => {
     setLoading(true);
