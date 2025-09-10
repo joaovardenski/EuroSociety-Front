@@ -1,7 +1,7 @@
 // hooks/useDashboardData.ts
 import { useEffect, useState } from "react";
 import axiosPrivate from "../api/axiosPrivate";
-import type { Reserva } from "../types/interfaces";
+import type { Reserva } from "../types/interfacesFront";
 
 interface DashboardAdminData {
   agendamentosHoje: number;
@@ -20,7 +20,7 @@ export function useDashboardAdminData() {
       try {
         const response = await axiosPrivate.get("/admin/dashboard");
         setData(response.data.data);
-        console.log("Dados: ", response.data.data)
+        console.log("Dados: ", response.data.data);
       } catch (error) {
         console.error("Erro ao carregar dashboard:", error);
       } finally {

@@ -29,46 +29,13 @@ import { useAuth } from "../../hooks/useAuth";
 // API
 import axiosPrivate from "../../api/axiosPrivate";
 import { AxiosError } from "axios";
-
-// Types
-interface QuadraAPI {
-  id: number;
-  nome: string;
-  tipo?: string;
-  status?: string;
-  hora_abertura: string;
-  hora_fechamento: string;
-  preco_normal: string | number;
-  preco_noturno: string | number;
-  preco_normal_mensal: string | number;
-  preco_noturno_mensal: string | number;
-}
-
-type Quadra = {
-  id: number;
-  nome: string;
-  tipo: string;
-  status: string;
-  horaAbertura: string;
-  horaFechamento: string;
-  precoNormal: number;
-  precoNoturno: number;
-  precoMensalNormal: number;
-  precoMensalNoturno: number;
-};
+import type { Quadra } from "../../types/interfacesFront";
+import type { QuadraAPI } from "../../types/interfacesApi";
+import type { ReservaAPI } from "../../types/interfacesApi";
+import { mapQuadra } from "../../utils/Mappers";
 
 type Indisponibilidade = { nome: string; indisponiveis: string[] };
 type Bloqueio = { nome: string; bloqueados: string[] };
-
-interface ReservaPendente {
-  id: number;
-  user_id: number;
-  quadra_id: number;
-  data: string;
-  slot: string;
-  valor: number;
-  status: string;
-}
 
 interface PreferenceResponse {
   preferenceId: string;
@@ -119,22 +86,10 @@ export default function NewBooking() {
       setLoading(true);
 
       try {
-        // Carrega quadras apenas uma vez
         if (quadras.length === 0) {
           const responseQuadras = await axiosPrivate.get("/quadras");
           const quadrasFormatadas: Quadra[] = responseQuadras.data.data.map(
-            (q: QuadraAPI) => ({
-              id: q.id,
-              nome: q.nome,
-              tipo: q.tipo || "",
-              status: q.status || "ativa",
-              horaAbertura: q.hora_abertura,
-              horaFechamento: q.hora_fechamento,
-              precoNormal: Number(q.preco_normal),
-              precoNoturno: Number(q.preco_noturno),
-              precoMensalNormal: Number(q.preco_normal_mensal),
-              precoMensalNoturno: Number(q.preco_noturno_mensal),
-            })
+            (q: QuadraAPI) => mapQuadra(q)
           );
           setQuadras(quadrasFormatadas);
         }
@@ -230,6 +185,8 @@ export default function NewBooking() {
         mensalistaDisponivel: false,
       });
 
+      console.log({ quadra, horario, dataSelecionada, valor });
+
       if (bloqueado) return;
       if (indisponivel) {
         setModalAtivo("fila");
@@ -296,7 +253,7 @@ export default function NewBooking() {
 
     try {
       const reservaResponse = await axiosPrivate.post<
-        ReservaPendente | ReservaPendente[]
+        ReservaAPI | ReservaAPI[]
       >("/reservas", {
         user_id: user.id,
         quadra_id: quadra.id,
@@ -307,8 +264,8 @@ export default function NewBooking() {
       });
 
       const reservaId = mensalista
-        ? (reservaResponse.data as ReservaPendente[])[0].id
-        : (reservaResponse.data as ReservaPendente).id;
+        ? (reservaResponse.data as ReservaAPI[])[0].id
+        : (reservaResponse.data as ReservaAPI).id;
 
       const pagamentoResponse = await axiosPrivate.post<PreferenceResponse>(
         "/mercado-pago/pagar",

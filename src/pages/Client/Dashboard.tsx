@@ -6,7 +6,7 @@ import ProximaReservaCard from "../../components/Reservas/ProximaReservaCard";
 import CardNovaReserva from "../../components/Reservas/NovaReservaCard";
 import ReservasAtivasCard from "../../components/Reservas/ReservasAtivasCard";
 import LoadingMessage from "../../components/LoadingMessage";
-import type { Reserva } from "../../types/interfaces";
+import type { Reserva } from "../../types/interfacesFront";
 import { useAuth } from "../../hooks/useAuth";
 import { getNomeCondensado } from "../../utils/NameUtils";
 import useReservas from "../../hooks/useReservas";
@@ -23,10 +23,12 @@ function Dashboard() {
     }
   }, [auth.user?.nome]);
 
-  const { reservas, isLoading } = useReservas(auth.isAuthenticated && !auth.isLoading);
+  const { reservas, isLoading } = useReservas(
+    auth.isAuthenticated && !auth.isLoading
+  );
 
   const activeBookings = useMemo(
-    () => reservas.filter(r => r.status.toLowerCase() === "confirmada"),
+    () => reservas.filter((r) => r.status.toLowerCase() === "confirmada"),
     [reservas]
   );
 
@@ -34,11 +36,13 @@ function Dashboard() {
     const agora = new Date();
     return activeBookings
       .map(adicionarDataHora)
-      .filter(r => r.dataHora > agora)
+      .filter((r) => r.dataHora > agora)
       .sort((a, b) => a.dataHora.getTime() - b.dataHora.getTime())[0];
   }, [activeBookings]);
 
-  const username = getNomeCondensado(localStorage.getItem("user_nome") || "Usuário");
+  const username = getNomeCondensado(
+    localStorage.getItem("user_nome") || "Usuário"
+  );
 
   return (
     <div className="flex flex-col min-h-screen bg-[#e1e6f9]">
@@ -52,7 +56,8 @@ function Dashboard() {
             {/* Boas-vindas */}
             <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-4xl text-center mb-8">
               <h1 className="text-2xl font-bold text-gray-900">
-                Seja bem-vindo, <span className="text-azulBase">{username}</span>!
+                Seja bem-vindo,{" "}
+                <span className="text-azulBase">{username}</span>!
               </h1>
               <p className="text-gray-600 mt-2">
                 Confira seus agendamentos e aproveite nossas quadras.

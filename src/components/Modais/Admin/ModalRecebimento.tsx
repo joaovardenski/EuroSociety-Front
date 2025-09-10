@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Reserva } from "../../../types/interfaces";
+import type { Reserva } from "../../../types/interfacesFront";
 import { formatarDataIso } from "../../../utils/DateUtils";
 import Modal from "../Modal";
 import { Wallet, Info, ArrowLeftIcon, DollarSignIcon } from "lucide-react";
@@ -20,7 +20,8 @@ export default function ModalRecebimentoAdmin({
   const [loading, setLoading] = useState(false); // Estado de loading
 
   // Garantindo valores válidos
-  const clienteNome = dados.cliente_nome ?? dados.user?.nome ?? "Cliente não informado";
+  const clienteNome =
+    dados.cliente_nome ?? dados.user?.nome ?? "Cliente não informado";
   const quadraNome = dados.quadra?.nome ?? "Quadra não informada";
   const slot = dados.slot ?? "-";
   const dataFormatada = dados.data ? formatarDataIso(dados.data) : "-";
@@ -51,8 +52,8 @@ export default function ModalRecebimentoAdmin({
         </h2>
         <p className="text-sm text-gray-700 mb-4 px-4">
           O cliente pagou antecipadamente. Restam{" "}
-          <span className="text-red-500 font-semibold">R$ {restante} </span>
-          a serem pagos no balcão.
+          <span className="text-red-500 font-semibold">R$ {restante} </span>a
+          serem pagos no balcão.
         </p>
 
         {/* Informações da reserva */}
@@ -77,7 +78,8 @@ export default function ModalRecebimentoAdmin({
         <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
           <Info size={14} className="text-green-600" />
           <span>
-            Confirme o recebimento para atualizar o status do pagamento no sistema.
+            Confirme o recebimento para atualizar o status do pagamento no
+            sistema.
           </span>
         </div>
 

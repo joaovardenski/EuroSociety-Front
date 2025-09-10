@@ -1,4 +1,4 @@
-import type { Reserva } from "../../types/interfaces";
+import type { Reserva } from "../../types/interfacesFront";
 import { formatarDataIso } from "../../utils/DateUtils";
 import { CheckCircle, Clock } from "lucide-react";
 
@@ -27,7 +27,7 @@ export default function TableRecentBookings({
           </thead>
           <tbody>
             {recentBookings.map((agendamento, index) => {
-              const statusPago = agendamento.pagamentoFaltante == 0.00;
+              const statusPago = agendamento.pagamentoFaltante == 0.0;
               return (
                 <tr
                   key={index}

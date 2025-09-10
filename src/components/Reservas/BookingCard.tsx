@@ -1,5 +1,5 @@
 import { Calendar, Clock, DollarSign, Eye, CircleX } from "lucide-react";
-import type { Quadra, Reserva } from "../../types/interfaces";
+import type { Quadra, Reserva } from "../../types/interfacesFront";
 import { formatarDataIso } from "../../utils/DateUtils";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
 import ModalReservaDetalhes from "../Modais/Client/ModalReservaDetalhes";
@@ -29,8 +29,8 @@ export default function BookingCard({
 
     const preco = reserva.mensalidade
       ? hora >= 18
-        ? quadraInfo.precoMensalNoturno
-        : quadraInfo.precoMensalNormal
+        ? quadraInfo.precoNoturnoMensal
+        : quadraInfo.precoNormalMensal
       : hora >= 18
       ? quadraInfo.precoNoturno
       : quadraInfo.precoNormal;
@@ -106,7 +106,10 @@ export default function BookingCard({
       <div className="flex md:flex-col items-stretch gap-2 mt-4 md:mt-0 md:ml-6 w-full md:w-auto">
         <button
           className="flex items-center gap-2 bg-azulBase text-white px-4 py-1 rounded text-sm hover:bg-azulEscuro w-full md:w-[130px]"
-          onClick={() => {setModalDetalhesAberto(true); console.log(reserva);}}
+          onClick={() => {
+            setModalDetalhesAberto(true);
+            console.log(reserva);
+          }}
         >
           <Eye size={16} /> Detalhes
         </button>

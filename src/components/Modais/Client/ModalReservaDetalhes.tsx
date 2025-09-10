@@ -1,13 +1,14 @@
 import Modal from "../Modal";
 import { formatarDataIso } from "../../../utils/DateUtils";
 import { capitalizeFirstLetter } from "../../../utils/StringUtils";
-import type { Reserva } from "../../../types/interfaces";
+import type { Reserva } from "../../../types/interfacesFront";
 import {
   Calendar,
   Clock,
   User,
   BookmarkCheckIcon,
   CalendarCheckIcon,
+  DollarSign,
 } from "lucide-react";
 
 interface ModalReservaDetalhesProps {
@@ -21,7 +22,7 @@ export default function ModalReservaDetalhes({
   onClose,
   reserva,
 }: ModalReservaDetalhesProps) {
-  const nomeCliente = localStorage.getItem("user_nome") || reserva.cliente_nome || "Não informado";
+  const nomeCliente = localStorage.getItem("user_nome") || reserva.clienteNome || "Não informado";
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -58,7 +59,7 @@ export default function ModalReservaDetalhes({
           <BookmarkCheckIcon size={20} className="text-purple-500" />
           <div>
             <p className="text-gray-600 text-xs">Tipo de Reserva</p>
-            <p className="font-medium text-gray-800">{capitalizeFirstLetter(reserva.tipo_reserva)}</p>
+            <p className="font-medium text-gray-800">{capitalizeFirstLetter(reserva.tipoReserva)}</p>
           </div>
         </div>
 
@@ -80,6 +81,19 @@ export default function ModalReservaDetalhes({
             </p>
           </div>
         </div>
+
+        {/* Valor (opcional) */}
+        {reserva.pagamentoFaltante != null && (
+          <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-lg shadow-sm">
+            <DollarSign size={20} className="text-green-700" />
+            <div>
+              <p className="text-gray-600 text-xs">Pagamento pendente</p>
+              <p className="font-medium text-gray-800">
+                R$ {reserva.pagamentoFaltante}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </Modal>
   );

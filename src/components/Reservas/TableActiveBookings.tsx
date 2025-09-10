@@ -1,5 +1,5 @@
 // src/components/Tabelas/TabelaAgendamentos.tsx
-import type { Reserva } from "../../types/interfaces";
+import type { Reserva } from "../../types/interfacesFront";
 import { formatarDataIso } from "../../utils/DateUtils";
 import { getNomeCondensado } from "../../utils/NameUtils";
 
@@ -19,11 +19,21 @@ export default function TableActiveBookings({
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50 sticky top-0 z-10">
           <tr>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Cliente</th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Quadra</th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Data/Hora</th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Status pag.</th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Ações</th>
+            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+              Cliente
+            </th>
+            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+              Quadra
+            </th>
+            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+              Data/Hora
+            </th>
+            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+              Status pag.
+            </th>
+            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+              Ações
+            </th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
@@ -35,10 +45,16 @@ export default function TableActiveBookings({
               } hover:bg-blue-50`}
             >
               <td className="px-6 py-3 text-sm text-gray-800">
-                {r.user ? getNomeCondensado(r.user.nome) : getNomeCondensado(r.cliente_nome)}
+                {r.user
+                  ? getNomeCondensado(r.user.nome)
+                  : getNomeCondensado(r.cliente_nome)}
               </td>
-              <td className="px-6 py-3 text-sm text-gray-800">{r.quadra?.nome}</td>
-              <td className="px-6 py-3 text-sm text-gray-800">{`${formatarDataIso(r.data)} às ${r.slot}`}</td>
+              <td className="px-6 py-3 text-sm text-gray-800">
+                {r.quadra?.nome}
+              </td>
+              <td className="px-6 py-3 text-sm text-gray-800">{`${formatarDataIso(
+                r.data
+              )} às ${r.slot}`}</td>
               <td className="px-6 py-3">
                 <span
                   className={`inline-block text-sm font-medium px-3 py-1 rounded-full ${

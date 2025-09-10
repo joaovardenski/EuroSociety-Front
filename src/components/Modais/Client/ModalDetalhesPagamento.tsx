@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import Modal from "../Modal";
 import { formatarDataBrasileira } from "../../../utils/DateUtils";
-import type { Quadra } from "../../../types/interfaces";
+import type { Quadra } from "../../../types/interfacesFront";
 import { calcularValor } from "../../../utils/Calculate";
 
 interface ModalDetalhesPagamentoProps {
@@ -20,7 +20,10 @@ interface ModalDetalhesPagamentoProps {
     valor: number;
   };
   mensalistaDisponivel: boolean;
-  onConfirmarPagamento: (valorPago: number, mensalista: boolean) => Promise<void>;
+  onConfirmarPagamento: (
+    valorPago: number,
+    mensalista: boolean
+  ) => Promise<void>;
 }
 
 export default function ModalDetalhesPagamento({
@@ -32,14 +35,18 @@ export default function ModalDetalhesPagamento({
 }: ModalDetalhesPagamentoProps) {
   const [mensalista, setMensalista] = useState(false);
   const [percentual, setPercentual] = useState(50);
-  const [valorPago, setValorPago] = useState(dados.valor * (percentual / 100));
+  const [valorPago, setValorPago] = useState<number>(
+    Number(dados.valor) * (percentual / 100)
+  );
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (mensalista && dados.quadra) {
-      setValorPago(calcularValor(dados.quadra, dados.horario.split(" - ")[0], true));
+      setValorPago(
+        Number(calcularValor(dados.quadra, dados.horario.split(" - ")[0], true))
+      );
     } else {
-      setValorPago((dados.valor * percentual) / 100);
+      setValorPago((Number(dados.valor) * percentual) / 100);
     }
   }, [mensalista, percentual, dados]);
 
@@ -82,9 +89,7 @@ export default function ModalDetalhesPagamento({
         </p>
         <p>
           <span className="font-medium">Valor total:</span>{" "}
-          <span className="text-green-600 font-semibold">
-            R$ {dados.valor.toFixed(2)}
-          </span>
+          <span className="text-green-600 font-semibold">R$ {dados.valor}</span>
         </p>
       </div>
 
@@ -141,7 +146,7 @@ export default function ModalDetalhesPagamento({
             />
             <div className="text-xs flex justify-between mb-1">
               <span>Min: 50% (R$ {(dados.valor * 0.5).toFixed(2)})</span>
-              <span>Total: 100% (R$ {dados.valor.toFixed(2)})</span>
+              <span>Total: 100% (R$ {dados.valor})</span>
             </div>
           </>
         )}

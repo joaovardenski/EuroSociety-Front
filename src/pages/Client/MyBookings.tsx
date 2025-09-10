@@ -11,7 +11,7 @@ import Modal from "../../components/Modais/Modal";
 import ModalCancelarReserva from "../../components/Modais/Client/ModalCancelarReserva";
 import LoadingMessage from "../../components/LoadingMessage";
 
-import type { Reserva } from "../../types/interfaces";
+import type { Reserva } from "../../types/interfacesFront";
 import {
   getMinhasReservas,
   cancelarMinhaReserva,
@@ -97,7 +97,7 @@ export default function MyBookings() {
     try {
       await cancelarMinhaReserva(
         reservaSelecionada.id,
-        reservaSelecionada.podeReembolso,
+        reservaSelecionada.podeReembolso
       );
       setReservas((prev) => prev.filter((r) => r.id !== reservaSelecionada.id));
     } catch (error) {
@@ -111,21 +111,24 @@ export default function MyBookings() {
 
   // Determina se a reserva ainda pode ter reembolso
   function podeTerReembolso(reserva: Reserva): boolean {
-  // Apenas reservas confirmadas e do tipo "unica" podem ter reembolso
-  if (reserva.status.toLowerCase() !== "confirmada" || reserva.tipo_reserva !== "unica") {
-    return false;
+    // Apenas reservas confirmadas e do tipo "unica" podem ter reembolso
+    if (
+      reserva.status.toLowerCase() !== "confirmada" ||
+      reserva.tipoReserva !== "unica"
+    ) {
+      return false;
+    }
+
+    const [horaInicio] = reserva.slot.split(" - ");
+    const [hora, minuto] = horaInicio.split(":").map(Number);
+    const [ano, mes, dia] = reserva.data.split("T")[0].split("-").map(Number);
+    const dataHoraReserva = new Date(ano, mes - 1, dia, hora, minuto);
+
+    const diffMilissegundos = dataHoraReserva.getTime() - Date.now();
+    const seteHorasMilissegundos = 7 * 60 * 60 * 1000;
+
+    return diffMilissegundos > seteHorasMilissegundos;
   }
-
-  const [horaInicio] = reserva.slot.split(" - ");
-  const [hora, minuto] = horaInicio.split(":").map(Number);
-  const [ano, mes, dia] = reserva.data.split("T")[0].split("-").map(Number);
-  const dataHoraReserva = new Date(ano, mes - 1, dia, hora, minuto);
-
-  const diffMilissegundos = dataHoraReserva.getTime() - Date.now();
-  const seteHorasMilissegundos = 7 * 60 * 60 * 1000;
-
-  return diffMilissegundos > seteHorasMilissegundos;
-}
 
   // -----------------------
   // Hooks
@@ -221,6 +224,8 @@ export default function MyBookings() {
           />
         )}
       </Modal>
+
+      
     </div>
   );
 }

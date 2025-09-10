@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axiosPrivate from "../api/axiosPrivate";
-import type { Quadra } from "../types/interfaces";
+import type { Quadra } from "../types/interfacesFront";
 
 interface QuadraAPI {
   id: number;
@@ -22,7 +22,9 @@ export default function useQuadras() {
   useEffect(() => {
     const fetchQuadras = async () => {
       try {
-        const response = await axiosPrivate.get<{ data: QuadraAPI[] }>("/quadras");
+        const response = await axiosPrivate.get<{ data: QuadraAPI[] }>(
+          "/quadras"
+        );
         setQuadras(
           response.data.data.map((q) => ({
             id: q.id,

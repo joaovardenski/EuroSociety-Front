@@ -1,6 +1,6 @@
 import { CalendarClock, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
-import type { Reserva } from "../../types/interfaces";
+import type { Reserva } from "../../types/interfacesFront";
 import { formatarDataIso } from "../../utils/DateUtils";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
 
@@ -21,7 +21,8 @@ export default function ProximaReservaCard({ reserva }: Props) {
         {reserva ? (
           <>
             <p className="text-sm font-semibold text-gray-700">
-              Quadra: <span className="font-medium">{reserva.quadra?.nome}</span>
+              Quadra:{" "}
+              <span className="font-medium">{reserva.quadra?.nome}</span>
             </p>
             <p className="text-sm font-semibold text-gray-700">
               Data:{" "}

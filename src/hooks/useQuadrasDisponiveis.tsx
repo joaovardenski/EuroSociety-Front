@@ -1,14 +1,16 @@
 // hooks/useQuadrasDisponiveis.ts
 import { useState, useEffect } from "react";
 import axiosPrivate from "../api/axiosPrivate";
-import type { Quadra } from "../types/interfaces";
+import type { Quadra } from "../types/interfacesFront";
 
 type Indisponibilidade = { nome: string; indisponiveis: string[] };
 type Bloqueio = { nome: string; bloqueados: string[] };
 
 export function useQuadrasDisponiveis(dataSelecionada: string) {
   const [quadras, setQuadras] = useState<Quadra[]>([]);
-  const [indisponibilidades, setIndisponibilidades] = useState<Indisponibilidade[]>([]);
+  const [indisponibilidades, setIndisponibilidades] = useState<
+    Indisponibilidade[]
+  >([]);
   const [bloqueios, setBloqueios] = useState<Bloqueio[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -18,8 +20,12 @@ export function useQuadrasDisponiveis(dataSelecionada: string) {
       try {
         const [quadrasRes, indisponiveisRes, bloqueiosRes] = await Promise.all([
           axiosPrivate.get("/quadras"),
-          axiosPrivate.get("/reservas/indisponiveis", { params: { data: dataSelecionada } }),
-          axiosPrivate.get("/agenda-bloqueios/bloqueados-por-data", { params: { data: dataSelecionada } }),
+          axiosPrivate.get("/reservas/indisponiveis", {
+            params: { data: dataSelecionada },
+          }),
+          axiosPrivate.get("/agenda-bloqueios/bloqueados-por-data", {
+            params: { data: dataSelecionada },
+          }),
         ]);
 
         setQuadras(quadrasRes.data.data);

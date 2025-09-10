@@ -8,7 +8,7 @@ import {
   AlarmClockCheckIcon,
   Loader2,
 } from "lucide-react";
-import type { Quadra } from "../../../types/interfaces";
+import type { Quadra } from "../../../types/interfacesFront";
 
 interface ModalListaDeEsperaProps {
   isOpen: boolean;
@@ -53,8 +53,8 @@ export default function ModalListaDeEspera({
         </h2>
         <p className="text-sm text-gray-700 mb-4 max-w-sm">
           Mas não desanime! Entre na lista de espera e será avisado assim que{" "}
-          <span className="font-semibold text-azulBase">este horário</span> ficar
-          disponível.
+          <span className="font-semibold text-azulBase">este horário</span>{" "}
+          ficar disponível.
         </p>
 
         {/* Dados da reserva */}
@@ -68,11 +68,11 @@ export default function ModalListaDeEspera({
             {formatarDataBrasileira(dados.data)}
           </p>
           <p>
-            <span className="font-medium">Horário:</span> {dados.horario}
+            <span className="font-medium">Horário:</span> {dados.horario.split(" - ")[0]}
           </p>
           <p>
             <span className="font-medium">Valor:</span> R${" "}
-            {dados.valor.toFixed(2)}
+            {dados.valor}
           </p>
         </div>
 

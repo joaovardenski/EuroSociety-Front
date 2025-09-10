@@ -1,7 +1,7 @@
 // hooks/useAgendamentos.ts
 import { useState, useEffect } from "react";
 import axiosPrivate from "../api/axiosPrivate";
-import type { Reserva, ReservaBackend } from "../types/interfaces";
+import type { Reserva, ReservaBackend } from "../types/interfacesFront";
 
 const mapReservasFromBackend = (data: ReservaBackend[]): Reserva[] => {
   return data.map((reserva) => ({
@@ -20,7 +20,8 @@ const mapReservasFromBackend = (data: ReservaBackend[]): Reserva[] => {
     clienteNome: reserva.cliente_nome,
     createdAt: reserva.created_at,
     updatedAt: reserva.updated_at,
-    statusPagamento: parseFloat(reserva.pagamento_faltante) === 0 ? "Completo" : "Parcial",
+    statusPagamento:
+      parseFloat(reserva.pagamento_faltante) === 0 ? "Completo" : "Parcial",
   }));
 };
 

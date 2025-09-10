@@ -11,7 +11,7 @@ import ModalRecebimentoAdmin from "../../components/Modais/Admin/ModalRecebiment
 import ModalCancelarAdmin from "../../components/Modais/Admin/ModalCancelarAdmin";
 // Utils
 import { getCurrentDate } from "../../utils/DateUtils";
-import type { Reserva } from "../../types/interfaces";
+import type { Reserva } from "../../types/interfacesFront";
 import { useAgendamentosAtivos } from "../../hooks/useAgendamentosAtivos";
 import axiosPrivate from "../../api/axiosPrivate";
 
@@ -20,9 +20,14 @@ export default function ActiveBookingsAdmin() {
   const [searchQuery, setSearchQuery] = useState("");
   const [modalRecebimentoOpen, setModalRecebimentoOpen] = useState(false);
   const [modalCancelarOpen, setModalCancelarOpen] = useState(false);
-  const [agendamentoSelecionado, setAgendamentoSelecionado] = useState<Reserva | null>(null);
+  const [agendamentoSelecionado, setAgendamentoSelecionado] =
+    useState<Reserva | null>(null);
 
-  const { agendamentos, setAgendamentos, loading: isLoading } = useAgendamentosAtivos(dataSelecionada);
+  const {
+    agendamentos,
+    setAgendamentos,
+    loading: isLoading,
+  } = useAgendamentosAtivos(dataSelecionada);
 
   // Filtra os agendamentos com useMemo para melhor desempenho
   const agendamentosFiltrados = useMemo(() => {
@@ -46,11 +51,18 @@ export default function ActiveBookingsAdmin() {
   // Confirma pagamento restante
   const confirmarPagamentoRestante = async (reservaId: number) => {
     try {
-      await axiosPrivate.post(`/reservas/${reservaId}/confirmar-pagamento-restante`);
+      await axiosPrivate.post(
+        `/reservas/${reservaId}/confirmar-pagamento-restante`
+      );
       setAgendamentos((prev) =>
         prev.map((r) =>
           r.id === reservaId
-            ? { ...r, pagamentoFaltante: 0, status: "agendada", statusPagamento: "Completo" }
+            ? {
+                ...r,
+                pagamentoFaltante: 0,
+                status: "agendada",
+                statusPagamento: "Completo",
+              }
             : r
         )
       );
@@ -63,7 +75,9 @@ export default function ActiveBookingsAdmin() {
   // Cancela a reserva
   const cancelarReserva = async (reservaId: number) => {
     try {
-      await axiosPrivate.post(`/reservas/${reservaId}/cancelar?reembolso=false`);
+      await axiosPrivate.post(
+        `/reservas/${reservaId}/cancelar?reembolso=false`
+      );
       setAgendamentos((prev) => prev.filter((r) => r.id !== reservaId));
       setModalCancelarOpen(false);
     } catch (err) {
@@ -105,7 +119,9 @@ export default function ActiveBookingsAdmin() {
           </div>
 
           {isLoading ? (
-            <p className="text-center text-gray-500">Carregando agendamentos...</p>
+            <p className="text-center text-gray-500">
+              Carregando agendamentos...
+            </p>
           ) : (
             <TableActiveBookings
               reservas={agendamentosFiltrados}
@@ -130,7 +146,9 @@ export default function ActiveBookingsAdmin() {
             isOpen={modalRecebimentoOpen}
             onClose={() => setModalRecebimentoOpen(false)}
             dados={agendamentoSelecionado}
-            onConfirmar={() => confirmarPagamentoRestante(agendamentoSelecionado.id)}
+            onConfirmar={() =>
+              confirmarPagamentoRestante(agendamentoSelecionado.id)
+            }
           />
           <ModalCancelarAdmin
             isOpen={modalCancelarOpen}

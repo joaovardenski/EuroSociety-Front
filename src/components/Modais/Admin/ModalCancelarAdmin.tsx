@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Reserva } from "../../../types/interfaces";
+import type { Reserva } from "../../../types/interfacesFront";
 import { formatarDataIso } from "../../../utils/DateUtils";
 import Modal from "../Modal";
 import { AlertTriangle, ArrowLeftIcon, CircleX } from "lucide-react";
@@ -18,7 +18,8 @@ export default function ModalCancelarAdmin({
   onConfirmar,
 }: ModalCancelarAdminProps) {
   const [loading, setLoading] = useState(false); // Estado de loading
-  const nomeCliente = dados.cliente_nome ?? dados.user?.nome ?? "Cliente não informado";
+  const nomeCliente =
+    dados.cliente_nome ?? dados.user?.nome ?? "Cliente não informado";
 
   const handleConfirmar = async () => {
     setLoading(true);
@@ -45,9 +46,7 @@ export default function ModalCancelarAdmin({
         </h2>
         <p className="text-sm text-gray-600 mb-5 px-4">
           Ao cancelar este horário, o cliente{" "}
-          <span className="font-semibold text-gray-800">
-            {nomeCliente}
-          </span>{" "}
+          <span className="font-semibold text-gray-800">{nomeCliente}</span>{" "}
           será notificado imediatamente.
         </p>
 
