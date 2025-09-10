@@ -246,6 +246,7 @@ export default function Register() {
               label={loading ? "Registrando..." : "Registrar"}
               icon="register"
               disabled={loading}
+              loading={loading}
             />
           </form>
 

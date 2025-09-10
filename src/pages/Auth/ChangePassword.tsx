@@ -139,6 +139,7 @@ export default function ChangePassword() {
               label={loading ? "Redefinindo..." : "Confirmar redefinição"}
               icon="send"
               disabled={loading}
+              loading={loading}
             />
           </form>
 

@@ -115,6 +115,7 @@ export default function RecoverPassword() {
               label={loading ? "Enviando..." : "Enviar link de recuperação"}
               icon="send"
               disabled={loading}
+              loading={loading}
             />
           </form>
 
