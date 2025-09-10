@@ -112,7 +112,7 @@ export default function MyBookings() {
   // Determina se a reserva ainda pode ter reembolso
   function podeTerReembolso(reserva: Reserva): boolean {
   // Apenas reservas confirmadas e do tipo "unica" podem ter reembolso
-  if (reserva.status.toLowerCase() !== "confirmada" || reserva.tipoReserva !== "unica") {
+  if (reserva.status.toLowerCase() !== "confirmada" || reserva.tipo_reserva !== "unica") {
     return false;
   }
 

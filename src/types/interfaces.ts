@@ -54,7 +54,7 @@ export interface Reserva {
   id: number;
   userId?: number | null;
   quadraId: number;
-  tipoReserva: string;           // 'tipo_reserva'
+  tipo_reserva: string;           // 'tipo_reserva'
   mensalidadeId?: number | null;
   pagamentoId?: number | null;
   pagamentoFaltante: number;     // 'pagamento_faltante'

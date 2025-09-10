@@ -2,6 +2,8 @@ import { Calendar, Clock, DollarSign, Eye, CircleX } from "lucide-react";
 import type { Quadra, Reserva } from "../../types/interfaces";
 import { formatarDataIso } from "../../utils/DateUtils";
 import { capitalizeFirstLetter } from "../../utils/StringUtils";
+import ModalReservaDetalhes from "../Modais/Client/ModalReservaDetalhes";
+import { useState } from "react";
 
 interface BookingCardProps {
   reserva: Reserva;
@@ -16,8 +18,8 @@ export default function BookingCard({
   loading,
   onCancel,
 }: BookingCardProps) {
-
   const quadraInfo = quadras.find((q) => q.nome === reserva.quadra?.nome);
+  const [modalDetalhesAberto, setModalDetalhesAberto] = useState(false);
 
   function calcularValorReserva(slot: string): string {
     if (!quadraInfo) return "N/A";
@@ -75,7 +77,8 @@ export default function BookingCard({
           {reserva.quadra?.nome ?? "Quadra Desconhecida"}
         </h2>
         <p className="flex items-center gap-2">
-          <Calendar size={16} /> Data: <strong>{formatarDataIso(reserva.data)}</strong>
+          <Calendar size={16} /> Data:{" "}
+          <strong>{formatarDataIso(reserva.data)}</strong>
         </p>
         <p className="flex items-center gap-2">
           <Clock size={16} /> Horário: <strong>{reserva.slot}</strong>
@@ -101,7 +104,10 @@ export default function BookingCard({
 
       {/* Botões de ação */}
       <div className="flex md:flex-col items-stretch gap-2 mt-4 md:mt-0 md:ml-6 w-full md:w-auto">
-        <button className="flex items-center gap-2 bg-azulBase text-white px-4 py-1 rounded text-sm hover:bg-azulEscuro w-full md:w-[130px]">
+        <button
+          className="flex items-center gap-2 bg-azulBase text-white px-4 py-1 rounded text-sm hover:bg-azulEscuro w-full md:w-[130px]"
+          onClick={() => {setModalDetalhesAberto(true); console.log(reserva);}}
+        >
           <Eye size={16} /> Detalhes
         </button>
         {cancelamentoDisponivel() && (
@@ -113,6 +119,11 @@ export default function BookingCard({
           </button>
         )}
       </div>
+      <ModalReservaDetalhes
+        isOpen={modalDetalhesAberto}
+        onClose={() => setModalDetalhesAberto(false)}
+        reserva={reserva}
+      />
     </div>
   );
 }
