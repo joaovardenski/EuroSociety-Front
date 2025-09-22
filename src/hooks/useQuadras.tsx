@@ -12,10 +12,12 @@ export default function useQuadras() {
     const fetchQuadras = async () => {
       setLoading(true);
       try {
-        const response = await axiosPrivate.get<QuadraAPI[]>("/quadras");
+        const response = await axiosPrivate.get<{ data: QuadraAPI[] }>(
+          "/quadras"
+        );
 
-        // Mapeia cada quadra usando o mapQuadra
-        setQuadras(response.data.map(mapQuadra));
+        // acessar a propriedade data interna
+        setQuadras(response.data.data.map(mapQuadra));
       } catch (error) {
         console.error("Erro ao buscar quadras:", error);
       } finally {

@@ -35,7 +35,7 @@ export default function BookingCard({
       ? quadraInfo.precoNoturno
       : quadraInfo.precoNormal;
 
-    return `R$ ${preco.toFixed(2)}`;
+    return `R$ ${preco}`;
   }
 
   function reservaJaPassou(): boolean {
