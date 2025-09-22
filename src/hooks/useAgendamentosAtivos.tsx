@@ -17,6 +17,7 @@ export function useAgendamentosAtivos(dataSelecionada: string) {
         });
 
         setAgendamentos(response.data.map(mapReserva));
+        console.log(agendamentos);
       } catch (error) {
         console.error("Erro ao carregar agendamentos:", error);
       } finally {

@@ -20,7 +20,6 @@ export function useDashboardAdminData() {
       try {
         const response = await axiosPrivate.get("/admin/dashboard");
         setData(response.data.data);
-        console.log("Dados: ", response.data.data);
       } catch (error) {
         console.error("Erro ao carregar dashboard:", error);
       } finally {
