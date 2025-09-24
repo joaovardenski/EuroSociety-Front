@@ -21,8 +21,8 @@ interface HorarioButtonProps {
 
 const HorarioButton = ({ hora, isIndisponivel, isBloqueado, isAdmin, onClick }: HorarioButtonProps) => {
   const getButtonClasses = () => {
-    if (isIndisponivel) return "bg-yellow-200 text-gray-600 hover:bg-yellow-300/80";
     if (isBloqueado) return "bg-gray-300 text-gray-600 cursor-not-allowed";
+    if (isIndisponivel) return "bg-yellow-200 text-gray-600 hover:bg-yellow-300/80";
     return "bg-white text-azulBase border-azulBase hover:bg-azulBase hover:text-white";
   };
 

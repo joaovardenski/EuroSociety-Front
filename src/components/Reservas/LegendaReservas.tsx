@@ -8,7 +8,7 @@ export default function LegendaReservas() {
       </div>
       <div className="flex items-center gap-2">
         <div className="w-5 h-5 bg-yellow-200 rounded"></div>
-        <span className="text-gray-700">Indisponível (Fila de Espera)</span>
+        <span className="text-gray-700">Ocupado</span>
       </div>
       <div className="flex items-center gap-2">
         <div className="w-5 h-5 bg-gray-300 line-through rounded"></div>

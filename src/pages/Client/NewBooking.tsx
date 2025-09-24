@@ -117,6 +117,7 @@ export default function NewBooking() {
             { params: { data } }
           );
           bloqueiosData = bloqueiosRes.data ?? [];
+          console.log("Bloqueios fetched:", bloqueiosData);
           cacheBloqueios.set(data, bloqueiosData);
         }
 
