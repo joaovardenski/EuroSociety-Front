@@ -199,9 +199,6 @@ export default function AdminBooking() {
         (q) => q.nome === horarioSelecionado.quadra
       )?.id;
       if (!quadraId) return;
-      console.log(quadraId);
-      console.log(horarioSelecionado.data);
-      console.log(horarioSelecionado.horario.split(" - ")[0]);
 
       await axiosPrivate.post("/agenda-bloqueios/desbloquear", {
         quadra_id: quadraId,
