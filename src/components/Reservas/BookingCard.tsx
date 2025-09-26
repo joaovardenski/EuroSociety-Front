@@ -50,9 +50,7 @@ export default function BookingCard({
 
   function cancelamentoDisponivel(): boolean {
     return !(
-      reservaJaPassou() ||
-      reserva.status.toLowerCase() === "cancelada" ||
-      reserva.status.toLowerCase() === "pendente"
+      reservaJaPassou() || reserva.status.toLowerCase() !== "confirmada"
     );
   }
 

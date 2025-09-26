@@ -27,6 +27,10 @@ export default function MyBookings() {
   // -----------------------
   const [reservas, setReservas] = useState<Reserva[]>([]);
   const [searchOption, setSearchOption] = useState<FiltroReservas>("Próximas");
+  const [meta, setMeta] = useState<{
+    current_page: number;
+    last_page: number;
+  } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -39,11 +43,10 @@ export default function MyBookings() {
   // Funções auxiliares
   // -----------------------
 
-  // Carrega reservas do usuário com base no filtro
-  async function carregarReservas(filtro: FiltroReservas) {
+  async function carregarReservas(filtro: FiltroReservas, page = 1) {
     setIsLoading(true);
     try {
-      const reservasAPI = await getMinhasReservas(filtro);
+      const { data: reservasAPI, meta } = await getMinhasReservas(filtro, page);
 
       // Mapeia cada reserva para data + horário em Date
       const reservasComData = reservasAPI.map((reserva) => {
@@ -72,7 +75,8 @@ export default function MyBookings() {
         )
         .sort((a, b) => b.dataHora.getTime() - a.dataHora.getTime());
 
-      setReservas([...ativas, ...passadas]);
+      setReservas([...ativas, ...passadas]); // salva reservas
+      setMeta(meta); // salva paginação
     } catch (error) {
       console.error("Erro ao carregar reservas:", error);
       setReservas([]);
@@ -80,6 +84,10 @@ export default function MyBookings() {
       setIsLoading(false);
     }
   }
+
+  useEffect(() => {
+    carregarReservas(searchOption); // só o filtro
+  }, [searchOption]);
 
   // Abrir modal de cancelamento
   function abrirModal(reserva: Reserva) {
@@ -176,6 +184,7 @@ export default function MyBookings() {
                 )}
               </div>
             </div>
+
             <hr className="hidden md:block mb-6 border-t-2 rounded-2xl border-azulBase opacity-70" />
 
             {/* Lista de reservas */}
@@ -204,6 +213,37 @@ export default function MyBookings() {
                 ))
               )}
             </div>
+
+            {/* Paginação */}
+            {meta && meta.last_page > 1 && (
+              <div className="flex justify-center items-center gap-4 mt-8">
+                <button
+                  disabled={meta.current_page === 1}
+                  onClick={() =>
+                    carregarReservas(searchOption, meta.current_page - 1)
+                  }
+                  className="px-4 py-2 rounded-lg border border-azulBase text-azulBase 
+                           hover:bg-azulBase hover:text-white transition disabled:opacity-50"
+                >
+                  Anterior
+                </button>
+
+                <span className="text-gray-600 font-medium">
+                  Página {meta.current_page} de {meta.last_page}
+                </span>
+
+                <button
+                  disabled={meta.current_page === meta.last_page}
+                  onClick={() =>
+                    carregarReservas(searchOption, meta.current_page + 1)
+                  }
+                  className="px-4 py-2 rounded-lg border border-azulBase text-azulBase 
+                           hover:bg-azulBase hover:text-white transition disabled:opacity-50"
+                >
+                  Próxima
+                </button>
+              </div>
+            )}
           </>
         )}
       </main>
@@ -224,8 +264,6 @@ export default function MyBookings() {
           />
         )}
       </Modal>
-
-      
     </div>
   );
 }

@@ -10,6 +10,7 @@ import type { Reserva } from "../../types/interfacesFront";
 import { useAuth } from "../../hooks/useAuth";
 import { getNomeCondensado } from "../../utils/NameUtils";
 import useReservas from "../../hooks/useReservas";
+import useActiveBookingsCount from "../../hooks/useUserAgendamentosAtivos";
 
 type ReservaComDataHora = Reserva & { dataHora: Date };
 
@@ -24,6 +25,10 @@ function Dashboard() {
   }, [auth.user?.nome]);
 
   const { reservas, isLoading } = useReservas(
+    auth.isAuthenticated && !auth.isLoading
+  );
+
+  const { count: activeBookingsCount } = useActiveBookingsCount(
     auth.isAuthenticated && !auth.isLoading
   );
 
@@ -68,7 +73,7 @@ function Dashboard() {
             <div className="flex flex-wrap gap-6 justify-center w-full max-w-6xl mb-10 md:mb-0">
               <ProximaReservaCard reserva={lastBooking} />
               <CardNovaReserva />
-              <ReservasAtivasCard count={activeBookings.length} />
+              <ReservasAtivasCard count={activeBookingsCount} />
             </div>
           </>
         )}
