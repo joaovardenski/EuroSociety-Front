@@ -64,12 +64,16 @@ export default function NewBooking() {
     data: string;
     valor: number;
     mensalistaDisponivel: boolean;
+    jaNaFila?: boolean;
+    jaTemReserva?: boolean;
   }>({
     quadra: null,
     horario: "",
     data: dataSelecionada,
     valor: 0,
     mensalistaDisponivel: false,
+    jaNaFila: false,
+    jaTemReserva: false,
   });
 
   const { user, isLoading: isLoadingAuth } = useAuth();
@@ -178,9 +182,11 @@ export default function NewBooking() {
 
       const valor = calcularValor(quadra, horario, false);
 
+      // Prepara os dados iniciais
+      const horarioCompleto = `${horario} - ${gerarHorarioFim(horario)}`;
       setHorarioSelecionado({
         quadra,
-        horario: `${horario} - ${gerarHorarioFim(horario)}`,
+        horario: horarioCompleto,
         data: dataSelecionada,
         valor,
         mensalistaDisponivel: false,
@@ -188,12 +194,44 @@ export default function NewBooking() {
 
       console.log({ quadra, horario, dataSelecionada, valor });
 
+      // Se estiver bloqueado, não faz nada
       if (bloqueado) return;
+
+      // Se horário indisponível, verifica se usuário já está na fila
       if (indisponivel) {
-        setModalAtivo("fila");
+        console.log("Verificando lista de espera...");
+        try {
+          const params = new URLSearchParams({
+            quadra_id: quadraId.toString(),
+            data: dataSelecionada,
+            slot: horario,
+          });
+          console.log("Params:", params);
+
+          const response = await axiosPrivate.get(
+            `/lista-espera/verificar-fila?${params.toString()}`
+          );
+
+          const { jaNaFila, jaTemReserva } = response.data;
+
+          console.log("Resposta da verificação:", response.data);
+
+          setHorarioSelecionado((prev) => ({
+            ...prev,
+            jaNaFila,
+            jaTemReserva,
+          }));
+
+          setModalAtivo("fila");
+        } catch (error) {
+          console.error("Erro ao verificar fila de espera:", error);
+          alert("Ocorreu um erro ao verificar a lista de espera.");
+        }
+
         return;
       }
 
+      // Se o horário está disponível, verifica mensalidade
       try {
         const response = await axiosPrivate.post(
           "/mensalidades/check-disponibilidade",
@@ -402,6 +440,8 @@ export default function NewBooking() {
           isOpen
           onClose={() => setModalAtivo(null)}
           dados={horarioSelecionado}
+          jaNaFila={horarioSelecionado.jaNaFila}
+          jaTemReserva={horarioSelecionado.jaTemReserva}
           onEntrarLista={handleEntrarLista}
         />
       )}
